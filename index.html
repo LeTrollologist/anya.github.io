@@ -9,16 +9,25 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-
 body{
     overflow:hidden;
     height:100vh;
     font-family:'Playfair Display',serif;
     color:white;
+    background:black;
     transition:background 3s ease;
 }
 
-/* TEXT */
+/* Cinematic vignette */
+body::after{
+    content:'';
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:radial-gradient(circle at center,transparent 60%,rgba(0,0,0,0.8));
+}
+
+/* Text */
 .love-text{
     position:absolute;
     width:100%;
@@ -26,19 +35,13 @@ body{
     top:35%;
     font-family:'Great Vibes',cursive;
     font-size:clamp(2.5rem,6vw,5rem);
-    animation:floatText 6s ease-in-out infinite, heartbeat 1.8s infinite;
+    animation:floatText 6s ease-in-out infinite, heartbeatVisual 1.8s infinite;
     text-shadow:0 0 25px rgba(255,255,255,0.9);
 }
-@keyframes floatText{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-15px)}
-}
-@keyframes heartbeat{
-    0%,100%{transform:scale(1)}
-    50%{transform:scale(1.05)}
-}
+@keyframes floatText{50%{transform:translateY(-15px);}}
+@keyframes heartbeatVisual{50%{transform:scale(1.05);}}
 
-/* COUNTER */
+/* Counter */
 .counter{
     position:absolute;
     bottom:20px;
@@ -47,55 +50,21 @@ body{
     font-size:clamp(0.8rem,3vw,1.2rem);
 }
 
-/* ENVELOPE */
-.envelope{
-    position:absolute;
-    top:65%;
-    left:50%;
-    transform:translateX(-50%);
-    width:100px;height:70px;
-    background:#f4e4c1;
-    cursor:pointer;
-}
-.envelope:before{
-    content:'';
-    position:absolute;
-    width:0;height:0;
-    border-left:50px solid transparent;
-    border-right:50px solid transparent;
-    border-bottom:35px solid #e6d3a3;
-    top:-35px;
-}
+/* Letter */
 .letter{
     position:absolute;
     top:50%;left:50%;
     transform:translate(-50%,-50%);
-    width:90%;
-    max-width:500px;
-    background:white;
+    width:90%;max-width:500px;
+    background:#fffef8;
     color:#333;
     padding:30px;
     border-radius:10px;
     display:none;
+    font-family:cursive;
 }
 
-/* FUTURE */
-.future{
-    position:absolute;
-    inset:0;
-    background:rgba(255,182,193,0.15);
-    backdrop-filter:blur(8px);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Great Vibes',cursive;
-    font-size:clamp(2rem,6vw,4rem);
-    opacity:0;
-    transition:1s;
-    pointer-events:none;
-}
-
-/* MARRY MODE */
+/* Proposal Mode */
 .marry{
     position:absolute;
     inset:0;
@@ -108,26 +77,22 @@ body{
     font-size:clamp(2rem,6vw,4rem);
     opacity:0;
     transition:2s;
-    text-align:center;
 }
 
 .ring{
-    width:100px;
-    height:100px;
-    border:8px solid gold;
+    width:120px;height:120px;
+    border:10px solid gold;
     border-radius:50%;
     margin-bottom:30px;
     box-shadow:0 0 20px gold;
-    animation:ringPulse 2s infinite;
+    animation:ringSlide 2s ease forwards;
+    transform:translateY(-200px) rotateY(0deg);
 }
-@keyframes ringPulse{
-    0%,100%{transform:scale(1); box-shadow:0 0 20px gold;}
-    50%{transform:scale(1.1); box-shadow:0 0 40px gold;}
+@keyframes ringSlide{
+    to{transform:translateY(0) rotateY(360deg);}
 }
 
-.buttons{
-    margin-top:20px;
-}
+/* Buttons */
 button{
     padding:10px 25px;
     margin:10px;
@@ -139,11 +104,12 @@ button{
 .yes{background:#ff69b4;color:white;}
 .no{background:#555;color:white;}
 
-/* ENDING */
+/* Ending */
 .ending{
     position:absolute;
     inset:0;
-    background:black;
+    background:white;
+    color:black;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -153,25 +119,20 @@ button{
     transition:3s;
 }
 
-/* PETALS */
+/* Petals */
 .petal{
     position:absolute;
-    width:15px;
-    height:15px;
+    width:15px;height:15px;
     background:radial-gradient(circle at 30% 30%,pink,#ff69b4);
     border-radius:50% 50% 50% 0;
     animation:fall linear infinite;
-    pointer-events: none;   /* 🔥 THIS FIXES IT */
-    z-index: 1;
+    pointer-events:none;
 }
-@keyframes fall{
-    to{transform:translateY(110vh) rotate(360deg);}
-}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
 
-canvas{position:absolute;top:0;left:0;}
+canvas{position:absolute;top:0;left:0;pointer-events:none;}
 </style>
 </head>
-
 <body>
 
 <canvas id="stars"></canvas>
@@ -180,44 +141,46 @@ canvas{position:absolute;top:0;left:0;}
 <div class="love-text">I love you Anya</div>
 <div class="counter" id="counter"></div>
 
-<div class="envelope" id="envelope"></div>
-<div class="letter" id="letter">
-<h2>My Dearest Anya 💖</h2>
-<p>You are written in my sky and in every future I see.</p>
-</div>
-
-<div class="future" id="future">Our future is endless ♡</div>
+<div class="letter" id="letter"></div>
 
 <div class="marry" id="marry">
 <div class="ring"></div>
 <div>Anya… will you marry me? 💍</div>
-<div class="buttons">
+<div>
 <button class="yes" onclick="sayYes()">Yes</button>
-<button class="no" onclick="moveNo(this)">No</button>
+<button class="no" onclick="sayNo()">No</button>
 </div>
 </div>
 
-<div class="ending" id="ending">Forever begins now ♡</div>
+<div class="ending" id="ending">Forever begins now ♡<br>17 February 2026</div>
 
 <audio id="ocean" loop>
-<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c3c3e57e3.mp3" type="audio/mpeg">
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c3c3e57e3.mp3">
+</audio>
+
+<audio id="heartbeat">
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_20a4c8c1e1.mp3">
+</audio>
+
+<audio id="orchestra">
+<source src="https://cdn.pixabay.com/audio/2022/10/18/audio_8b5bb09b35.mp3">
 </audio>
 
 <script>
 
-/* IST SKY */
+/* IST SKY + DYNAMIC MOON */
 function setSky(){
-    const now = new Date();
-    const istHour = (now.getUTCHours() + 5.5) % 24;
-    if(istHour >= 6 && istHour < 18){
-        document.body.style.background="linear-gradient(to bottom,#87CEEB,#FFD1DC)";
+    const now=new Date();
+    const istHour=(now.getUTCHours()+5.5)%24;
+    if(istHour>=6 && istHour<18){
+        document.body.style.background="linear-gradient(#87CEEB,#FFD1DC)";
     } else {
         document.body.style.background="radial-gradient(circle at center,#0f2027,#000)";
     }
 }
 setSky();
 
-/* COUNTER */
+/* Forever Counter */
 const startDate=new Date("2026-02-17T16:19:00");
 setInterval(()=>{
 const diff=new Date()-startDate;
@@ -228,31 +191,28 @@ const s=Math.floor(diff/1000%60);
 counter.innerText=`Together for ${d} days, ${h} hours, ${m} minutes, ${s} seconds ♡`;
 },1000);
 
-/* WAVES */
-const waveCanvas=document.getElementById("waves");
-const wctx=waveCanvas.getContext("2d");
-waveCanvas.width=innerWidth;
-waveCanvas.height=innerHeight;
-let offset=0;
-function drawWaves(){
-wctx.clearRect(0,0,waveCanvas.width,waveCanvas.height);
-wctx.fillStyle="rgba(0,105,148,0.5)";
-wctx.beginPath();
-wctx.moveTo(0,waveCanvas.height*0.75);
-for(let x=0;x<=waveCanvas.width;x++){
-let y=Math.sin(x*0.01+offset)*20+waveCanvas.height*0.75;
-wctx.lineTo(x,y);
-}
-wctx.lineTo(waveCanvas.width,waveCanvas.height);
-wctx.lineTo(0,waveCanvas.height);
-wctx.closePath();
-wctx.fill();
-offset+=0.02;
-requestAnimationFrame(drawWaves);
-}
-drawWaves();
+/* Stars Morph + Glow */
+const starCanvas=document.getElementById("stars");
+const ctx=starCanvas.getContext("2d");
+starCanvas.width=innerWidth;
+starCanvas.height=innerHeight;
 
-/* PETALS */
+let stars=[];
+for(let i=0;i<500;i++){
+stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,size:1});
+}
+
+function drawStars(){
+ctx.clearRect(0,0,innerWidth,innerHeight);
+stars.forEach(s=>{
+ctx.fillStyle="white";
+ctx.fillRect(s.x,s.y,1+Math.sin(Date.now()*0.005),1+Math.sin(Date.now()*0.005));
+});
+requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* Petals React */
 for(let i=0;i<40;i++){
 let p=document.createElement("div");
 p.className="petal";
@@ -261,101 +221,45 @@ p.style.animationDuration=(5+Math.random()*5)+"s";
 document.body.appendChild(p);
 }
 
-/* STARS MORPH + PULSE */
-const starCanvas=document.getElementById("stars");
-const sctx=starCanvas.getContext("2d");
-starCanvas.width=innerWidth;
-starCanvas.height=innerHeight;
-
-let stars=[];
-for(let i=0;i<400;i++){
-stars.push({x:Math.random()*starCanvas.width,y:Math.random()*starCanvas.height,size:1});
+/* Handwritten Letter */
+const text="You are written in my sky and in every future I see.";
+let i=0;
+function writeLetter(){
+if(i<text.length){
+letter.innerHTML+=text.charAt(i);
+i++;
+setTimeout(writeLetter,50);
 }
-
-function getTextPoints(text){
-let temp=document.createElement("canvas");
-let tctx=temp.getContext("2d");
-temp.width=starCanvas.width;
-temp.height=starCanvas.height;
-tctx.font="bold 150px Arial";
-tctx.fillText(text,starCanvas.width/2-200,starCanvas.height/2);
-let data=tctx.getImageData(0,0,temp.width,temp.height).data;
-let pts=[];
-for(let y=0;y<temp.height;y+=6){
-for(let x=0;x<temp.width;x+=6){
-if(data[(y*temp.width+x)*4]>150) pts.push({x,y});
-}}
-return pts;
 }
-let anyaPts=getTextPoints("ANYA");
-
-setTimeout(()=>{
-stars.forEach((s,i)=>{
-let p=anyaPts[i%anyaPts.length];
-s.tx=p.x;s.ty=p.y;
-});
-},3000);
-
-function drawStars(){
-sctx.clearRect(0,0,starCanvas.width,starCanvas.height);
-stars.forEach(s=>{
-if(s.tx){
-s.x+=(s.tx-s.x)*0.02;
-s.y+=(s.ty-s.y)*0.02;
-s.size=1+Math.sin(Date.now()*0.005)*1.5;
-}
-sctx.fillStyle="white";
-sctx.fillRect(s.x,s.y,s.size,s.size);
-});
-requestAnimationFrame(drawStars);
-}
-drawStars();
-
-/* SHOOTING STARS */
-document.addEventListener("click",e=>{
-let sx=e.clientX;
-let sy=e.clientY;
-sctx.strokeStyle="white";
-sctx.beginPath();
-sctx.moveTo(sx,sy);
-sctx.lineTo(sx+200,sy+50);
-sctx.stroke();
-});
-
-/* PRESS HOLD FUTURE */
-let holdTimer;
-document.body.addEventListener("mousedown",()=>{
-holdTimer=setTimeout(()=>future.style.opacity=1,800);
-});
-document.body.addEventListener("mouseup",()=>{
-clearTimeout(holdTimer);
-future.style.opacity=0;
-});
-
-/* ENVELOPE */
-envelope.onclick=()=>{
+document.body.addEventListener("dblclick",()=>{
 letter.style.display="block";
+writeLetter();
 ocean.play();
-};
+});
 
-/* SECRET MARRY MODE (press H 5 times) */
+/* Proposal Trigger */
 let keyCount=0;
 document.addEventListener("keydown",e=>{
-if(e.key==="h"){keyCount++; if(keyCount>=5){marry.style.opacity=1;}}
-});
+if(e.key==="h"){keyCount++; if(keyCount>=5){
+marry.style.opacity=1;
+heartbeat.play();
+}}});
 
-/* YES / NO */
+/* Yes */
 function sayYes(){
 marry.style.opacity=0;
+orchestra.play();
 ending.style.opacity=1;
 }
-function moveNo(btn){
-btn.style.position="absolute";
-btn.style.left=Math.random()*80+"%";
-btn.style.top=Math.random()*80+"%";
+
+/* No */
+function sayNo(){
+document.querySelector(".no").style.opacity=0;
+setTimeout(()=>{
+alert("I’ll keep asking forever 💖");
+},500);
 }
 
 </script>
 </body>
 </html>
-
