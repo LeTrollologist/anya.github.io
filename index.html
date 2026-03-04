@@ -132,26 +132,69 @@ drawStars();
 for(let i=0;i<40;i++){let g=document.createElement("div");g.className="glitter";g.style.left=Math.random()*100+"vw";g.style.animationDuration=(5+Math.random()*5)+"s";document.body.appendChild(g);}
 
 /* ====== MOON PHASES ====== */
-const moonCanvas=document.getElementById("moon"), moonCtx=moonCanvas.getContext("2d");
-moonCanvas.width=innerWidth; moonCanvas.height=innerHeight;
-function drawMoon(){
-  moonCtx.clearRect(0,0,innerWidth,innerHeight);
-  const today=new Date();
-  const lunarDay=(today.getDate()%29.53); // simple phase
-  let radius=40;
-  let x=innerWidth*0.5 + Math.cos((lunarDay/29.53)*2*Math.PI)*innerWidth*0.3;
-  let y=innerHeight*0.2 + Math.sin((lunarDay/29.53)*2*Math.PI)*50;
-  moonCtx.beginPath();
-  moonCtx.arc(x,y,radius,0,Math.PI*2);
-  moonCtx.fillStyle="#fffacd";
-  moonCtx.fill();
-  moonCtx.beginPath();
-  moonCtx.arc(x,y,radius,0,Math.PI*2);
-  moonCtx.fillStyle="rgba(0,0,0,"+(1-Math.sin((lunarDay/29.53)*Math.PI))+")";
-  moonCtx.fill();
-  requestAnimationFrame(drawMoon);
+<script>
+// Moon Canvas
+const moonCanvas = document.getElementById("moon");
+const moonCtx = moonCanvas.getContext("2d");
+moonCanvas.width = innerWidth;
+moonCanvas.height = innerHeight;
+
+// Function to calculate moon phase (0=new, 0.5=full, 1=new)
+function getMoonPhase(date) {
+    const lp = 29.530588853; // lunar cycle in days
+    const newMoon = new Date(2026, 1, 17); // reference new moon
+    const diff = date - newMoon;
+    const days = diff / (1000*60*60*24);
+    return (days % lp) / lp; // 0-1
 }
+
+// Draw moon with realistic phase
+function drawMoon(){
+    moonCtx.clearRect(0, 0, innerWidth, innerHeight);
+
+    const now = new Date();
+    const phase = getMoonPhase(now);
+    
+    // Position across the sky based on time
+    const hour = now.getHours() + now.getMinutes()/60;
+    const x = (hour / 24) * innerWidth;
+    const y = innerHeight * 0.2 + Math.sin((hour/24) * Math.PI*2) * 50;
+
+    const radius = 40;
+
+    // Draw the moon body
+    moonCtx.beginPath();
+    moonCtx.arc(x, y, radius, 0, Math.PI*2);
+    moonCtx.fillStyle = "#fffacd";
+    moonCtx.fill();
+
+    // Draw shadow to simulate phase
+    moonCtx.globalCompositeOperation = "destination-out";
+    moonCtx.beginPath();
+
+    // waxing/waning logic
+    const angle = phase * 2 * Math.PI;
+    if(phase <= 0.5){
+        // Waxing: shadow on left
+        moonCtx.ellipse(x - Math.cos(angle) * radius, y, radius, radius, 0, 0, Math.PI*2);
+    } else {
+        // Waning: shadow on right
+        moonCtx.ellipse(x + Math.cos(angle) * radius, y, radius, radius, 0, 0, Math.PI*2);
+    }
+    moonCtx.fill();
+    moonCtx.globalCompositeOperation = "source-over";
+
+    requestAnimationFrame(drawMoon);
+}
+
 drawMoon();
+
+// Make canvas responsive
+window.addEventListener("resize", () => {
+    moonCanvas.width = innerWidth;
+    moonCanvas.height = innerHeight;
+});
+</script>
 
 /* ====== PETALS ====== */
 for(let i=0;i<40;i++){
@@ -198,3 +241,4 @@ function sayNo(){document.querySelector(".no").style.opacity=0;setTimeout(()=>{a
 </script>
 </body>
 </html>
+
