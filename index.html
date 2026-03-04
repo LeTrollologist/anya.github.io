@@ -13,18 +13,9 @@
 body{
     overflow:hidden;
     height:100vh;
-    background:radial-gradient(circle at center,#0f2027,#203a43,#000);
     font-family:'Playfair Display',serif;
     color:white;
-    perspective:1200px;
-}
-
-/* PARALLAX CONTAINER */
-.scene{
-    width:100%;
-    height:100%;
-    transform-style:preserve-3d;
-    transition:transform 0.1s ease;
+    transition:background 3s ease;
 }
 
 /* TEXT */
@@ -35,22 +26,16 @@ body{
     top:35%;
     font-family:'Great Vibes',cursive;
     font-size:clamp(2.5rem,6vw,5rem);
-    animation:floatText 6s ease-in-out infinite;
+    animation:floatText 6s ease-in-out infinite, heartbeat 1.8s infinite;
     text-shadow:0 0 25px rgba(255,255,255,0.9);
 }
-
 @keyframes floatText{
     0%,100%{transform:translateY(0)}
     50%{transform:translateY(-15px)}
 }
-
-/* HEARTBEAT EFFECT */
 @keyframes heartbeat{
     0%,100%{transform:scale(1)}
     50%{transform:scale(1.05)}
-}
-.heartbeat{
-    animation:heartbeat 1.8s infinite;
 }
 
 /* COUNTER */
@@ -60,7 +45,6 @@ body{
     width:100%;
     text-align:center;
     font-size:clamp(0.8rem,3vw,1.2rem);
-    opacity:0.9;
 }
 
 /* ENVELOPE */
@@ -69,8 +53,7 @@ body{
     top:65%;
     left:50%;
     transform:translateX(-50%);
-    width:100px;
-    height:70px;
+    width:100px;height:70px;
     background:#f4e4c1;
     cursor:pointer;
 }
@@ -96,19 +79,7 @@ body{
     display:none;
 }
 
-/* SURPRISE */
-.surprise{
-    position:absolute;
-    top:10%;
-    width:100%;
-    text-align:center;
-    font-family:'Great Vibes',cursive;
-    font-size:clamp(1.5rem,4vw,3rem);
-    opacity:0;
-    transition:1.5s;
-}
-
-/* FUTURE OVERLAY */
+/* FUTURE */
 .future{
     position:absolute;
     inset:0;
@@ -124,13 +95,70 @@ body{
     pointer-events:none;
 }
 
+/* MARRY MODE */
+.marry{
+    position:absolute;
+    inset:0;
+    background:black;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-family:'Great Vibes',cursive;
+    font-size:clamp(2rem,6vw,4rem);
+    opacity:0;
+    transition:2s;
+    text-align:center;
+}
+
+.ring{
+    width:100px;
+    height:100px;
+    border:8px solid gold;
+    border-radius:50%;
+    margin-bottom:30px;
+    box-shadow:0 0 20px gold;
+    animation:ringPulse 2s infinite;
+}
+@keyframes ringPulse{
+    0%,100%{transform:scale(1); box-shadow:0 0 20px gold;}
+    50%{transform:scale(1.1); box-shadow:0 0 40px gold;}
+}
+
+.buttons{
+    margin-top:20px;
+}
+button{
+    padding:10px 25px;
+    margin:10px;
+    font-size:1rem;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+}
+.yes{background:#ff69b4;color:white;}
+.no{background:#555;color:white;}
+
+/* ENDING */
+.ending{
+    position:absolute;
+    inset:0;
+    background:black;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Great Vibes',cursive;
+    font-size:clamp(2rem,7vw,5rem);
+    opacity:0;
+    transition:3s;
+}
+
 /* PETALS */
 .petal{
     position:absolute;
     width:15px;height:15px;
     background:radial-gradient(circle at 30% 30%,pink,#ff69b4);
     border-radius:50% 50% 50% 0;
-    opacity:0.8;
     animation:fall linear infinite;
 }
 @keyframes fall{
@@ -143,89 +171,59 @@ canvas{position:absolute;top:0;left:0;}
 
 <body>
 
-<div class="scene" id="scene">
-
 <canvas id="stars"></canvas>
 <canvas id="waves"></canvas>
 
-<div class="love-text heartbeat">I love you Anya</div>
-
-<div class="surprise" id="surprise">You are my forever 🌙</div>
-
+<div class="love-text">I love you Anya</div>
 <div class="counter" id="counter"></div>
 
 <div class="envelope" id="envelope"></div>
-
 <div class="letter" id="letter">
 <h2>My Dearest Anya 💖</h2>
-<p>
-From the moment we met, my world changed forever.
-You are my peace, my warmth, my future.
-Every second with you feels written in the stars.
-I love you endlessly.
-</p>
+<p>You are written in my sky and in every future I see.</p>
 </div>
 
 <div class="future" id="future">Our future is endless ♡</div>
+
+<div class="marry" id="marry">
+<div class="ring"></div>
+<div>Anya… will you marry me? 💍</div>
+<div class="buttons">
+<button class="yes" onclick="sayYes()">Yes</button>
+<button class="no" onclick="moveNo(this)">No</button>
+</div>
+</div>
+
+<div class="ending" id="ending">Forever begins now ♡</div>
 
 <audio id="ocean" loop>
 <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c3c3e57e3.mp3" type="audio/mpeg">
 </audio>
 
-</div>
-
 <script>
 
-/* FOREVER COUNTER */
+/* IST SKY */
+function setSky(){
+    const now = new Date();
+    const istHour = (now.getUTCHours() + 5.5) % 24;
+    if(istHour >= 6 && istHour < 18){
+        document.body.style.background="linear-gradient(to bottom,#87CEEB,#FFD1DC)";
+    } else {
+        document.body.style.background="radial-gradient(circle at center,#0f2027,#000)";
+    }
+}
+setSky();
+
+/* COUNTER */
 const startDate=new Date("2026-02-17T16:19:00");
-function updateCounter(){
-const now=new Date();
-const diff=now-startDate;
+setInterval(()=>{
+const diff=new Date()-startDate;
 const d=Math.floor(diff/86400000);
 const h=Math.floor(diff/3600000%24);
 const m=Math.floor(diff/60000%60);
 const s=Math.floor(diff/1000%60);
 counter.innerText=`Together for ${d} days, ${h} hours, ${m} minutes, ${s} seconds ♡`;
-}
-setInterval(updateCounter,1000);
-
-/* PARALLAX */
-const scene=document.getElementById("scene");
-document.addEventListener("mousemove",e=>{
-let x=(e.clientX/window.innerWidth-0.5)*10;
-let y=(e.clientY/window.innerHeight-0.5)*10;
-scene.style.transform=`rotateY(${x}deg) rotateX(${-y}deg)`;
-});
-
-/* PRESS & HOLD FUTURE */
-let holdTimer;
-document.body.addEventListener("mousedown",()=>{
-holdTimer=setTimeout(()=>future.style.opacity=1,800);
-});
-document.body.addEventListener("mouseup",()=>{
-clearTimeout(holdTimer);
-future.style.opacity=0;
-});
-
-/* ENVELOPE */
-envelope.onclick=()=>{
-letter.style.display="block";
-ocean.play();
-};
-
-/* SURPRISE */
-document.body.addEventListener("click",()=>{
-surprise.style.opacity=1;
-});
-
-/* PETALS */
-for(let i=0;i<40;i++){
-let p=document.createElement("div");
-p.className="petal";
-p.style.left=Math.random()*100+"vw";
-p.style.animationDuration=(5+Math.random()*5)+"s";
-document.body.appendChild(p);
-}
+},1000);
 
 /* WAVES */
 const waveCanvas=document.getElementById("waves");
@@ -251,34 +249,109 @@ requestAnimationFrame(drawWaves);
 }
 drawWaves();
 
-/* STARS FORMING ANYA */
+/* PETALS */
+for(let i=0;i<40;i++){
+let p=document.createElement("div");
+p.className="petal";
+p.style.left=Math.random()*100+"vw";
+p.style.animationDuration=(5+Math.random()*5)+"s";
+document.body.appendChild(p);
+}
+
+/* STARS MORPH + PULSE */
 const starCanvas=document.getElementById("stars");
 const sctx=starCanvas.getContext("2d");
 starCanvas.width=innerWidth;
 starCanvas.height=innerHeight;
 
 let stars=[];
-for(let i=0;i<200;i++){
-stars.push({
-x:Math.random()*starCanvas.width,
-y:Math.random()*starCanvas.height,
-size:Math.random()*2
-});
+for(let i=0;i<400;i++){
+stars.push({x:Math.random()*starCanvas.width,y:Math.random()*starCanvas.height,size:1});
 }
+
+function getTextPoints(text){
+let temp=document.createElement("canvas");
+let tctx=temp.getContext("2d");
+temp.width=starCanvas.width;
+temp.height=starCanvas.height;
+tctx.font="bold 150px Arial";
+tctx.fillText(text,starCanvas.width/2-200,starCanvas.height/2);
+let data=tctx.getImageData(0,0,temp.width,temp.height).data;
+let pts=[];
+for(let y=0;y<temp.height;y+=6){
+for(let x=0;x<temp.width;x+=6){
+if(data[(y*temp.width+x)*4]>150) pts.push({x,y});
+}}
+return pts;
+}
+let anyaPts=getTextPoints("ANYA");
+
+setTimeout(()=>{
+stars.forEach((s,i)=>{
+let p=anyaPts[i%anyaPts.length];
+s.tx=p.x;s.ty=p.y;
+});
+},3000);
 
 function drawStars(){
 sctx.clearRect(0,0,starCanvas.width,starCanvas.height);
-sctx.fillStyle="white";
 stars.forEach(s=>{
-sctx.beginPath();
-sctx.arc(s.x,s.y,s.size,0,Math.PI*2);
-sctx.fill();
+if(s.tx){
+s.x+=(s.tx-s.x)*0.02;
+s.y+=(s.ty-s.y)*0.02;
+s.size=1+Math.sin(Date.now()*0.005)*1.5;
+}
+sctx.fillStyle="white";
+sctx.fillRect(s.x,s.y,s.size,s.size);
 });
 requestAnimationFrame(drawStars);
 }
 drawStars();
 
-</script>
+/* SHOOTING STARS */
+document.addEventListener("click",e=>{
+let sx=e.clientX;
+let sy=e.clientY;
+sctx.strokeStyle="white";
+sctx.beginPath();
+sctx.moveTo(sx,sy);
+sctx.lineTo(sx+200,sy+50);
+sctx.stroke();
+});
 
+/* PRESS HOLD FUTURE */
+let holdTimer;
+document.body.addEventListener("mousedown",()=>{
+holdTimer=setTimeout(()=>future.style.opacity=1,800);
+});
+document.body.addEventListener("mouseup",()=>{
+clearTimeout(holdTimer);
+future.style.opacity=0;
+});
+
+/* ENVELOPE */
+envelope.onclick=()=>{
+letter.style.display="block";
+ocean.play();
+};
+
+/* SECRET MARRY MODE (press H 5 times) */
+let keyCount=0;
+document.addEventListener("keydown",e=>{
+if(e.key==="h"){keyCount++; if(keyCount>=5){marry.style.opacity=1;}}
+});
+
+/* YES / NO */
+function sayYes(){
+marry.style.opacity=0;
+ending.style.opacity=1;
+}
+function moveNo(btn){
+btn.style.position="absolute";
+btn.style.left=Math.random()*80+"%";
+btn.style.top=Math.random()*80+"%";
+}
+
+</script>
 </body>
 </html>
