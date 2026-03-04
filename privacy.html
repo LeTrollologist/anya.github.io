@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy 💖</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{overflow:hidden;height:100vh;font-family:'Playfair Display',serif;transition:background 1s linear;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 60%,rgba(0,0,0,0.8));}
+
+/* Header */
+header{position:absolute;top:0;width:100%;padding:10px 20px;display:flex;justify-content:center;align-items:center;gap:20px;z-index:50;font-family:'Great Vibes',cursive;font-size:clamp(1rem,2vw,1.5rem);color:white;text-shadow:0 0 5px black;}
+header a{color:white;text-decoration:none;font-family:'Playfair Display',serif;font-weight:bold;transition:0.3s;}
+header a:hover{color:#ff69b4;cursor:pointer;}
+
+/* Main */
+.main{position:absolute;top:80px;left:50%;transform:translateX(-50%);width:90%;max-width:800px;color:white;font-family:'Playfair Display',serif;text-shadow:0 0 5px black;line-height:1.6;z-index:10;}
+.main h1{font-family:'Great Vibes',cursive;font-size:clamp(2rem,5vw,3rem);margin-bottom:20px;text-align:center;}
+.main h2{font-family:'Great Vibes',cursive;font-size:clamp(1.5rem,4vw,2rem);margin-top:20px;margin-bottom:10px;color:#ff69b4;}
+.main p{margin-bottom:15px;}
+
+/* Footer */
+footer{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  text-align:center;
+  z-index:10;
+}
+#footerCounter{
+  font-size:clamp(0.8rem,2vw,1rem);
+  font-family:'Playfair Display',serif;
+  color:white;
+  text-shadow:0 0 10px black;
+  margin-bottom:2px;
+  transition:all 0.3s ease;
+}
+.footer-meta{
+  font-size:clamp(0.8rem,1.5vw,0.9rem);
+  color:white;
+  text-shadow:0 0 5px black;
+  margin-bottom:5px;
+}
+.footer-meta a{
+  color:white;
+  text-decoration:underline;
+  margin-left:5px;
+  transition:0.3s;
+}
+.footer-meta a:hover{
+  color:#ff69b4;
+}
+
+/* Petals + Glitter */
+.petal,.glitter{position:absolute;width:15px;height:15px;background:radial-gradient(circle at 30% 30%,pink,#ff69b4);border-radius:50% 50% 50% 0;animation:fall linear infinite;pointer-events:none;z-index:5;}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);} }
+.glitter{width:3px;height:3px;border-radius:50%;background:white;opacity:0.7;animation:glitterMove linear infinite;z-index:4;}
+@keyframes glitterMove{0%{transform:translateY(0) rotate(0deg);opacity:0.7;}50%{opacity:1;}100%{transform:translateY(100vh) rotate(360deg);opacity:0;}}
+
+/* Canvas */
+canvas{position:absolute;top:0;left:0;pointer-events:none;}
+#moon,#sun{position:absolute;top:0;left:0;pointer-events:none;z-index:6;}
+</style>
+</head>
+<body>
+<header>
+  💖 Our Magical Love 💖
+  <a href="index.html">HOME</a>
+  <a href="album.html">ALBUM</a>
+  <a href="log.html">LOG</a>
+  <a href="status.html">STATUS</a>
+</header>
+
+<canvas id="sun"></canvas>
+<canvas id="moon"></canvas>
+
+<div class="main">
+  <h1>Privacy Policy 💖</h1>
+  <p>This website is made for <strong>Anya</strong>. Her privacy and personal information are respected and not shared. Please do not attempt to identify or contact her from this website.</p>
+
+  <h2>Visitor Information</h2>
+  <p>We use a simple counter to track how many times the site has been visited. This count is stored in your browser's localStorage and does not collect personal data.</p>
+
+  <h2>GitHub Hosting</h2>
+  <p>This site is hosted on <a href="https://github.com" target="_blank">GitHub</a>. By using this site, you also agree to GitHub's <a href="https://docs.github.com/en/site-policy/github-terms-of-service" target="_blank">Terms of Service</a> and <a href="https://docs.github.com/en/site-policy/github-privacy-statement" target="_blank">Privacy Statement</a>.</p>
+
+  <h2>Data Respect</h2>
+  <p>All content is made for personal enjoyment and should not be copied, distributed, or used to reveal personal information about anyone involved. Visitors should respect the intended privacy.</p>
+
+  <h2>Updates</h2>
+  <p>The site may be updated from time to time. Please check this page if you have concerns about privacy changes or new features.</p>
+</div>
+
+<footer>
+    <div id="footerCounter"></div>
+    <div class="footer-meta">
+        <p>© 2026 Our Magical Love. All rights reserved.</p>
+        <a href="privacy.html" target="_blank">Privacy Policy</a>
+    </div>
+</footer>
+
+<!-- SunCalc -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+<script>
+const lat = 22.5726, lng = 88.3639;
+
+// CANVASES
+const sunCanvas = document.getElementById("sun"), sunCtx = sunCanvas.getContext("2d"),
+      moonCanvas = document.getElementById("moon"), moonCtx = moonCanvas.getContext("2d");
+
+function resizeCanvases(){
+    sunCanvas.width = moonCanvas.width = innerWidth;
+    sunCanvas.height = moonCanvas.height = innerHeight;
+}
+resizeCanvases();
+window.addEventListener("resize", resizeCanvases);
+
+// Background gradient based on sun altitude
+function updateBackground(sunAlt){
+    const t = Math.max(0, Math.min(1, (sunAlt + Math.PI/2)/Math.PI));
+    const dayColor = `rgb(${25+205*t},${50+130*t},${80+175*t})`;
+    const nightColor = `rgb(15,25,50)`;
+    document.body.style.background = `linear-gradient(to bottom, ${dayColor}, ${nightColor})`;
+}
+
+// Draw sky
+function drawSky(){
+    const now = new Date();
+    const sunPos = SunCalc.getPosition(now, lat, lng);
+    const sunAlt = sunPos.altitude;
+    const sunAz = sunPos.azimuth;
+    updateBackground(sunAlt);
+
+    sunCtx.clearRect(0,0,innerWidth,innerHeight);
+    if(sunAlt > -0.1){
+        const sx = (sunAz + Math.PI)/(2*Math.PI)*innerWidth;
+        const sy = innerHeight * (1 - (sunAlt + Math.PI/2)/Math.PI);
+        const glow = Math.max(0, Math.sin(sunAlt) * 0.8);
+        sunCtx.beginPath();
+        sunCtx.fillStyle = `rgba(255,240,150,${glow})`;
+        sunCtx.arc(sx, sy, 80, 0, Math.PI*2);
+        sunCtx.fill();
+        sunCtx.beginPath();
+        sunCtx.fillStyle = "yellow";
+        sunCtx.arc(sx, sy, 30, 0, Math.PI*2);
+        sunCtx.fill();
+    }
+
+    const moonPos = SunCalc.getMoonPosition(now, lat, lng);
+    const moonIll = SunCalc.getMoonIllumination(now);
+    const moonAlt = moonPos.altitude;
+    moonCtx.clearRect(0,0,innerWidth,innerHeight);
+    if(moonAlt > -0.1){
+        const mx = (moonPos.azimuth + Math.PI)/(2*Math.PI)*innerWidth;
+        const my = innerHeight*(1 - (moonAlt + Math.PI/2)/Math.PI);
+        const fraction = moonIll.fraction;
+        moonCtx.beginPath();
+        moonCtx.fillStyle = "#ddd";
+        moonCtx.arc(mx, my, 25, 0, Math.PI*2);
+        moonCtx.fill();
+        moonCtx.globalCompositeOperation = "destination-out";
+        moonCtx.beginPath();
+        const shift = 25*(1 - fraction);
+        moonCtx.ellipse(mx + (fraction>0.5 ? shift : -shift), my, 25, 25, 0, 0, Math.PI*2);
+        moonCtx.fill();
+        moonCtx.globalCompositeOperation = "source-over";
+    }
+
+    requestAnimationFrame(drawSky);
+}
+drawSky();
+
+// Footer visits counter
+let visits = localStorage.getItem("anya_visits")||0;
+visits++;
+localStorage.setItem("anya_visits",visits);
+document.getElementById("footerCounter").innerHTML=`You’ve visited ${visits} times 🌸`;
+
+// Petals
+for(let i=0;i<40;i++){
+    let p=document.createElement("div");p.className="petal";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=(5+Math.random()*5)+"s";
+    p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)];
+    p.style.transform=`rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(p);
+}
+
+// Glitter
+for(let i=0;i<40;i++){
+    let g=document.createElement("div");g.className="glitter";
+    g.style.left=Math.random()*100+"vw";
+    g.style.animationDuration=(5+Math.random()*5)+"s";
+    document.body.appendChild(g);
+}
+</script>
+</body>
+</html>
