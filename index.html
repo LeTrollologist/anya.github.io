@@ -15,7 +15,7 @@ body{
     font-family:'Playfair Display',serif;
     color:white;
     background:black;
-    transition:background 3s ease;
+    transition:background 2s linear;
 }
 
 /* Cinematic vignette */
@@ -167,20 +167,48 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 </audio>
 
 <script>
+/* 🌞 Real-Time IST Sky */
+const skyStops = [
+  { time: 0.0, colors: ["#0a0f2c", "#1b2550"] }, // Midnight
+  { time: 0.25, colors: ["#ff9966", "#ff5e62"] }, // Sunrise
+  { time: 0.5, colors: ["#87ceeb", "#4facfe"] },  // Noon
+  { time: 0.75, colors: ["#f3904f", "#3b4371"] }, // Sunset
+  { time: 1.0, colors: ["#0a0f2c", "#1b2550"] }    // Midnight
+];
 
-/* IST SKY + DYNAMIC MOON */
-function setSky(){
-    const now=new Date();
-    const istHour=(now.getUTCHours()+5.5)%24;
-    if(istHour>=6 && istHour<18){
-        document.body.style.background="linear-gradient(#87CEEB,#FFD1DC)";
-    } else {
-        document.body.style.background="radial-gradient(circle at center,#0f2027,#000)";
+function getISTTime(){
+    return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"}));
+}
+function getDayProgress(){
+    const ist = getISTTime();
+    return (ist.getHours()*3600 + ist.getMinutes()*60 + ist.getSeconds())/86400;
+}
+function lerpColor(a,b,t){
+  const ah=parseInt(a.replace("#",""),16),
+        ar=ah>>16, ag=(ah>>8)&0xff, ab=ah&0xff,
+        bh=parseInt(b.replace("#",""),16),
+        br=bh>>16, bg=(bh>>8)&0xff, bb=bh&0xff,
+        rr=ar+t*(br-ar), rg=ag+t*(bg-ag), rb=ab+t*(bb-ab);
+  return `rgb(${rr|0},${rg|0},${rb|0})`;
+}
+function updateSky(){
+    const progress = getDayProgress();
+    for(let i=0;i<skyStops.length-1;i++){
+        const current = skyStops[i];
+        const next = skyStops[i+1];
+        if(progress >= current.time && progress <= next.time){
+            const localT = (progress - current.time)/(next.time - current.time);
+            const topColor = lerpColor(current.colors[0], next.colors[0], localT);
+            const bottomColor = lerpColor(current.colors[1], next.colors[1], localT);
+            document.body.style.background = `linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
+            break;
+        }
     }
 }
-setSky();
+updateSky();
+setInterval(updateSky,10000);
 
-/* Forever Counter */
+/* Counter */
 const startDate=new Date("2026-02-17T16:19:00");
 setInterval(()=>{
 const diff=new Date()-startDate;
@@ -188,20 +216,15 @@ const d=Math.floor(diff/86400000);
 const h=Math.floor(diff/3600000%24);
 const m=Math.floor(diff/60000%60);
 const s=Math.floor(diff/1000%60);
-counter.innerText=`Together for ${d} days, ${h} hours, ${m} minutes, ${s} seconds ♡`;
+document.getElementById("counter").innerText=`Together for ${d} days, ${h} hours, ${m} minutes, ${s} seconds ♡`;
 },1000);
 
-/* Stars Morph + Glow */
+/* Stars Morph */
 const starCanvas=document.getElementById("stars");
 const ctx=starCanvas.getContext("2d");
-starCanvas.width=innerWidth;
-starCanvas.height=innerHeight;
-
+starCanvas.width=innerWidth; starCanvas.height=innerHeight;
 let stars=[];
-for(let i=0;i<500;i++){
-stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,size:1});
-}
-
+for(let i=0;i<500;i++){stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,size:1});}
 function drawStars(){
 ctx.clearRect(0,0,innerWidth,innerHeight);
 stars.forEach(s=>{
@@ -212,7 +235,7 @@ requestAnimationFrame(drawStars);
 }
 drawStars();
 
-/* Petals React */
+/* Petals */
 for(let i=0;i<40;i++){
 let p=document.createElement("div");
 p.className="petal";
@@ -222,44 +245,29 @@ document.body.appendChild(p);
 }
 
 /* Handwritten Letter */
+const letter=document.getElementById("letter");
 const text="You are written in my sky and in every future I see.";
 let i=0;
-function writeLetter(){
-if(i<text.length){
-letter.innerHTML+=text.charAt(i);
-i++;
-setTimeout(writeLetter,50);
-}
-}
+function writeLetter(){if(i<text.length){letter.innerHTML+=text.charAt(i);i++;setTimeout(writeLetter,50);}}
 document.body.addEventListener("dblclick",()=>{
 letter.style.display="block";
 writeLetter();
-ocean.play();
+document.getElementById("ocean").play();
 });
 
-/* Proposal Trigger */
+/* Proposal Mode */
 let keyCount=0;
 document.addEventListener("keydown",e=>{
-if(e.key==="h"){keyCount++; if(keyCount>=5){
-marry.style.opacity=1;
-heartbeat.play();
-}}});
-
-/* Yes */
+if(e.key==="h"){keyCount++; if(keyCount>=5){document.getElementById("marry").style.opacity=1;document.getElementById("heartbeat").play();}}});
 function sayYes(){
-marry.style.opacity=0;
-orchestra.play();
-ending.style.opacity=1;
+document.getElementById("marry").style.opacity=0;
+document.getElementById("orchestra").play();
+document.getElementById("ending").style.opacity=1;
 }
-
-/* No */
 function sayNo(){
 document.querySelector(".no").style.opacity=0;
-setTimeout(()=>{
-alert("I’ll keep asking forever 💖");
-},500);
+setTimeout(()=>{alert("I’ll keep asking forever 💖");},500);
 }
-
 </script>
 </body>
 </html>
