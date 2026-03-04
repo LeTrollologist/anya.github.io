@@ -14,6 +14,8 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;background:rad
 header{position:absolute;top:0;width:100%;padding:10px 20px;display:flex;justify-content:center;align-items:center;gap:20px;z-index:50;font-family:'Great Vibes',cursive;font-size:clamp(1rem,2vw,1.5rem);color:white;text-shadow:0 0 5px black;}
 header a{color:white;text-decoration:none;font-family:'Playfair Display',serif;font-weight:bold;transition:0.3s;}
 header a:hover{color:#ff69b4;cursor:pointer;}
+#headerProposal{cursor:pointer;transition:0.3s;}
+#headerProposal:hover{transform:scale(1.2);}
 
 /* Text */
 .love-text{position:absolute;width:100%;text-align:center;top:30%;font-family:'Great Vibes',cursive;font-size:clamp(2.5rem,6vw,5rem);animation:floatText 6s ease-in-out infinite, heartbeatVisual 1.8s infinite;text-shadow:0 0 25px rgba(255,255,255,0.9);z-index:10;}
@@ -31,7 +33,7 @@ footer{position:absolute;bottom:10px;width:100%;text-align:center;font-size:clam
 /* Proposal */
 .marry{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:none;flex-direction:column;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;font-size:clamp(2rem,6vw,4rem);opacity:0;z-index:30;pointer-events:all;backdrop-filter: blur(5px);transition:opacity 1s ease;}
 #proposalText{text-align:center;color:white;text-shadow:0 0 10px #ffddaa,0 0 20px #ffbb88,0 0 30px #ff9966;margin-bottom:30px;}
-.marry p{font-size:1.2rem;text-align:center;margin-top:20px;}
+.marry p{font-size:1.4rem;text-align:center;margin-top:20px;}
 
 /* Ending */
 .ending{position:absolute;inset:0;background:white;color:black;display:flex;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;font-size:clamp(2rem,7vw,5rem);opacity:0;pointer-events:none;transition:3s;z-index:40;text-shadow:0 0 20px #ff69b4,0 0 40px #ffb6c1;text-align:center;line-height:1.5;}
@@ -48,11 +50,10 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 </style>
 </head>
 <body>
-
 <header>
   💖 Our Magical Love 💖
   <a href="#">HOME</a>
-  <span id="headerProposal" style="cursor:pointer;">💍</span>
+  <span id="headerProposal">💍</span>
   <a href="#">ALBUM (WIP)</a>
   <a href="#">CONTACT</a>
 </header>
@@ -72,7 +73,7 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
         <button class="yes" onclick="sayYes()">Yes</button>
         <button class="no" onclick="sayNo()">No</button>
     </div>
-    <p>Disclaimer: This isn’t a real proposal 💖 I wish it were, but this is a glimpse into *our* future.</p>
+    <p>Disclaimer: This isn’t a real proposal 💖 I wish it were, but this is a glimpse into <em>our</em> future.</p>
 </div>
 
 <div class="ending" id="ending"></div>
@@ -80,23 +81,13 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 
 <!-- SunCalc -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
-
 <script>
-// IST helper
-function getISTTime(){ return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"})); }
+// Coordinates for Kolkata (Anya's IST)
+const lat = 22.5726, lng = 88.3639;
 
-// Background gradient based on sun altitude
-function updateBackground(sunAlt){
-    const t = Math.max(0, Math.min(1, (sunAlt + Math.PI/2)/Math.PI)); // 0-1 from horizon(-90°) to zenith(90°)
-    const dayColor = `rgb(${25+205*t},${50+130*t},${80+175*t})`;
-    const nightColor = `rgb(15,25,50)`;
-    document.body.style.background = `linear-gradient(to bottom, ${dayColor}, ${nightColor})`;
-}
-
-// CANVASES
-const sunCanvas = document.getElementById("sun"), sunCtx = sunCanvas.getContext("2d"),
-      moonCanvas = document.getElementById("moon"), moonCtx = moonCanvas.getContext("2d");
-
+// Canvas setup
+const sunCanvas = document.getElementById("sun"), sunCtx = sunCanvas.getContext("2d");
+const moonCanvas = document.getElementById("moon"), moonCtx = moonCanvas.getContext("2d");
 function resizeCanvases(){
     sunCanvas.width = moonCanvas.width = innerWidth;
     sunCanvas.height = moonCanvas.height = innerHeight;
@@ -104,22 +95,26 @@ function resizeCanvases(){
 resizeCanvases();
 window.addEventListener("resize", resizeCanvases);
 
-// Location (can adjust for Anya)
-const lat = 22.5726, lng = 88.3639;
+// Background gradient based on sun altitude
+function updateBackground(sunAlt){
+    const t = Math.max(0, Math.min(1, (sunAlt + Math.PI/2)/Math.PI)); 
+    const dayColor = `rgb(${25+205*t},${50+130*t},${80+175*t})`;
+    const nightColor = `rgb(15,25,50)`;
+    document.body.style.background = `linear-gradient(to bottom, ${dayColor}, ${nightColor})`;
+}
 
-// Draw sky
+// Draw sun and moon
 function drawSky(){
-    const now = getISTTime();
+    const now = new Date();
 
     // Sun
     const sunPos = SunCalc.getPosition(now, lat, lng);
     const sunAlt = sunPos.altitude, sunAz = sunPos.azimuth;
     updateBackground(sunAlt);
-
     sunCtx.clearRect(0,0,innerWidth,innerHeight);
     if(sunAlt > -0.1){
         const sx = (sunAz + Math.PI)/(2*Math.PI)*innerWidth;
-        const sy = innerHeight * (1 - (sunAlt + Math.PI/2)/Math.PI); 
+        const sy = innerHeight * (1 - (sunAlt + Math.PI/2)/Math.PI);
         const glow = Math.max(0, Math.sin(sunAlt) * 0.8);
         sunCtx.beginPath();
         sunCtx.fillStyle = `rgba(255,240,150,${glow})`;
@@ -157,7 +152,7 @@ function drawSky(){
 drawSky();
 
 // Days counter
-const startDate = new Date("2026-02-17T16:19:00");
+const startDate = new Date("2026-02-17T16:19:00+05:30");
 const counterEl = document.getElementById("counter");
 function updateCounter(){
     const diff=new Date()-startDate;
@@ -200,24 +195,34 @@ const letterText="You are written in my sky and in every future I see.";
 function writeLetter(){if(iChar<letterText.length){letter.innerHTML+=letterText.charAt(iChar);iChar++;setTimeout(writeLetter,50);}}
 document.body.addEventListener("click",()=>{clickCount++;if(clickCount>=3 && !letter.classList.contains('show')){letter.classList.add('show');writeLetter();}});
 
-// Proposal
-const headerProposal=document.getElementById("headerProposal");
-headerProposal.addEventListener("click",()=>{
+// Proposal popup (header)
+const headerProposal = document.getElementById("headerProposal");
+let proposalClockInterval;
+function updateProposalClocks(){
+    const proposalText = document.getElementById("proposalText");
+    const now = new Date();
+    const istString = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12:true });
+    const deviceString = now.toLocaleTimeString();
+    proposalText.innerHTML=`IST: ${istString}<br>Device: ${deviceString}`;
+}
+headerProposal.addEventListener("click",(e)=>{
+    e.stopPropagation();
     const marry=document.getElementById("marry");
-    const proposalText=document.getElementById("proposalText");
-    const ist=getISTTime();
-    const device=new Date();
-    proposalText.innerHTML=`IST: ${ist.toLocaleString('en-IN',{hour12:true})}<br>Device: ${device.toLocaleString()}`;
+    updateProposalClocks();
+    proposalClockInterval=setInterval(updateProposalClocks,1000);
     marry.style.display="flex";
     setTimeout(()=>{marry.style.opacity=1;},10);
 });
 
-// Proposal YES/NO
+// YES / NO
 function sayYes(){
-    const marry=document.getElementById("marry"); marry.style.opacity=0;
+    clearInterval(proposalClockInterval);
+    const marry=document.getElementById("marry");
+    marry.style.opacity=0;
     setTimeout(()=>{marry.style.display="none";},1000);
     const ending=document.getElementById("ending");
-    const today=new Date(); const options={year:'numeric',month:'long',day:'numeric'};
+    const today=new Date(); 
+    const options={year:'numeric',month:'long',day:'numeric'};
     ending.innerHTML=`Forever begins now ♡<br>${today.toLocaleDateString(undefined,options)}`;
     ending.style.opacity=1; ending.style.pointerEvents="auto";
 }
@@ -229,6 +234,5 @@ function sayNo(){
 // Stop propagation
 [letter,document.getElementById("marry"),headerProposal].forEach(el=>el.addEventListener("click",e=>e.stopPropagation()));
 </script>
-
 </body>
 </html>
