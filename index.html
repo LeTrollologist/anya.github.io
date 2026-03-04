@@ -46,7 +46,6 @@ footer{position:absolute;bottom:10px;width:100%;text-align:center;font-size:clam
 canvas{position:absolute;top:0;left:0;pointer-events:none;}
 #moon,#sun{position:absolute;top:0;left:0;pointer-events:none;z-index:6;}
 </style>
-
 </head>
 <body>
 
@@ -86,15 +85,11 @@ window.SunCalc = SunCalc;
 <footer id="footerCounter"></footer>
 
 <script>
+// IST helper
+function getISTTime(){ return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"})); }
 
-// HELPER: IST TIME
-function getISTTime(){
-    return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"}));
-}
-
-// BODY COLOR (horizon transition)
+// Horizon gradient based on sun altitude
 function updateBackground(sunAltitude){
-    // below horizon = night, above 0 = day
     const t = Math.max(0, Math.min(1, (sunAltitude + 0.2) / 1.0));
     const dayColor = `rgb(${230*t+25},${180*t+50},${255*t+80})`;
     const nightColor = `rgb(15,25,50)`;
@@ -102,13 +97,11 @@ function updateBackground(sunAltitude){
 }
 
 /* ====== SUN & MOON DRAW ====== */
-
 const sunCanvas = document.getElementById("sun"),
       sunCtx    = sunCanvas.getContext("2d"),
       moonCanvas= document.getElementById("moon"),
       moonCtx   = moonCanvas.getContext("2d");
 
-// Resize
 function resizeCanvases(){
     sunCanvas.width = moonCanvas.width = innerWidth;
     sunCanvas.height= moonCanvas.height= innerHeight;
@@ -116,10 +109,8 @@ function resizeCanvases(){
 resizeCanvases();
 window.addEventListener("resize",resizeCanvases);
 
-// Geographic location (any point in IST)
 const lat = 22.5726, lng = 88.3639;
 
-// Draw loop
 function drawSky(){
     const now = getISTTime();
 
@@ -127,23 +118,19 @@ function drawSky(){
     const sunPos = SunCalc.getPosition(now, lat, lng);
     const sunAlt = sunPos.altitude;
     const sunAz  = sunPos.azimuth;
-
     updateBackground(sunAlt);
 
     sunCtx.clearRect(0,0,innerWidth,innerHeight);
-    if(sunAlt > -0.2){ // sun visible above/below horizon
+    if(sunAlt > -0.2){
         const sx = (sunAz + Math.PI) / (2*Math.PI) * innerWidth;
         const sy = innerHeight * 0.5 - Math.sin(sunAlt) * innerHeight*0.5;
-
         const glow = Math.max(0, Math.sin(sunAlt) * 0.8);
 
-        // glow
         sunCtx.beginPath();
         sunCtx.fillStyle = `rgba(255,240,150,${glow})`;
         sunCtx.arc(sx, sy, 80, 0, Math.PI*2);
         sunCtx.fill();
 
-        // sun core
         sunCtx.beginPath();
         sunCtx.fillStyle = "yellow";
         sunCtx.arc(sx, sy, 30, 0, Math.PI*2);
@@ -153,10 +140,10 @@ function drawSky(){
     // MOON
     const moonPos = SunCalc.getMoonPosition(now, lat, lng);
     const moonIll = SunCalc.getMoonIllumination(now);
+    const moonAlt = moonPos.altitude;
 
     moonCtx.clearRect(0,0,innerWidth,innerHeight);
-    const moonAlt = moonPos.altitude;
-    if(moonAlt > -0.2){  // only show if above horizon
+    if(moonAlt > -0.2){
         const mx = (moonPos.azimuth + Math.PI)/(2*Math.PI)*innerWidth;
         const my = innerHeight*0.5 - Math.sin(moonAlt)*innerHeight*0.5;
         const fraction = moonIll.fraction;
@@ -176,12 +163,9 @@ function drawSky(){
 
     requestAnimationFrame(drawSky);
 }
-
 drawSky();
 
-/* ====== REST OF YOUR EXISTING CODE (counters, stars, petals, proposal, etc.) ====== */
-
-// Days counter
+/* ====== DAYS COUNTER ====== */
 const startDate=new Date("2026-02-17T16:19:00");
 const counterEl=document.getElementById("counter");
 function updateCounter(){
@@ -191,9 +175,62 @@ function updateCounter(){
 }
 setInterval(updateCounter,1000);
 
-// Rest of petals, stars, proposal code stays unchanged — exactly as in your previous version.
+// Petals
+for(let i=0;i<40;i++){
+    let p=document.createElement("div");
+    p.className="petal";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=(5+Math.random()*5)+"s";
+    p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)];
+    p.style.transform=`rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(p);
+}
+
+// Glitter
+for(let i=0;i<40;i++){
+    let g=document.createElement("div");
+    g.className="glitter";
+    g.style.left=Math.random()*100+"vw";
+    g.style.animationDuration=(5+Math.random()*5)+"s";
+    document.body.appendChild(g);
+}
+
+// Letter 3-click
+let clickCount=0,iChar=0;
+const letter=document.getElementById("letter");
+const letterText="You are written in my sky and in every future I see.";
+function writeLetter(){if(iChar<letterText.length){letter.innerHTML+=letterText.charAt(iChar);iChar++;setTimeout(writeLetter,50);}}
+document.body.addEventListener("click",()=>{clickCount++;if(clickCount>=3 && !letter.classList.contains('show')){letter.classList.add('show');writeLetter();}});
+
+// Proposal activation
+const headerProposal=document.getElementById("headerProposal");
+headerProposal.addEventListener("click",()=>{
+    const marry=document.getElementById("marry");
+    const proposalText=document.getElementById("proposalText");
+    const ist=getISTTime();
+    const device=new Date();
+    proposalText.innerHTML=`IST: ${ist.toLocaleString('en-IN',{hour12:true})}<br>Device: ${device.toLocaleString()}`;
+    marry.style.display="flex";
+    setTimeout(()=>{marry.style.opacity=1;},10);
+});
+
+// Proposal YES/NO
+function sayYes(){
+    const marry=document.getElementById("marry"); marry.style.opacity=0;
+    setTimeout(()=>{marry.style.display="none";},1000);
+    const ending=document.getElementById("ending");
+    const today=new Date(); const options={year:'numeric',month:'long',day:'numeric'};
+    ending.innerHTML=`Forever begins now ♡<br>${today.toLocaleDateString(undefined,options)}`;
+    ending.style.opacity=1; ending.style.pointerEvents="auto";
+}
+function sayNo(){
+    document.querySelector(".no").style.opacity=0;
+    setTimeout(()=>{alert("I’ll keep asking forever 💖");},500);
+}
+
+// Stop propagation
+[letter,document.getElementById("marry"),headerProposal].forEach(el=>el.addEventListener("click",e=>e.stopPropagation()));
 
 </script>
-
 </body>
 </html>
