@@ -94,14 +94,14 @@ Just intention and clean logic.
 
 ## 🧭 Pages
 
-| Page            | Status             |
-| --------------- | ------------------ |
+| Page            | Status               |
+|                 |                      |
 | Home            | ✅ Fully functional |
-| Proposal (💍)   | ✅ Functional       |
-| Album           | 🚧 WIP             |
+| Proposal        | ✅ Functional       |
+| Album           | 🚧 WIP              |
 | Version Log     | ✅ Active           |
-| Status          | ✅ Active           |
-| Future Projects | 🚧 Planned         |
+| Privacy         | ✅ Active           |
+| Minigame        | ✅ Active           |
 
 ---
 
