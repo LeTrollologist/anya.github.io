@@ -15,15 +15,25 @@ header{position:absolute;top:0;width:100%;padding:10px 20px;display:flex;justify
 header a{color:white;text-decoration:none;font-family:'Playfair Display',serif;font-weight:bold;transition:0.3s;}
 header a:hover{color:#ff69b4;cursor:pointer;}
 
-/* Game Container */
-#gameContainer{position:absolute;top:60px;left:0;width:100%;height:calc(100% - 100px);display:flex;justify-content:center;align-items:center;z-index:10;}
-#pongCanvas{background:rgba(255,255,255,0.05);border:2px solid rgba(255,105,180,0.6);border-radius:15px;box-shadow:0 0 20px rgba(255,105,180,0.4);}
-
 /* Score */
-#score{position:absolute;top:80px;width:100%;text-align:center;font-family:'Great Vibes',cursive;color:white;font-size:clamp(2rem,6vw,3rem);text-shadow:0 0 15px #ff69b4,0 0 25px #ffb6c1;z-index:20;}
+#score{position:absolute;top:70px;width:100%;text-align:center;font-family:'Great Vibes',cursive;color:white;font-size:clamp(2rem,6vw,3rem);text-shadow:0 0 15px #ff69b4,0 0 25px #ffb6c1;z-index:20;}
+
+/* Game container */
+#gameContainer{position:absolute;top:120px;left:0;width:100%;height:calc(100% - 140px);display:flex;justify-content:center;align-items:center;z-index:10;}
+#pongCanvas{background:rgba(255,255,255,0.05);border:2px solid rgba(255,105,180,0.6);border-radius:15px;box-shadow:0 0 20px rgba(255,105,180,0.4);max-width:100%;max-height:100%;}
 
 /* Footer */
 footer{position:absolute;bottom:10px;width:100%;text-align:center;font-size:clamp(0.8rem,2vw,1rem);z-index:10;font-family:'Playfair Display',serif;color:white;text-shadow:0 0 10px black;transition:all 0.3s ease;}
+
+/* Petals + Glitter */
+.petal,.glitter{position:absolute;width:15px;height:15px;background:radial-gradient(circle at 30% 30%,pink,#ff69b4);border-radius:50% 50% 50% 0;animation:fall linear infinite;pointer-events:none;z-index:5;}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
+.glitter{width:3px;height:3px;border-radius:50%;background:white;opacity:0.7;animation:glitterMove linear infinite;z-index:4;}
+@keyframes glitterMove{0%{transform:translateY(0) rotate(0deg);opacity:0.7;}50%{opacity:1;}100%{transform:translateY(100vh) rotate(360deg);opacity:0;}}
+
+/* Canvas */
+canvas{position:absolute;top:0;left:0;pointer-events:none;}
+#moon,#sun{position:absolute;top:0;left:0;pointer-events:none;z-index:6;}
 </style>
 </head>
 <body>
@@ -53,18 +63,11 @@ const sunCanvas = document.getElementById("sun"), sunCtx = sunCanvas.getContext(
 const moonCanvas = document.getElementById("moon"), moonCtx = moonCanvas.getContext("2d");
 
 function resizeCanvases(){
-  sunCanvas.width = moonCanvas.width = window.innerWidth;
-  sunCanvas.height = moonCanvas.height = window.innerHeight;
-
-  pongCanvas.width = Math.min(window.innerWidth - 20, 500);
-  pongCanvas.height = Math.min(window.innerHeight - 120, 700);
+  sunCanvas.width = moonCanvas.width = innerWidth;
+  sunCanvas.height = moonCanvas.height = innerHeight;
 }
-window.addEventListener("resize", resizeCanvases);
-
-// Responsive Pong Canvas
-const pongCanvas = document.getElementById("pongCanvas");
-const ctx = pongCanvas.getContext("2d");
 resizeCanvases();
+window.addEventListener("resize", resizeCanvases);
 
 function updateBackground(sunAlt){
   const t = Math.max(0, Math.min(1, (sunAlt + Math.PI/2)/Math.PI));
@@ -81,7 +84,7 @@ function drawSky(){
 
   // Sun
   sunCtx.clearRect(0,0,innerWidth,innerHeight);
-  if(sunAlt > -0.1){
+  if(sunAlt>-0.1){
     const sx = (sunAz+Math.PI)/(2*Math.PI)*innerWidth;
     const sy = innerHeight*(1-(sunAlt+Math.PI/2)/Math.PI);
     sunCtx.beginPath();
@@ -108,28 +111,13 @@ function drawSky(){
     moonCtx.ellipse(mx+(fraction>0.5?shift:-shift),my,25,25,0,0,Math.PI*2); moonCtx.fill();
     moonCtx.globalCompositeOperation="source-over";
   }
-
   requestAnimationFrame(drawSky);
 }
 drawSky();
 
 // Petals & Glitter
-for(let i=0;i<40;i++){
-  let p=document.createElement("div");
-  p.className="petal";
-  p.style.left=Math.random()*100+"vw";
-  p.style.animationDuration=(5+Math.random()*5)+"s";
-  p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)];
-  p.style.transform=`rotate(${Math.random()*360}deg)`;
-  document.body.appendChild(p);
-}
-for(let i=0;i<40;i++){
-  let g=document.createElement("div");
-  g.className="glitter";
-  g.style.left=Math.random()*100+"vw";
-  g.style.animationDuration=(5+Math.random()*5)+"s";
-  document.body.appendChild(g);
-}
+for(let i=0;i<40;i++){let p=document.createElement("div");p.className="petal";p.style.left=Math.random()*100+"vw";p.style.animationDuration=(5+Math.random()*5)+"s";p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)];p.style.transform=`rotate(${Math.random()*360}deg)`;document.body.appendChild(p);}
+for(let i=0;i<40;i++){let g=document.createElement("div");g.className="glitter";g.style.left=Math.random()*100+"vw";g.style.animationDuration=(5+Math.random()*5)+"s";document.body.appendChild(g);}
 
 // Visitor counter
 let visits = localStorage.getItem("anya_visits")||0; visits++;
@@ -137,79 +125,95 @@ localStorage.setItem("anya_visits",visits);
 document.getElementById("footerCounter").innerHTML=`You’ve visited ${visits} times 🌸`;
 
 // ===== Pong Game =====
-let width = pongCanvas.width, height = pongCanvas.height;
-const paddleWidth = 15, paddleHeight = 100;
-let playerY = height/2 - paddleHeight/2;
-let aiY = height/2 - paddleHeight/2;
-let ballX = width/2, ballY = height/2, ballRadius = 10;
-let ballSpeedX = 5, ballSpeedY = 3;
-let playerScore = 0, aiScore = 0;
+const canvas = document.getElementById("pongCanvas"), ctx = canvas.getContext("2d");
 
-// Touch & keyboard control
+let paddleWidth=15, paddleHeight=100;
+let playerY, aiY, ballX, ballY, ballSpeedX, ballSpeedY;
+let playerScore=0, aiScore=0;
 let touchY = null;
-pongCanvas.addEventListener("touchmove", (e)=>{
-  const touch = e.touches[0].clientY - pongCanvas.getBoundingClientRect().top;
+let upPressed=false, downPressed=false;
+
+function resizeCanvasGame(){
+  // Max width/height for desktop, full width for mobile
+  canvas.width = Math.min(window.innerWidth-20, 500);
+  canvas.height = Math.min(window.innerHeight-160, 700);
+  playerY = canvas.height/2 - paddleHeight/2;
+  aiY = canvas.height/2 - paddleHeight/2;
+  ballX = canvas.width/2; ballY = canvas.height/2;
+  ballSpeedX = 5; ballSpeedY = 3;
+}
+resizeCanvasGame();
+window.addEventListener("resize", resizeCanvasGame);
+
+// Touch controls
+canvas.addEventListener("touchmove",(e)=>{
+  const touch = e.touches[0].clientY - canvas.getBoundingClientRect().top;
   touchY = touch - paddleHeight/2;
 });
-let upPressed=false, downPressed=false;
-document.addEventListener("keydown", e => { if(e.key==="ArrowUp"||e.key==="w") upPressed=true; if(e.key==="ArrowDown"||e.key==="s") downPressed=true; });
-document.addEventListener("keyup", e => { if(e.key==="ArrowUp"||e.key==="w") upPressed=false; if(e.key==="ArrowDown"||e.key==="s") downPressed=false; });
 
-// Draw & update game
+// Keyboard controls
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowUp"||e.key==="w") upPressed=true;
+  if(e.key==="ArrowDown"||e.key==="s") downPressed=true;
+});
+document.addEventListener("keyup",e=>{
+  if(e.key==="ArrowUp"||e.key==="w") upPressed=false;
+  if(e.key==="ArrowDown"||e.key==="s") downPressed=false;
+});
+
+// Reset Ball
+function resetBall(){
+  ballX=canvas.width/2; ballY=canvas.height/2;
+  ballSpeedX = -ballSpeedX;
+  ballSpeedY = (Math.random()*6-3);
+}
+
+// Draw & Update
 function draw(){
-  width = pongCanvas.width; height = pongCanvas.height;
-  ctx.clearRect(0,0,width,height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
   // Center line
-  ctx.strokeStyle="rgba(255,182,193,0.3)";
-  ctx.setLineDash([10,15]);
-  ctx.beginPath(); ctx.moveTo(width/2,0); ctx.lineTo(width/2,height); ctx.stroke();
+  ctx.strokeStyle="rgba(255,182,193,0.3)"; ctx.setLineDash([10,15]);
+  ctx.beginPath(); ctx.moveTo(canvas.width/2,0); ctx.lineTo(canvas.width/2,canvas.height); ctx.stroke();
   ctx.setLineDash([]);
 
   // Paddles
   ctx.fillStyle="pink"; ctx.fillRect(0,playerY,paddleWidth,paddleHeight);
-  ctx.fillStyle="hotpink"; ctx.fillRect(width-paddleWidth,aiY,paddleWidth,paddleHeight);
+  ctx.fillStyle="hotpink"; ctx.fillRect(canvas.width-paddleWidth,aiY,paddleWidth,paddleHeight);
 
   // Ball
-  ctx.fillStyle="white"; ctx.beginPath(); ctx.arc(ballX,ballY,ballRadius,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="white"; ctx.beginPath(); ctx.arc(ballX,ballY,10,0,Math.PI*2); ctx.fill();
 
-  // Ball movement
+  // Move Ball
   ballX += ballSpeedX; ballY += ballSpeedY;
 
   // Wall collision
-  if(ballY<ballRadius || ballY>height-ballRadius) ballSpeedY*=-1;
+  if(ballY<10 || ballY>canvas.height-10) ballSpeedY*=-1;
 
   // Paddle collision
-  if(ballX-ballRadius<paddleWidth && ballY>playerY && ballY<playerY+paddleHeight) ballSpeedX*=-1;
-  if(ballX+ballRadius>width-paddleWidth && ballY>aiY && ballY<aiY+paddleHeight) ballSpeedX*=-1;
+  if(ballX-10 < paddleWidth && ballY>playerY && ballY<playerY+paddleHeight) ballSpeedX*=-1;
+  if(ballX+10 > canvas.width-paddleWidth && ballY>aiY && ballY<aiY+paddleHeight) ballSpeedX*=-1;
 
   // Score
   if(ballX<0){ aiScore++; resetBall(); }
-  if(ballX>width){ playerScore++; resetBall(); }
-  document.getElementById("score").innerHTML=`${playerScore} 💖 : 💖 ${aiScore}`;
+  if(ballX>canvas.width){ playerScore++; resetBall(); }
+  document.getElementById("score").innerHTML = `${playerScore} 💖 : 💖 ${aiScore}`;
 
   // AI movement
-  const aiCenter = aiY + paddleHeight/2;
-  const difficulty = 0.08;
+  const aiCenter=aiY+paddleHeight/2;
+  const difficulty=0.08;
   if(aiCenter<ballY) aiY += 5*difficulty*60;
   else aiY -= 5*difficulty*60;
 
   // Player movement
-  if(touchY !== null) playerY += (touchY-playerY)*0.2;
-  if(upPressed) playerY -= 8;
-  if(downPressed) playerY += 8;
+  if(touchY!==null) playerY += (touchY-playerY)*0.2;
+  if(upPressed) playerY -=8;
+  if(downPressed) playerY +=8;
   if(playerY<0) playerY=0;
-  if(playerY+paddleHeight>height) playerY=height-paddleHeight;
+  if(playerY+paddleHeight>canvas.height) playerY=canvas.height-paddleHeight;
 
   requestAnimationFrame(draw);
 }
-
-function resetBall(){
-  ballX=width/2; ballY=height/2;
-  ballSpeedX=-ballSpeedX;
-  ballSpeedY=(Math.random()*6-3);
-}
-
 draw();
 </script>
 </body>
