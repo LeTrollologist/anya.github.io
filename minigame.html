@@ -9,22 +9,12 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{overflow:hidden;min-height:100vh;font-family:'Playfair Display',serif;transition:background 1s linear;}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 60%,rgba(0,0,0,0.8));}
-
-/* Header yay */
 header{position:absolute;top:0;width:100%;padding:10px 20px;display:flex;justify-content:center;align-items:center;gap:20px;z-index:50;font-family:'Great Vibes',cursive;font-size:clamp(1rem,2vw,1.5rem);color:white;text-shadow:0 0 5px black;}
 header a{color:white;text-decoration:none;font-family:'Playfair Display',serif;font-weight:bold;transition:0.3s;}
 header a:hover{color:#ff69b4;cursor:pointer;}
-
-/* Canvas container */
 #gameContainer{position:absolute;top:60px;left:0;width:100%;height:calc(100% - 100px);display:flex;justify-content:center;align-items:center;z-index:10;}
-
-/* Game Canvas */
 #pongCanvas{background:rgba(255,255,255,0.05);border:2px solid rgba(255,105,180,0.6);border-radius:15px;box-shadow:0 0 20px rgba(255,105,180,0.4);}
-
-/* Score */
 #score{position:absolute;top:80px;width:100%;text-align:center;font-family:'Great Vibes',cursive;color:white;font-size:clamp(2rem,6vw,3rem);text-shadow:0 0 15px #ff69b4,0 0 25px #ffb6c1;z-index:20;}
-
-/* Footer */
 footer{position:absolute;bottom:10px;width:100%;text-align:center;font-size:clamp(0.8rem,2vw,1rem);z-index:10;font-family:'Playfair Display',serif;color:white;text-shadow:0 0 10px black;transition:all 0.3s ease;}
 </style>
 </head>
@@ -43,8 +33,6 @@ footer{position:absolute;bottom:10px;width:100%;text-align:center;font-size:clam
 </div>
 
 <footer id="footerCounter"></footer>
-
-<!-- Sun & Moon Canvases -->
 <canvas id="sun"></canvas>
 <canvas id="moon"></canvas>
 
@@ -115,8 +103,7 @@ for(let i=0;i<40;i++){let g=document.createElement("div");g.className="glitter";
 // Visitor counter
 let visits = localStorage.getItem("anya_visits")||0; visits++;
 localStorage.setItem("anya_visits",visits);
-const footer=document.getElementById("footerCounter");
-footer.innerHTML=`You’ve visited ${visits} times 🌸`;
+document.getElementById("footerCounter").innerHTML=`You’ve visited ${visits} times 🌸`;
 
 // ===== Pong Game =====
 const canvas=document.getElementById("pongCanvas"), ctx=canvas.getContext("2d");
@@ -126,7 +113,6 @@ let width=canvas.width, height=canvas.height;
 const paddleWidth=15, paddleHeight=100;
 let playerY=height/2-paddleHeight/2;
 let aiY=height/2-paddleHeight/2;
-const paddleSpeed=10;
 
 // Ball
 let ballX=width/2, ballY=height/2, ballRadius=10;
@@ -142,7 +128,18 @@ canvas.addEventListener("touchmove",(e)=>{
   touchY=touch-canvas.getBoundingClientRect().top-paddleHeight/2;
 });
 
-// Draw everything
+// Keyboard control
+let upPressed=false, downPressed=false;
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowUp" || e.key==="w") upPressed=true;
+  if(e.key==="ArrowDown" || e.key==="s") downPressed=true;
+});
+document.addEventListener("keyup",e=>{
+  if(e.key==="ArrowUp" || e.key==="w") upPressed=false;
+  if(e.key==="ArrowDown" || e.key==="s") downPressed=false;
+});
+
+// Draw & Update Game
 function draw(){
   ctx.clearRect(0,0,width,height);
 
@@ -153,14 +150,11 @@ function draw(){
   ctx.setLineDash([]);
 
   // Paddles
-  ctx.fillStyle="pink";
-  ctx.fillRect(0,playerY,paddleWidth,paddleHeight);
-  ctx.fillStyle="hotpink";
-  ctx.fillRect(width-paddleWidth,aiY,paddleWidth,paddleHeight);
+  ctx.fillStyle="pink"; ctx.fillRect(0,playerY,paddleWidth,paddleHeight);
+  ctx.fillStyle="hotpink"; ctx.fillRect(width-paddleWidth,aiY,paddleWidth,paddleHeight);
 
   // Ball
-  ctx.fillStyle="white";
-  ctx.beginPath(); ctx.arc(ballX,ballY,ballRadius,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="white"; ctx.beginPath(); ctx.arc(ballX,ballY,ballRadius,0,Math.PI*2); ctx.fill();
 
   // Update Ball
   ballX+=ballSpeedX; ballY+=ballSpeedY;
@@ -168,7 +162,7 @@ function draw(){
   // Wall collision
   if(ballY<ballRadius || ballY>height-ballRadius) ballSpeedY*=-1;
 
-  // Player collision
+  // Paddle collision
   if(ballX-ballRadius<paddleWidth && ballY>playerY && ballY<playerY+paddleHeight) ballSpeedX*=-1;
   if(ballX+ballRadius>width-paddleWidth && ballY>aiY && ballY<aiY+paddleHeight) ballSpeedX*=-1;
 
@@ -177,21 +171,23 @@ function draw(){
   if(ballX>width){playerScore++; resetBall();}
   document.getElementById("score").innerHTML=`${playerScore} 💖 : 💖 ${aiScore}`;
 
-  // AI movement
+  // AI
   const aiCenter=aiY+paddleHeight/2;
-  const difficulty=0.08; // Adjust AI speed
+  const difficulty=0.08; 
   if(aiCenter<ballY) aiY+=5*difficulty*60;
   else aiY-=5*difficulty*60;
 
-  // Player paddle follow touch
-  if(touchY!==null){
-    playerY+=(touchY-playerY)*0.2;
-  }
+  // Player paddle
+  if(touchY!==null){playerY+=(touchY-playerY)*0.2;}
+  if(upPressed) playerY-=8;
+  if(downPressed) playerY+=8;
+  if(playerY<0) playerY=0;
+  if(playerY+paddleHeight>height) playerY=height-paddleHeight;
 
   requestAnimationFrame(draw);
 }
 
-// Reset ball to center
+// Reset ball
 function resetBall(){
   ballX=width/2; ballY=height/2;
   ballSpeedX=-ballSpeedX;
