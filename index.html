@@ -35,6 +35,7 @@ body::after{
     font-size:clamp(2.5rem,6vw,5rem);
     animation:floatText 6s ease-in-out infinite, heartbeatVisual 1.8s infinite;
     text-shadow:0 0 25px rgba(255,255,255,0.9);
+    z-index:10;
 }
 @keyframes floatText{50%{transform:translateY(-15px);}}
 @keyframes heartbeatVisual{50%{transform:scale(1.05);}}
@@ -46,6 +47,7 @@ body::after{
     width:100%;
     text-align:center;
     font-size:clamp(0.8rem,3vw,1.2rem);
+    z-index:10;
 }
 
 /* Letter */
@@ -60,13 +62,15 @@ body::after{
     border-radius:10px;
     display:none;
     font-family:cursive;
+    z-index:20;
+    pointer-events:auto;
 }
 
 /* Proposal Mode */
 .marry{
     position:absolute;
     inset:0;
-    background:black;
+    background:rgba(0,0,0,0.85);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -75,6 +79,7 @@ body::after{
     font-size:clamp(2rem,6vw,4rem);
     opacity:0;
     transition:2s;
+    z-index:30;
 }
 
 .ring{
@@ -98,6 +103,8 @@ button{
     border:none;
     border-radius:20px;
     cursor:pointer;
+    z-index:31;
+    pointer-events:auto;
 }
 .yes{background:#ff69b4;color:white;}
 .no{background:#555;color:white;}
@@ -115,6 +122,7 @@ button{
     font-size:clamp(2rem,7vw,5rem);
     opacity:0;
     transition:3s;
+    z-index:40;
 }
 
 /* Petals */
@@ -125,16 +133,19 @@ button{
     border-radius:50% 50% 50% 0;
     animation:fall linear infinite;
     pointer-events:none;
+    z-index:5;
 }
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
 
 canvas{position:absolute;top:0;left:0;pointer-events:none;}
+#moon{position:absolute;top:0;left:0;pointer-events:none;z-index:6;}
 </style>
 </head>
 <body>
 
 <canvas id="stars"></canvas>
 <canvas id="waves"></canvas>
+<canvas id="moon"></canvas>
 
 <div class="love-text">I love you Anya</div>
 <div class="counter" id="counter"></div>
@@ -143,7 +154,7 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 
 <div class="marry" id="marry">
 <div class="ring"></div>
-<div>Anya… will you marry me? 💍</div>
+<div id="proposalText"></div>
 <div>
 <button class="yes" onclick="sayYes()">Yes</button>
 <button class="no" onclick="sayNo()">No</button>
@@ -167,11 +178,11 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 <script>
 /* 🌞 Real-Time IST Sky + Text Color */
 const skyStops = [
-  { time: 0.0, colors: ["#0a0f2c", "#1b2550"] }, // Midnight
-  { time: 0.25, colors: ["#ff9966", "#ff5e62"] }, // Sunrise
-  { time: 0.5, colors: ["#87ceeb", "#4facfe"] },  // Noon
-  { time: 0.75, colors: ["#f3904f", "#3b4371"] }, // Sunset
-  { time: 1.0, colors: ["#0a0f2c", "#1b2550"] }    // Midnight
+  { time: 0.0, colors: ["#0a0f2c", "#1b2550"] },
+  { time: 0.25, colors: ["#ff9966", "#ff5e62"] },
+  { time: 0.5, colors: ["#87ceeb", "#4facfe"] },
+  { time: 0.75, colors: ["#f3904f", "#3b4371"] },
+  { time: 1.0, colors: ["#0a0f2c", "#1b2550"] }
 ];
 
 function getISTTime(){
@@ -200,10 +211,9 @@ function updateSky(){
             const bottomColor = lerpColor(current.colors[1], next.colors[1], localT);
             document.body.style.background = `linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
 
-            // ✅ Text color: black for day, white for night
             const loveText = document.querySelector(".love-text");
             const counterText = document.querySelector(".counter");
-            if(progress >= 0.25 && progress <= 0.75){ // 6AM - 6PM IST
+            if(progress >= 0.25 && progress <= 0.75){
                 loveText.style.color = "black";
                 counterText.style.color = "black";
             } else {
@@ -228,7 +238,7 @@ const s=Math.floor(diff/1000%60);
 document.getElementById("counter").innerText=`Together for ${d} days, ${h} hours, ${m} minutes, ${s} seconds ♡`;
 },1000);
 
-/* Stars Morph */
+/* Stars */
 const starCanvas=document.getElementById("stars");
 const ctx=starCanvas.getContext("2d");
 starCanvas.width=innerWidth; starCanvas.height=innerHeight;
@@ -243,6 +253,28 @@ ctx.fillRect(s.x,s.y,1+Math.sin(Date.now()*0.005),1+Math.sin(Date.now()*0.005));
 requestAnimationFrame(drawStars);
 }
 drawStars();
+
+/* Moon */
+const moonCanvas=document.getElementById("moon");
+const moonCtx=moonCanvas.getContext("2d");
+moonCanvas.width=innerWidth;
+moonCanvas.height=innerHeight;
+function drawMoon(){
+    moonCtx.clearRect(0,0,innerWidth,innerHeight);
+    const ist=getISTTime();
+    const hour = ist.getHours()+ist.getMinutes()/60;
+    let x = ((hour>=18?hour-18:hour+6)/12)*innerWidth;
+    let y = innerHeight*0.2 + Math.sin((hour/24)*Math.PI*2)*50;
+    let brightness = (hour>=6 && hour<=18)?0:1;
+    moonCtx.globalAlpha = brightness;
+    moonCtx.beginPath();
+    moonCtx.arc(x,y,40,0,Math.PI*2);
+    moonCtx.fillStyle="#fffacd";
+    moonCtx.fill();
+    moonCtx.globalAlpha=1;
+    requestAnimationFrame(drawMoon);
+}
+drawMoon();
 
 /* Petals */
 for(let i=0;i<40;i++){
@@ -264,10 +296,23 @@ writeLetter();
 document.getElementById("ocean").play();
 });
 
-/* Proposal Mode */
+/* Proposal Mode with Local IST & Device Date */
 let keyCount=0;
 document.addEventListener("keydown",e=>{
-if(e.key==="h"){keyCount++; if(keyCount>=5){document.getElementById("marry").style.opacity=1;document.getElementById("heartbeat").play();}}});
+if(e.key==="h"){
+  keyCount++;
+  if(keyCount>=5){
+      const marry=document.getElementById("marry");
+      const proposalText=document.getElementById("proposalText");
+
+      const ist=getISTTime();
+      const device=new Date();
+      proposalText.innerHTML=`IST: ${ist.toLocaleString('en-IN')}<br>Device: ${device.toLocaleString()}`;
+
+      marry.style.opacity=1;
+      document.getElementById("heartbeat").play();
+  }
+}});
 function sayYes(){
 document.getElementById("marry").style.opacity=0;
 document.getElementById("orchestra").play();
