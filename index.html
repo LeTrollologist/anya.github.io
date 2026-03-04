@@ -22,7 +22,11 @@ header a:hover{color:#ff69b4;cursor:pointer;}
 
 /* Counters */
 .counter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;font-size:clamp(1rem,3vw,2rem);z-index:10;font-family:'Great Vibes',cursive;}
-footer{position:absolute;bottom:10px;width:100%;text-align:center;font-size:clamp(0.8rem,2vw,1rem);z-index:10;font-family:'Playfair Display',serif;color:white;text-shadow:0 0 10px black;transition:all 0.3s ease;}
+footer{position:absolute;bottom:0;width:100%;text-align:center;z-index:10;}
+#footerCounter{font-size:clamp(0.8rem,2vw,1rem);font-family:'Playfair Display',serif;color:white;text-shadow:0 0 10px black;margin-bottom:2px;transition:all 0.3s ease;}
+.footer-meta{font-size:clamp(0.8rem,1.5vw,0.9rem);color:white;text-shadow:0 0 5px black;margin-bottom:5px;}
+.footer-meta a{color:white;text-decoration:underline;margin-left:5px;transition:0.3s;}
+.footer-meta a:hover{color:#ff69b4;}
 
 /* Letter */
 .letter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;max-width:500px;background:#fffef8;color:#333;padding:30px;border-radius:10px;display:none;opacity:0;font-family:cursive;z-index:20;pointer-events:all;transition:opacity 1s ease;}
@@ -263,6 +267,7 @@ function sayNo(){
 </script>
 </body>
 </html>
+
 
 
 
