@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Anya 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    overflow:hidden;
+    height:100vh;
+    background:radial-gradient(circle at center,#0f2027,#203a43,#000);
+    font-family:'Playfair Display',serif;
+    color:white;
+    perspective:1200px;
+}
+
+/* PARALLAX CONTAINER */
+.scene{
+    width:100%;
+    height:100%;
+    transform-style:preserve-3d;
+    transition:transform 0.1s ease;
+}
+
+/* TEXT */
+.love-text{
+    position:absolute;
+    width:100%;
+    text-align:center;
+    top:35%;
+    font-family:'Great Vibes',cursive;
+    font-size:clamp(2.5rem,6vw,5rem);
+    animation:floatText 6s ease-in-out infinite;
+    text-shadow:0 0 25px rgba(255,255,255,0.9);
+}
+
+@keyframes floatText{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-15px)}
+}
+
+/* HEARTBEAT EFFECT */
+@keyframes heartbeat{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.05)}
+}
+.heartbeat{
+    animation:heartbeat 1.8s infinite;
+}
+
+/* COUNTER */
+.counter{
+    position:absolute;
+    bottom:20px;
+    width:100%;
+    text-align:center;
+    font-size:clamp(0.8rem,3vw,1.2rem);
+    opacity:0.9;
+}
+
+/* ENVELOPE */
+.envelope{
+    position:absolute;
+    top:65%;
+    left:50%;
+    transform:translateX(-50%);
+    width:100px;
+    height:70px;
+    background:#f4e4c1;
+    cursor:pointer;
+}
+.envelope:before{
+    content:'';
+    position:absolute;
+    width:0;height:0;
+    border-left:50px solid transparent;
+    border-right:50px solid transparent;
+    border-bottom:35px solid #e6d3a3;
+    top:-35px;
+}
+.letter{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:90%;
+    max-width:500px;
+    background:white;
+    color:#333;
+    padding:30px;
+    border-radius:10px;
+    display:none;
+}
+
+/* SURPRISE */
+.surprise{
+    position:absolute;
+    top:10%;
+    width:100%;
+    text-align:center;
+    font-family:'Great Vibes',cursive;
+    font-size:clamp(1.5rem,4vw,3rem);
+    opacity:0;
+    transition:1.5s;
+}
+
+/* FUTURE OVERLAY */
+.future{
+    position:absolute;
+    inset:0;
+    background:rgba(255,182,193,0.15);
+    backdrop-filter:blur(8px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Great Vibes',cursive;
+    font-size:clamp(2rem,6vw,4rem);
+    opacity:0;
+    transition:1s;
+    pointer-events:none;
+}
+
+/* PETALS */
+.petal{
+    position:absolute;
+    width:15px;height:15px;
+    background:radial-gradient(circle at 30% 30%,pink,#ff69b4);
+    border-radius:50% 50% 50% 0;
+    opacity:0.8;
+    animation:fall linear infinite;
+}
+@keyframes fall{
+    to{transform:translateY(110vh) rotate(360deg);}
+}
+
+canvas{position:absolute;top:0;left:0;}
+</style>
+</head>
+
+<body>
+
+<div class="scene" id="scene">
+
+<canvas id="stars"></canvas>
+<canvas id="waves"></canvas>
+
+<div class="love-text heartbeat">I love you Anya</div>
+
+<div class="surprise" id="surprise">You are my forever 🌙</div>
+
+<div class="counter" id="counter"></div>
+
+<div class="envelope" id="envelope"></div>
+
+<div class="letter" id="letter">
+<h2>My Dearest Anya 💖</h2>
+<p>
+From the moment we met, my world changed forever.
+You are my peace, my warmth, my future.
+Every second with you feels written in the stars.
+I love you endlessly.
+</p>
+</div>
+
+<div class="future" id="future">Our future is endless ♡</div>
+
+<audio id="ocean" loop>
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c3c3e57e3.mp3" type="audio/mpeg">
+</audio>
+
+</div>
+
+<script>
+
+/* FOREVER COUNTER */
+const startDate=new Date("2026-02-17T16:19:00");
+function updateCounter(){
+const now=new Date();
+const diff=now-startDate;
+const d=Math.floor(diff/86400000);
+const h=Math.floor(diff/3600000%24);
+const m=Math.floor(diff/60000%60);
+const s=Math.floor(diff/1000%60);
+counter.innerText=`Together for ${d} days, ${h} hours, ${m} minutes, ${s} seconds ♡`;
+}
+setInterval(updateCounter,1000);
+
+/* PARALLAX */
+const scene=document.getElementById("scene");
+document.addEventListener("mousemove",e=>{
+let x=(e.clientX/window.innerWidth-0.5)*10;
+let y=(e.clientY/window.innerHeight-0.5)*10;
+scene.style.transform=`rotateY(${x}deg) rotateX(${-y}deg)`;
+});
+
+/* PRESS & HOLD FUTURE */
+let holdTimer;
+document.body.addEventListener("mousedown",()=>{
+holdTimer=setTimeout(()=>future.style.opacity=1,800);
+});
+document.body.addEventListener("mouseup",()=>{
+clearTimeout(holdTimer);
+future.style.opacity=0;
+});
+
+/* ENVELOPE */
+envelope.onclick=()=>{
+letter.style.display="block";
+ocean.play();
+};
+
+/* SURPRISE */
+document.body.addEventListener("click",()=>{
+surprise.style.opacity=1;
+});
+
+/* PETALS */
+for(let i=0;i<40;i++){
+let p=document.createElement("div");
+p.className="petal";
+p.style.left=Math.random()*100+"vw";
+p.style.animationDuration=(5+Math.random()*5)+"s";
+document.body.appendChild(p);
+}
+
+/* WAVES */
+const waveCanvas=document.getElementById("waves");
+const wctx=waveCanvas.getContext("2d");
+waveCanvas.width=innerWidth;
+waveCanvas.height=innerHeight;
+let offset=0;
+function drawWaves(){
+wctx.clearRect(0,0,waveCanvas.width,waveCanvas.height);
+wctx.fillStyle="rgba(0,105,148,0.5)";
+wctx.beginPath();
+wctx.moveTo(0,waveCanvas.height*0.75);
+for(let x=0;x<=waveCanvas.width;x++){
+let y=Math.sin(x*0.01+offset)*20+waveCanvas.height*0.75;
+wctx.lineTo(x,y);
+}
+wctx.lineTo(waveCanvas.width,waveCanvas.height);
+wctx.lineTo(0,waveCanvas.height);
+wctx.closePath();
+wctx.fill();
+offset+=0.02;
+requestAnimationFrame(drawWaves);
+}
+drawWaves();
+
+/* STARS FORMING ANYA */
+const starCanvas=document.getElementById("stars");
+const sctx=starCanvas.getContext("2d");
+starCanvas.width=innerWidth;
+starCanvas.height=innerHeight;
+
+let stars=[];
+for(let i=0;i<200;i++){
+stars.push({
+x:Math.random()*starCanvas.width,
+y:Math.random()*starCanvas.height,
+size:Math.random()*2
+});
+}
+
+function drawStars(){
+sctx.clearRect(0,0,starCanvas.width,starCanvas.height);
+sctx.fillStyle="white";
+stars.forEach(s=>{
+sctx.beginPath();
+sctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+sctx.fill();
+});
+requestAnimationFrame(drawStars);
+}
+drawStars();
+
+</script>
+
+</body>
+</html>
