@@ -13,8 +13,6 @@ body{
     overflow:hidden;
     height:100vh;
     font-family:'Playfair Display',serif;
-    color:white;
-    background:black;
     transition:background 2s linear;
 }
 
@@ -167,7 +165,7 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 </audio>
 
 <script>
-/* 🌞 Real-Time IST Sky */
+/* 🌞 Real-Time IST Sky + Text Color */
 const skyStops = [
   { time: 0.0, colors: ["#0a0f2c", "#1b2550"] }, // Midnight
   { time: 0.25, colors: ["#ff9966", "#ff5e62"] }, // Sunrise
@@ -201,6 +199,17 @@ function updateSky(){
             const topColor = lerpColor(current.colors[0], next.colors[0], localT);
             const bottomColor = lerpColor(current.colors[1], next.colors[1], localT);
             document.body.style.background = `linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
+
+            // ✅ Text color: black for day, white for night
+            const loveText = document.querySelector(".love-text");
+            const counterText = document.querySelector(".counter");
+            if(progress >= 0.25 && progress <= 0.75){ // 6AM - 6PM IST
+                loveText.style.color = "black";
+                counterText.style.color = "black";
+            } else {
+                loveText.style.color = "white";
+                counterText.style.color = "white";
+            }
             break;
         }
     }
