@@ -156,10 +156,13 @@ button{
 /* PETALS */
 .petal{
     position:absolute;
-    width:15px;height:15px;
+    width:15px;
+    height:15px;
     background:radial-gradient(circle at 30% 30%,pink,#ff69b4);
     border-radius:50% 50% 50% 0;
     animation:fall linear infinite;
+    pointer-events: none;   /* 🔥 THIS FIXES IT */
+    z-index: 1;
 }
 @keyframes fall{
     to{transform:translateY(110vh) rotate(360deg);}
@@ -355,3 +358,4 @@ btn.style.top=Math.random()*80+"%";
 </script>
 </body>
 </html>
+
