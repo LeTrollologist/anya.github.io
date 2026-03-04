@@ -49,12 +49,7 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 </head>
 <body>
 
-<!-- SUN/MOON LIBRARY -->
-<script type="module">
-import SunCalc from "https://cdn.skypack.dev/suncalc";
-window.SunCalc = SunCalc;
-</script>
-
+<!-- Header -->
 <header>
   💖 Our Magical Love 💖
   <a href="#">HOME</a>
@@ -63,10 +58,12 @@ window.SunCalc = SunCalc;
   <a href="#">CONTACT</a>
 </header>
 
+<!-- Canvases -->
 <canvas id="stars"></canvas>
 <canvas id="sun"></canvas>
 <canvas id="moon"></canvas>
 
+<!-- Elements -->
 <div class="love-text">I love you Anya</div>
 <div class="counter" id="counter"></div>
 <div class="letter" id="letter"></div>
@@ -84,11 +81,14 @@ window.SunCalc = SunCalc;
 <div class="ending" id="ending"></div>
 <footer id="footerCounter"></footer>
 
+<!-- SunCalc UMD version -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+
 <script>
 // IST helper
 function getISTTime(){ return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"})); }
 
-// Horizon gradient based on sun altitude
+// Horizon gradient
 function updateBackground(sunAltitude){
     const t = Math.max(0, Math.min(1, (sunAltitude + 0.2) / 1.0));
     const dayColor = `rgb(${230*t+25},${180*t+50},${255*t+80})`;
@@ -96,7 +96,7 @@ function updateBackground(sunAltitude){
     document.body.style.background = `linear-gradient(to bottom, ${dayColor}, ${nightColor})`;
 }
 
-/* ====== SUN & MOON DRAW ====== */
+/* SUN & MOON DRAW */
 const sunCanvas = document.getElementById("sun"),
       sunCtx    = sunCanvas.getContext("2d"),
       moonCanvas= document.getElementById("moon"),
@@ -165,7 +165,7 @@ function drawSky(){
 }
 drawSky();
 
-/* ====== DAYS COUNTER ====== */
+/* ===== DAYS COUNTER ===== */
 const startDate=new Date("2026-02-17T16:19:00");
 const counterEl=document.getElementById("counter");
 function updateCounter(){
