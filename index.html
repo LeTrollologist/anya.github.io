@@ -160,6 +160,7 @@ button{
     font-family:'Great Vibes',cursive;
     font-size:clamp(2rem,7vw,5rem);
     opacity:0;
+    pointer-events:none; /* <-- prevent blocking clicks */
     transition:3s;
     z-index:40;
     text-shadow: 0 0 20px #ff69b4, 0 0 40px #ffb6c1;
@@ -300,13 +301,16 @@ proposalBtn.addEventListener("click",()=>{
 
 /* Proposal Yes/No */
 function sayYes(){
-    const marry=document.getElementById("marry"); marry.style.opacity=0;
+    const marry=document.getElementById("marry");
+    marry.style.opacity=0;
     setTimeout(()=>{marry.style.display="none";},1000);
+
     const ending=document.getElementById("ending");
     const today=new Date();
     const options={year:'numeric',month:'long',day:'numeric'};
     ending.innerHTML=`Forever begins now ♡<br>${today.toLocaleDateString(undefined,options)}`;
     ending.style.opacity=1;
+    ending.style.pointerEvents="auto"; // enable only when visible
 }
 function sayNo(){
     document.querySelector(".no").style.opacity=0;
