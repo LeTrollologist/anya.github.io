@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Magical Love – Dev Log 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    overflow-x:hidden;
+    min-height:100vh;
+    font-family:'Playfair Display',serif;
+    transition:background 1s linear;
+}
+body::after{
+    content:'';
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:radial-gradient(circle at center,transparent 60%,rgba(0,0,0,0.8));
+}
+
+/* Header */
+header{
+    position:relative;
+    width:100%;
+    padding:15px;
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    align-items:center;
+    z-index:50;
+    font-family:'Great Vibes',cursive;
+    font-size:clamp(1.5rem,3vw,2.2rem);
+    color:white;
+    text-shadow:0 0 10px black;
+}
+header a{
+    font-family:'Playfair Display',serif;
+    font-size:1rem;
+    text-decoration:none;
+    color:white;
+    font-weight:bold;
+    transition:0.3s;
+}
+header a:hover{color:#ff69b4;}
+
+/* Counter */
+.counter{
+    text-align:center;
+    margin-top:10px;
+    font-family:'Great Vibes',cursive;
+    font-size:clamp(1.2rem,3vw,2rem);
+    color:white;
+    text-shadow:0 0 10px black;
+}
+
+/* Timeline */
+.timeline{
+    width:85%;
+    margin:50px auto 100px auto;
+    position:relative;
+    z-index:20;
+}
+.entry{
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(10px);
+    padding:25px;
+    margin:25px 0;
+    border-radius:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+    transition:0.4s ease;
+    color:white;
+}
+.entry:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 50px rgba(255,105,180,0.6);
+}
+.version{
+    font-family:'Great Vibes',cursive;
+    font-size:1.8rem;
+    color:#ffd6f0;
+}
+.date{
+    font-size:0.9rem;
+    opacity:0.8;
+    margin-bottom:10px;
+}
+ul{
+    margin-left:20px;
+}
+li{
+    margin:6px 0;
+}
+
+/* Floating Title */
+.log-title{
+    text-align:center;
+    font-family:'Great Vibes',cursive;
+    font-size:3rem;
+    color:white;
+    margin-top:30px;
+    animation:floatTitle 6s ease-in-out infinite;
+    text-shadow:0 0 20px #ff69b4;
+}
+@keyframes floatTitle{
+    50%{transform:translateY(-10px);}
+}
+
+/* Petals + Glitter */
+.petal,.glitter{
+    position:fixed;
+    pointer-events:none;
+    z-index:5;
+}
+.petal{
+    width:15px;height:15px;
+    background:radial-gradient(circle at 30% 30%,pink,#ff69b4);
+    border-radius:50% 50% 50% 0;
+    animation:fall linear infinite;
+}
+.glitter{
+    width:3px;height:3px;
+    border-radius:50%;
+    background:white;
+    opacity:0.7;
+    animation:glitterMove linear infinite;
+}
+@keyframes fall{
+    to{transform:translateY(110vh) rotate(360deg);}
+}
+@keyframes glitterMove{
+    0%{transform:translateY(0);opacity:0.7;}
+    50%{opacity:1;}
+    100%{transform:translateY(100vh);opacity:0;}
+}
+
+/* Canvas */
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    pointer-events:none;
+    z-index:0;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+💖 Our Magical Love 💖
+<a href="index.html">HOME</a>
+<a href="album.html">ALBUM</a>
+<a href="#">LOG</a>
+</header>
+
+<div class="counter" id="counter"></div>
+
+<div class="log-title">Website Dev Log ✨</div>
+
+<div class="timeline">
+
+<div class="entry">
+<div class="version">Version 1.0 – The Beginning</div>
+<div class="date">Initial Launch</div>
+<ul>
+<li>Created romantic homepage</li>
+<li>Added relationship counter 💖</li>
+<li>Implemented proposal system 💍</li>
+</ul>
+</div>
+
+<div class="entry">
+<div class="version">Version 1.1 – Celestial Update</div>
+<div class="date">Sky System Upgrade</div>
+<ul>
+<li>Added real-time IST sun positioning 🌅</li>
+<li>Integrated accurate moon phases 🌙</li>
+<li>Added glitter & petals animations ✨🌸</li>
+</ul>
+</div>
+
+<div class="entry">
+<div class="version">Version 1.2 – Album Expansion</div>
+<div class="date">Memory System Added</div>
+<ul>
+<li>Created animated album page</li>
+<li>Editable captions</li>
+<li>Fluid responsive layout 💗</li>
+</ul>
+</div>
+
+<div class="entry">
+<div class="version">Version 1.3 – Love Evolution</div>
+<div class="date">Visual Enhancements</div>
+<ul>
+<li>Improved night/day gradients</li>
+<li>Improved proposal buttons styling</li>
+<li>Enhanced glow effects 🌌</li>
+</ul>
+</div>
+
+</div>
+
+<canvas id="sun"></canvas>
+<canvas id="moon"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+
+<script>
+// Coordinates (Kolkata)
+const lat=22.5726,lng=88.3639;
+
+const sunCanvas=document.getElementById("sun"),
+sunCtx=sunCanvas.getContext("2d"),
+moonCanvas=document.getElementById("moon"),
+moonCtx=moonCanvas.getContext("2d");
+
+function resize(){
+    sunCanvas.width=moonCanvas.width=innerWidth;
+    sunCanvas.height=moonCanvas.height=innerHeight;
+}
+resize();
+addEventListener("resize",resize);
+
+function updateBackground(sunAlt){
+    const t=Math.max(0,Math.min(1,(sunAlt+Math.PI/2)/Math.PI));
+    const top=`rgb(${25+205*t},${50+130*t},${80+175*t})`;
+    const bottom=`rgb(${10+20*t},${20+40*t},${40+60*t})`;
+    document.body.style.background=`linear-gradient(to bottom,${top},${bottom})`;
+}
+
+function drawSky(){
+    const now=new Date();
+    const sunPos=SunCalc.getPosition(now,lat,lng);
+    updateBackground(sunPos.altitude);
+
+    sunCtx.clearRect(0,0,innerWidth,innerHeight);
+    if(sunPos.altitude>-0.1){
+        const sx=(sunPos.azimuth+Math.PI)/(2*Math.PI)*innerWidth;
+        const sy=innerHeight*(1-(sunPos.altitude+Math.PI/2)/Math.PI);
+        sunCtx.beginPath();
+        sunCtx.fillStyle="yellow";
+        sunCtx.arc(sx,sy,30,0,Math.PI*2);
+        sunCtx.fill();
+    }
+
+    const moonPos=SunCalc.getMoonPosition(now,lat,lng);
+    const moonIll=SunCalc.getMoonIllumination(now);
+
+    moonCtx.clearRect(0,0,innerWidth,innerHeight);
+    if(moonPos.altitude>-0.1){
+        const mx=(moonPos.azimuth+Math.PI)/(2*Math.PI)*innerWidth;
+        const my=innerHeight*(1-(moonPos.altitude+Math.PI/2)/Math.PI);
+
+        moonCtx.beginPath();
+        moonCtx.fillStyle="#ddd";
+        moonCtx.arc(mx,my,25,0,Math.PI*2);
+        moonCtx.fill();
+
+        moonCtx.globalCompositeOperation="destination-out";
+        moonCtx.beginPath();
+        const shift=25*(1-moonIll.fraction);
+        moonCtx.ellipse(mx+shift,my,25,25,0,0,Math.PI*2);
+        moonCtx.fill();
+        moonCtx.globalCompositeOperation="source-over";
+    }
+
+    requestAnimationFrame(drawSky);
+}
+drawSky();
+
+// Counter
+const startDate=new Date("2026-02-17T16:19:00+05:30");
+const counterEl=document.getElementById("counter");
+setInterval(()=>{
+    const diff=new Date()-startDate;
+    const d=Math.floor(diff/86400000);
+    counterEl.innerHTML=`${d} Days Together 💖`;
+},1000);
+
+// Petals
+for(let i=0;i<30;i++){
+    let p=document.createElement("div");
+    p.className="petal";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=(5+Math.random()*5)+"s";
+    document.body.appendChild(p);
+}
+
+// Glitter
+for(let i=0;i<40;i++){
+    let g=document.createElement("div");
+    g.className="glitter";
+    g.style.left=Math.random()*100+"vw";
+    g.style.animationDuration=(5+Math.random()*5)+"s";
+    document.body.appendChild(g);
+}
+</script>
+
+</body>
+</html>
