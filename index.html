@@ -70,7 +70,7 @@ body::after{
 .marry{
     position:absolute;
     inset:0;
-    background:rgba(0,0,0,0.85);
+    background:rgba(0,0,0,0.5);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -81,8 +81,18 @@ body::after{
     transition:2s;
     z-index:30;
     pointer-events:auto;
+    backdrop-filter: blur(5px);
 }
 
+/* Proposal Text Glow */
+#proposalText {
+    text-align:center;
+    color:white;
+    text-shadow: 0 0 10px #ffddaa, 0 0 20px #ffbb88, 0 0 30px #ff9966;
+    margin-bottom:20px;
+}
+
+/* Ring animation */
 .ring{
     width:120px;height:120px;
     border:10px solid gold;
@@ -115,15 +125,21 @@ button{
     position:absolute;
     top:20px;
     right:20px;
-    width:60px;
-    height:60px;
+    width:80px;
+    height:80px;
     border-radius:50%;
     background:gold;
     border:none;
     cursor:pointer;
-    font-size:1.5rem;
+    font-size:2rem;
     z-index:50;
-    box-shadow:0 0 15px gold;
+    box-shadow:0 0 20px gold;
+    animation:glowPulse 2s infinite;
+}
+@keyframes glowPulse{
+    0%{box-shadow:0 0 10px gold;}
+    50%{box-shadow:0 0 25px gold,0 0 40px rgba(255,223,0,0.7);}
+    100%{box-shadow:0 0 10px gold;}
 }
 
 /* Ending */
