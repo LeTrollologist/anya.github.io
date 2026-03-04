@@ -95,7 +95,7 @@ Just intention and clean logic.
 ## 🧭 Pages
 
 | Page            | Status               |
-|                 |                      |
+| --------------- | ------------------ |
 | Home            | ✅ Fully functional |
 | Proposal        | ✅ Functional       |
 | Album           | 🚧 WIP              |
