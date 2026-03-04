@@ -208,18 +208,6 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 
 <div class="ending" id="ending"></div>
 
-<audio id="ocean" loop>
-<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_7c3c3e57e3.mp3">
-</audio>
-
-<audio id="heartbeat">
-<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_20a4c8c1e1.mp3">
-</audio>
-
-<audio id="orchestra">
-<source src="https://cdn.pixabay.com/audio/2022/10/18/audio_8b5bb09b35.mp3">
-</audio>
-
 <script>
 /* 🌞 Real-Time IST Sky + Text Color */
 const skyStops = [
@@ -230,47 +218,27 @@ const skyStops = [
   { time: 1.0, colors: ["#0a0f2c", "#1b2550"] }
 ];
 
-function getISTTime(){
-    return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"}));
-}
-function getDayProgress(){
-    const ist = getISTTime();
-    return (ist.getHours()*3600 + ist.getMinutes()*60 + ist.getSeconds())/86400;
-}
-function lerpColor(a,b,t){
-  const ah=parseInt(a.replace("#",""),16),
-        ar=ah>>16, ag=(ah>>8)&0xff, ab=ah&0xff,
-        bh=parseInt(b.replace("#",""),16),
-        br=bh>>16, bg=(bh>>8)&0xff, bb=bh&0xff,
-        rr=ar+t*(br-ar), rg=ag+t*(bg-ag), rb=ab+t*(bb-ab);
-  return `rgb(${rr|0},${rg|0},${rb|0})`;
-}
+function getISTTime(){ return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"})); }
+function getDayProgress(){ const ist=getISTTime(); return (ist.getHours()*3600 + ist.getMinutes()*60 + ist.getSeconds())/86400; }
+function lerpColor(a,b,t){ const ah=parseInt(a.replace("#",""),16), ar=ah>>16, ag=(ah>>8)&0xff, ab=ah&0xff, bh=parseInt(b.replace("#",""),16), br=bh>>16, bg=(bh>>8)&0xff, bb=bh&0xff, rr=ar+t*(br-ar), rg=ag+t*(bg-ag), rb=ab+t*(bb-ab); return `rgb(${rr|0},${rg|0},${rb|0})`; }
 function updateSky(){
-    const progress = getDayProgress();
+    const progress=getDayProgress();
     for(let i=0;i<skyStops.length-1;i++){
-        const current = skyStops[i];
-        const next = skyStops[i+1];
-        if(progress >= current.time && progress <= next.time){
-            const localT = (progress - current.time)/(next.time - current.time);
-            const topColor = lerpColor(current.colors[0], next.colors[0], localT);
-            const bottomColor = lerpColor(current.colors[1], next.colors[1], localT);
-            document.body.style.background = `linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
-
-            const loveText = document.querySelector(".love-text");
-            const counterText = document.querySelector(".counter");
-            if(progress >= 0.25 && progress <= 0.75){
-                loveText.style.color = "black";
-                counterText.style.color = "black";
-            } else {
-                loveText.style.color = "white";
-                counterText.style.color = "white";
-            }
+        const current=skyStops[i]; const next=skyStops[i+1];
+        if(progress>=current.time && progress<=next.time){
+            const localT=(progress-current.time)/(next.time-current.time);
+            const topColor=lerpColor(current.colors[0],next.colors[0],localT);
+            const bottomColor=lerpColor(current.colors[1],next.colors[1],localT);
+            document.body.style.background=`linear-gradient(to bottom, ${topColor}, ${bottomColor})`;
+            const loveText=document.querySelector(".love-text");
+            const counterText=document.querySelector(".counter");
+            if(progress>=0.25 && progress<=0.75){ loveText.style.color="black"; counterText.style.color="black"; }
+            else{ loveText.style.color="white"; counterText.style.color="white"; }
             break;
         }
     }
 }
-updateSky();
-setInterval(updateSky,10000);
+updateSky(); setInterval(updateSky,10000);
 
 /* Counter */
 const startDate=new Date("2026-02-17T16:19:00");
@@ -284,70 +252,42 @@ document.getElementById("counter").innerText=`Together for ${d} days, ${h} hours
 },1000);
 
 /* Stars */
-const starCanvas=document.getElementById("stars");
-const ctx=starCanvas.getContext("2d");
+const starCanvas=document.getElementById("stars"); const ctx=starCanvas.getContext("2d");
 starCanvas.width=innerWidth; starCanvas.height=innerHeight;
-let stars=[];
-for(let i=0;i<500;i++){stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,size:1});}
-function drawStars(){
-ctx.clearRect(0,0,innerWidth,innerHeight);
-stars.forEach(s=>{
-ctx.fillStyle="white";
-ctx.fillRect(s.x,s.y,1+Math.sin(Date.now()*0.005),1+Math.sin(Date.now()*0.005));
-});
-requestAnimationFrame(drawStars);
-}
+let stars=[]; for(let i=0;i<500;i++){stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,size:1});}
+function drawStars(){ ctx.clearRect(0,0,innerWidth,innerHeight); stars.forEach(s=>{ ctx.fillStyle="white"; ctx.fillRect(s.x,s.y,1+Math.sin(Date.now()*0.005),1+Math.sin(Date.now()*0.005)); }); requestAnimationFrame(drawStars);}
 drawStars();
 
 /* Moon */
-const moonCanvas=document.getElementById("moon");
-const moonCtx=moonCanvas.getContext("2d");
-moonCanvas.width=innerWidth;
-moonCanvas.height=innerHeight;
-function drawMoon(){
-    moonCtx.clearRect(0,0,innerWidth,innerHeight);
-    const ist=getISTTime();
-    const hour = ist.getHours()+ist.getMinutes()/60;
-    let x = ((hour>=18?hour-18:hour+6)/12)*innerWidth;
-    let y = innerHeight*0.2 + Math.sin((hour/24)*Math.PI*2)*50;
-    let brightness = (hour>=6 && hour<=18)?0:1;
-    moonCtx.globalAlpha = brightness;
-    moonCtx.beginPath();
-    moonCtx.arc(x,y,40,0,Math.PI*2);
-    moonCtx.fillStyle="#fffacd";
-    moonCtx.fill();
-    moonCtx.globalAlpha=1;
-    requestAnimationFrame(drawMoon);
-}
+const moonCanvas=document.getElementById("moon"); const moonCtx=moonCanvas.getContext("2d");
+moonCanvas.width=innerWidth; moonCanvas.height=innerHeight;
+function drawMoon(){ moonCtx.clearRect(0,0,innerWidth,innerHeight); const ist=getISTTime(); const hour=ist.getHours()+ist.getMinutes()/60;
+let x=((hour>=18?hour-18:hour+6)/12)*innerWidth;
+let y=innerHeight*0.2 + Math.sin((hour/24)*Math.PI*2)*50;
+let brightness=(hour>=6 && hour<=18)?0:1;
+moonCtx.globalAlpha=brightness; moonCtx.beginPath(); moonCtx.arc(x,y,40,0,Math.PI*2); moonCtx.fillStyle="#fffacd"; moonCtx.fill(); moonCtx.globalAlpha=1;
+requestAnimationFrame(drawMoon);}
 drawMoon();
 
 /* Petals */
-for(let i=0;i<40;i++){
-let p=document.createElement("div");
-p.className="petal";
-p.style.left=Math.random()*100+"vw";
-p.style.animationDuration=(5+Math.random()*5)+"s";
-p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)];
-p.style.transform=`rotate(${Math.random()*360}deg)`;
-document.body.appendChild(p);
-}
+for(let i=0;i<40;i++){ let p=document.createElement("div"); p.className="petal"; p.style.left=Math.random()*100+"vw"; p.style.animationDuration=(5+Math.random()*5)+"s"; p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)]; p.style.transform=`rotate(${Math.random()*360}deg)`; document.body.appendChild(p); }
 
 /* Letter - 3 clicks to open */
 let clickCount=0;
-const letter=document.getElementById("letter");
-const letterText="You are written in my sky and in every future I see.";
-let i=0;
-function writeLetter(){if(i<letterText.length){letter.innerHTML+=letterText.charAt(i);i++;setTimeout(writeLetter,50);}}
+const letter=document.getElementById("letter"); const letterText="You are written in my sky and in every future I see."; let i=0;
+function writeLetter(){ if(i<letterText.length){letter.innerHTML+=letterText.charAt(i); i++; setTimeout(writeLetter,50);} }
 document.body.addEventListener("click",()=>{
-    clickCount++;
+    clickCount++; 
     if(clickCount>=3 && !letter.classList.contains('show')){
-        letter.classList.add('show');
-        writeLetter();
-        document.getElementById("ocean").play();
+        letter.classList.add('show'); writeLetter();
     }
 });
 
-/* Proposal Mode Button */
+/* Stop propagation so buttons work */
+const interactiveElements = [document.getElementById("letter"), document.getElementById("marry"), document.getElementById("proposalBtn")];
+interactiveElements.forEach(el=>{ el.addEventListener("click", e=>e.stopPropagation()); });
+
+/* Proposal Button */
 const proposalBtn=document.getElementById("proposalBtn");
 proposalBtn.addEventListener("click",()=>{
     const marry=document.getElementById("marry");
@@ -355,18 +295,13 @@ proposalBtn.addEventListener("click",()=>{
     const ist=getISTTime();
     const device=new Date();
     proposalText.innerHTML=`IST: ${ist.toLocaleString('en-IN',{hour12:true})}<br>Device: ${device.toLocaleString()}`;
-    marry.style.display="flex";  // display now visible
-    setTimeout(()=>{marry.style.opacity=1;},10); // trigger transition
-    document.getElementById("heartbeat").play();
+    marry.style.display="flex"; setTimeout(()=>{marry.style.opacity=1;},10);
 });
 
-/* Proposal Mode Yes/No */
+/* Proposal Yes/No */
 function sayYes(){
-    const marry=document.getElementById("marry");
-    marry.style.opacity=0;
-    setTimeout(()=>{marry.style.display="none";},1000); // hide after fade
-    document.getElementById("orchestra").play();
-    // Use local device date for ending
+    const marry=document.getElementById("marry"); marry.style.opacity=0;
+    setTimeout(()=>{marry.style.display="none";},1000);
     const ending=document.getElementById("ending");
     const today=new Date();
     const options={year:'numeric',month:'long',day:'numeric'};
