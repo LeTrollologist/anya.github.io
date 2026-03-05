@@ -49,7 +49,7 @@ header a:hover{color:#ff69b4;cursor:pointer;}
 #studyToggle, #headerProposal { cursor:pointer; font-size: 1.5rem; transition: transform 0.2s; }
 #studyToggle:hover, #headerProposal:hover { transform: scale(1.2); }
 
-/* Text & Counters */
+/* Text */
 .love-text{
     position:absolute;width:100%;text-align:center;top:25%;
     font-family:'Great Vibes',cursive;font-size:clamp(2.5rem,6vw,5rem);
@@ -66,11 +66,71 @@ header a:hover{color:#ff69b4;cursor:pointer;}
 @keyframes floatText{50%{transform:translateY(-15px);}}
 @keyframes heartbeatVisual{50%{transform:scale(1.05);}}
 
+/* Central Dashboard (Counter + Clocks) */
+.dashboard {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 10;
+    width: 100%;
+    transition: opacity 0.5s;
+}
+
 .counter{
-    position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);
-    text-align:center;font-size:clamp(1rem,3vw,2rem);z-index:10;
-    font-family:'Great Vibes',cursive; color: white; text-shadow:0 0 10px black;
-    transition: opacity 0.5s; display: flex; gap: 10px;
+    text-align:center;
+    font-size:clamp(1rem,3vw,2rem);
+    font-family:'Great Vibes',cursive; 
+    color: white; 
+    text-shadow:0 0 10px black;
+    display: flex; 
+    gap: 10px;
+}
+
+.world-clocks {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.clock-box {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 105, 180, 0.4);
+    border-radius: 15px;
+    padding: 12px 25px;
+    min-width: 180px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.clock-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
+}
+
+.clock-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.clock-time {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 0 10px #ff69b4;
+    letter-spacing: 1px;
 }
 
 /* Letter */
@@ -143,7 +203,7 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
 
 /* ================== STUDY MODE OVERHAUL ================== */
 body.studyMode { background: linear-gradient(to bottom, #0f1b2b, #1a2545, #050814) !important; }
-body.studyMode .love-text, body.studyMode .sub-text, body.studyMode .counter, 
+body.studyMode .love-text, body.studyMode .sub-text, body.studyMode .dashboard, 
 body.studyMode .petal, body.studyMode .glitter, body.studyMode #headerProposal, 
 body.studyMode #sunSvg, body.studyMode #moonSvg {
     opacity: 0; pointer-events: none;
@@ -227,13 +287,13 @@ footer{ position:absolute; bottom:0; width:100%; text-align:center; z-index:20; 
 
 <canvas id="stars"></canvas>
 
-<!-- New SVG Sun -->
+<!-- SVG Sun -->
 <svg id="sunSvg" width="160" height="160">
     <circle id="sunGlowLayer" cx="80" cy="80" r="80" fill="rgba(255,240,150,0.5)" />
     <circle cx="80" cy="80" r="30" fill="yellow" />
 </svg>
 
-<!-- New SVG Moon with Phase Masking -->
+<!-- SVG Moon with Phase Masking -->
 <svg id="moonSvg" width="60" height="60">
     <defs>
         <mask id="moonPhaseMask">
@@ -241,15 +301,30 @@ footer{ position:absolute; bottom:0; width:100%; text-align:center; z-index:20; 
             <circle id="moonMaskShadow" cx="30" cy="30" r="26" fill="black" />
         </mask>
     </defs>
-    <!-- Base solid moon masked by the shadow -->
     <circle cx="30" cy="30" r="25" fill="#ddd" mask="url(#moonPhaseMask)" />
-    <!-- Subtle outline to indicate the dark side of the moon -->
     <circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
 </svg>
 
 <div class="love-text">I love you Anya</div>
 <div class="sub-text">Forever and always. I will never forget you</div>
-<div class="counter" id="counter"></div>
+
+<!-- Main Dashboard Container -->
+<div class="dashboard" id="mainDashboard">
+    <!-- Relationship Counter -->
+    <div class="counter" id="counter"></div>
+    
+    <!-- Timezone Clocks -->
+    <div class="world-clocks">
+        <div class="clock-box">
+            <div class="clock-label">Eastern Time 🇺🇸</div>
+            <div class="clock-time" id="time-est">--:--:-- --</div>
+        </div>
+        <div class="clock-box">
+            <div class="clock-label">India Time 🇮🇳</div>
+            <div class="clock-time" id="time-ist">--:--:-- --</div>
+        </div>
+    </div>
+</div>
 
 <!-- Handwritten Letter -->
 <div class="letter" id="letter">
@@ -373,7 +448,6 @@ function drawSky(){
             sunSvg.style.top = `${sy}px`;
             sunSvg.style.display = "block";
             
-            // Dynamic sun glow
             const glowAlpha = Math.max(0, Math.sin(sunAlt) * 0.8);
             document.getElementById("sunGlowLayer").setAttribute("fill", `rgba(255,240,150,${glowAlpha})`);
         } else {
@@ -392,10 +466,8 @@ function drawSky(){
             moonSvg.style.top = `${my}px`;
             moonSvg.style.display = "block";
             
-            // Accurate Lunar Phase Calculation
             const fraction = moonIll.fraction;
             const isWaxing = moonIll.phase <= 0.5;
-            // Shift mask shadow based on illuminated fraction
             const shift = 50 * fraction; 
             const shadowCx = isWaxing ? 30 - shift : 30 + shift;
             document.getElementById("moonMaskShadow").setAttribute("cx", shadowCx);
@@ -408,15 +480,30 @@ function drawSky(){
 resizeCanvases();
 drawSky();
 
-// --- COUNTERS ---
+// --- RELATIONSHIP COUNTER & CLOCKS ---
 const startDate = new Date("2026-02-17T16:19:00+05:30");
-function updateCounter(){
-    const diff = new Date() - startDate;
+
+// Formatting options for accurately rendering timezones accounting for DST automatically 
+const estOptions = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+const istOptions = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+
+function updateTimeAndCounter() {
+    const now = new Date();
+    
+    // 1. Update Relationship Counter
+    const diff = now - startDate;
     const d=Math.floor(diff/86400000), h=Math.floor(diff/3600000%24), m=Math.floor(diff/60000%60), s=Math.floor(diff/1000%60);
     document.getElementById("counter").innerHTML=`<span>${d} 💖 Days</span> <span>${h} 🕒 Hours</span> <span>${m} ⏳ Mins</span> <span>${s} 💌 Secs</span>`;
-}
-setInterval(updateCounter,1000);
 
+    // 2. Update EST and IST Clocks
+    document.getElementById('time-est').innerText = now.toLocaleTimeString('en-US', estOptions);
+    document.getElementById('time-ist').innerText = now.toLocaleTimeString('en-US', istOptions);
+}
+// Run immediately once to avoid a delay on page load, then loop every second
+updateTimeAndCounter();
+setInterval(updateTimeAndCounter, 1000);
+
+// --- VISIT COUNTER ---
 let visits = localStorage.getItem("anya_visits") || 0;
 visits++; localStorage.setItem("anya_visits", visits);
 document.getElementById("footerCounter").innerHTML=`You've visited ${visits} times 🌸`;
@@ -596,5 +683,3 @@ updateDisplay();
 </script>
 </body>
 </html>
-
-
