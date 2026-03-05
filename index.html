@@ -133,6 +133,99 @@ header a:hover{color:#ff69b4;cursor:pointer;}
     letter-spacing: 1px;
 }
 
+/* ================== CUSTOM MUSIC PLAYER ================== */
+#musicPlayer {
+    position: absolute;
+    bottom: 25px;
+    left: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 105, 180, 0.4);
+    border-radius: 30px;
+    padding: 10px 20px 10px 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 50;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s;
+}
+
+#musicPlayer:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
+}
+
+.vinyl-record {
+    width: 45px;
+    height: 45px;
+    background: repeating-radial-gradient(
+        #111,
+        #111 2px,
+        #222 3px,
+        #222 4px
+    );
+    border-radius: 50%;
+    border: 2px solid #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);
+}
+
+.vinyl-record::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #ff69b4; /* Pink Label */
+    border-radius: 50%;
+}
+
+.vinyl-record::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white; /* Spindle hole */
+    border-radius: 50%;
+}
+
+.spin {
+    animation: spinRecord 3s linear infinite;
+}
+
+@keyframes spinRecord {
+    100% { transform: rotate(360deg); }
+}
+
+.track-info {
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+.track-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px black;
+}
+
+.track-artist {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* Floating Notes Animation */
+@keyframes floatNote {
+    0% { transform: translateY(0) scale(0.8) rotate(-10deg); opacity: 1; }
+    100% { transform: translateY(-70px) scale(1.3) rotate(20deg); opacity: 0; }
+}
+
 /* Letter */
 .letter{
     position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -326,6 +419,18 @@ footer{ position:absolute; bottom:0; width:100%; text-align:center; z-index:20; 
     </div>
 </div>
 
+<!-- ================== AUDIO TRACK ================== -->
+<audio id="bgAudio" loop src="https://res.cloudinary.com/dwpisauuy/video/upload/v1772744236/Interstellar-Space-Sounds_ux8nf2.mp3"></audio>
+
+<!-- ================== CUSTOM MUSIC PLAYER ================== -->
+<div id="musicPlayer" onclick="toggleMusic()">
+    <div class="vinyl-record" id="vinyl"></div>
+    <div class="track-info">
+        <div class="track-title" id="musicStatus">Interstellar Space Sounds</div>
+        <div class="track-artist">Serenity (Click to Play)</div>
+    </div>
+</div>
+
 <!-- Handwritten Letter -->
 <div class="letter" id="letter">
   <button class="close-btn" onclick="closeLetter()">✖</button>
@@ -401,7 +506,7 @@ function resizeCanvases(){
 window.addEventListener("resize", resizeCanvases);
 
 // --- STARS (Always visible) ---
-let starsArr = [];
+let starsArr =[];
 function initStars() {
     starsArr =[];
     for(let i=0; i<150; i++) {
@@ -432,14 +537,14 @@ function updateBackground(sunAlt){
 
 function drawSky(){
     drawStars();
-    const now = new Date(); // Accurate absolute time for SunCalc
+    const now = new Date(); 
     const sunPos = SunCalc.getPosition(now, lat, lng);
     const sunAlt = sunPos.altitude, sunAz = sunPos.azimuth;
     
     updateBackground(sunAlt);
 
     if(!studyMode) {
-        // --- Position & Style SVG Sun ---
+        // Position & Style SVG Sun
         const sunSvg = document.getElementById("sunSvg");
         if(sunAlt > -0.1){
             const sx = (sunAz + Math.PI)/(2*Math.PI)*innerWidth;
@@ -454,7 +559,7 @@ function drawSky(){
             sunSvg.style.display = "none";
         }
 
-        // --- Position & Style SVG Moon ---
+        // Position & Style SVG Moon
         const moonSvg = document.getElementById("moonSvg");
         const moonPos = SunCalc.getMoonPosition(now, lat, lng);
         const moonIll = SunCalc.getMoonIllumination(now);
@@ -482,24 +587,21 @@ drawSky();
 
 // --- RELATIONSHIP COUNTER & CLOCKS ---
 const startDate = new Date("2026-02-17T16:19:00+05:30");
-
-// Formatting options for accurately rendering timezones accounting for DST automatically 
 const estOptions = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
 const istOptions = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
 
 function updateTimeAndCounter() {
     const now = new Date();
     
-    // 1. Update Relationship Counter
+    // Update Counter
     const diff = now - startDate;
     const d=Math.floor(diff/86400000), h=Math.floor(diff/3600000%24), m=Math.floor(diff/60000%60), s=Math.floor(diff/1000%60);
     document.getElementById("counter").innerHTML=`<span>${d} 💖 Days</span> <span>${h} 🕒 Hours</span> <span>${m} ⏳ Mins</span> <span>${s} 💌 Secs</span>`;
 
-    // 2. Update EST and IST Clocks
+    // Update Clocks
     document.getElementById('time-est').innerText = now.toLocaleTimeString('en-US', estOptions);
     document.getElementById('time-ist').innerText = now.toLocaleTimeString('en-US', istOptions);
 }
-// Run immediately once to avoid a delay on page load, then loop every second
 updateTimeAndCounter();
 setInterval(updateTimeAndCounter, 1000);
 
@@ -507,6 +609,48 @@ setInterval(updateTimeAndCounter, 1000);
 let visits = localStorage.getItem("anya_visits") || 0;
 visits++; localStorage.setItem("anya_visits", visits);
 document.getElementById("footerCounter").innerHTML=`You've visited ${visits} times 🌸`;
+
+// --- CUSTOM MUSIC PLAYER LOGIC ---
+const bgAudio = document.getElementById("bgAudio");
+const vinyl = document.getElementById("vinyl");
+const musicStatus = document.getElementById("musicStatus");
+let noteInterval;
+
+function toggleMusic() {
+    if (bgAudio.paused) {
+        bgAudio.play().then(() => {
+            vinyl.classList.add("spin");
+            musicStatus.innerText = "Playing... 🎵";
+            noteInterval = setInterval(spawnMusicNote, 1500);
+        }).catch((err) => {
+            console.log("Audio play failed:", err);
+            alert("Oops! The audio couldn't play. Ensure the video file 'dhe_perissan.mp4' is in the same folder as the webpage!");
+        });
+    } else {
+        bgAudio.pause();
+        vinyl.classList.remove("spin");
+        musicStatus.innerText = "Paused ⏸️";
+        clearInterval(noteInterval);
+    }
+}
+
+function spawnMusicNote() {
+    const player = document.getElementById("musicPlayer");
+    const rect = player.getBoundingClientRect();
+    
+    const note = document.createElement("div");
+    note.innerText =["🎵", "🎶", "💖", "✨"][Math.floor(Math.random()*4)];
+    note.style.position = "absolute";
+    note.style.left = (rect.left + Math.random() * 40 + 10) + "px";
+    note.style.top = rect.top + "px";
+    note.style.fontSize = "1.5rem";
+    note.style.pointerEvents = "none";
+    note.style.zIndex = "100";
+    note.style.animation = "floatNote 2s ease-out forwards";
+    
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 2000);
+}
 
 // --- PETALS & GLITTER ---
 function spawnParticles() {
@@ -537,7 +681,9 @@ function writeLetter(){
     }
 }
 document.body.addEventListener("click", (e) => {
-    if(studyMode || e.target.closest('button') || e.target.closest('a') || e.target.closest('#studyPanel') || e.target.closest('.letter') || e.target.closest('.marry')) return;
+    // Avoid triggering when clicking functional UI elements
+    if(studyMode || e.target.closest('button') || e.target.closest('a') || e.target.closest('#studyPanel') || e.target.closest('.letter') || e.target.closest('.marry') || e.target.closest('#musicPlayer')) return;
+    
     clickCount++;
     if(clickCount >= 3 && !letter.classList.contains('show')){
         letter.classList.add('show');
@@ -546,7 +692,7 @@ document.body.addEventListener("click", (e) => {
 });
 function closeLetter() {
     letter.classList.remove('show');
-    clickCount = 0; // reset to allow reopening
+    clickCount = 0; 
 }
 
 // --- PROPOSAL ---
@@ -575,15 +721,12 @@ function sayNo(){
     setTimeout(()=> alert("I’ll keep asking forever 💖"), 300);
 }
 
-// --- JAVASCRIPT RETURN / STUDYBUDDY TOGGLE ---
+// --- STUDYBUDDY TOGGLE ---
 function toggleStudyMode() {
     studyMode = !studyMode;
-    
-    // Toggle CSS classes for visual updates (backgrounds, fading celestial bodies)
     document.body.classList.toggle("studyMode", studyMode);
     document.getElementById("studyPanel").style.display = studyMode ? "flex" : "none";
     
-    // Smoothly swap Header UI without breaking functionality
     const titleText = document.getElementById("titleText");
     const navLinks = document.getElementById("navLinks");
     const studyToggle = document.getElementById("studyToggle");
@@ -601,7 +744,7 @@ function toggleStudyMode() {
     }
 }
 
-// Study Timer Logic
+// --- STUDY TIMER LOGIC ---
 let timerInterval, isRunning = false;
 let defaultMinutes = 25, totalSeconds = 25 * 60, remainingSeconds = 25 * 60;
 const circle = document.querySelector('.progress-ring__circle');
@@ -655,12 +798,12 @@ function tick() {
         clearInterval(timerInterval); isRunning = false;
         document.getElementById("btnToggleTimer").innerText = "Start";
         document.getElementById("motivation").innerText = "Time's up! Great job 🌸";
-        let audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-        audio.play(); 
+        // Attempt a subtle sound ping if supported, optional
+        try{ new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); } catch(e){}
     }
 }
 
-// To-Do Logic
+// --- TO-DO LOGIC ---
 function handleTaskEnter(e) { if(e.key === 'Enter') addTask(); }
 function addTask() {
     const input = document.getElementById('taskInput');
@@ -671,7 +814,7 @@ function addTask() {
     input.value = '';
 }
 
-// Motivational Texts
+// --- MOTIVATIONAL TEXTS ---
 const messages =["Every minute counts.", "Your future self is proud.", "Stay steady. Stay calm.", "Small steps create big futures.", "You can do this, Anya."];
 setInterval(() => {
     if(studyMode && isRunning && remainingSeconds > 0) {
