@@ -4,294 +4,551 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>For Anya 💖</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
+
 *{margin:0;padding:0;box-sizing:border-box;}
-body{overflow:hidden;height:100vh;font-family:'Playfair Display',serif;transition:background 1s linear;}
-body::after{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 60%,rgba(0,0,0,0.8));}
 
-/* Header */
-header{position:absolute;top:0;width:100%;padding:10px 20px;display:flex;justify-content:center;align-items:center;gap:20px;z-index:50;font-family:'Great Vibes',cursive;font-size:clamp(1rem,2vw,1.5rem);color:white;text-shadow:0 0 5px black;}
-header a{color:white;text-decoration:none;font-family:'Playfair Display',serif;font-weight:bold;transition:0.3s;}
-header a:hover{color:#ff69b4;cursor:pointer;}
+body{
+overflow:hidden;
+height:100vh;
+font-family:'Playfair Display',serif;
+transition:background 1s;
+}
 
-/* Text */
-.love-text{position:absolute;width:100%;text-align:center;top:30%;font-family:'Great Vibes',cursive;font-size:clamp(2.5rem,6vw,5rem);animation:floatText 6s ease-in-out infinite, heartbeatVisual 1.8s infinite;text-shadow:0 0 25px rgba(255,255,255,0.9);z-index:10;}
-@keyframes floatText{50%{transform:translateY(-15px);} }
-@keyframes heartbeatVisual{50%{transform:scale(1.05);} }
+body::after{
+content:'';
+position:fixed;
+inset:0;
+pointer-events:none;
+background:radial-gradient(circle at center,transparent 60%,rgba(0,0,0,0.8));
+}
 
-/* Counters */
-.counter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;font-size:clamp(1rem,3vw,2rem);z-index:10;font-family:'Great Vibes',cursive;}
+/* HEADER */
 
-/* Footer */
+header{
+position:absolute;
+top:0;
+width:100%;
+padding:10px 20px;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:20px;
+z-index:50;
+font-family:'Great Vibes',cursive;
+font-size:clamp(1rem,2vw,1.5rem);
+color:white;
+text-shadow:0 0 5px black;
+}
+
+header a{
+color:white;
+text-decoration:none;
+font-family:'Playfair Display',serif;
+font-weight:bold;
+}
+
+header a:hover{
+color:#ff69b4;
+}
+
+/* STUDY TOGGLE */
+
+#studyToggle{
+cursor:pointer;
+font-size:1.2rem;
+}
+
+/* LOVE TEXT */
+
+.love-text{
+position:absolute;
+width:100%;
+text-align:center;
+top:30%;
+font-family:'Great Vibes',cursive;
+font-size:clamp(2.5rem,6vw,5rem);
+animation:floatText 6s ease-in-out infinite;
+text-shadow:0 0 25px rgba(255,255,255,0.9);
+z-index:10;
+}
+
+@keyframes floatText{
+50%{transform:translateY(-15px);}
+}
+
+/* COUNTER */
+
+.counter{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+text-align:center;
+font-size:clamp(1rem,3vw,2rem);
+z-index:10;
+font-family:'Great Vibes',cursive;
+}
+
+/* LETTER */
+
+.letter{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:90%;
+max-width:500px;
+background:#fffef8;
+color:#333;
+padding:30px;
+border-radius:10px;
+display:none;
+opacity:0;
+z-index:20;
+transition:opacity 1s;
+}
+
+.letter.show{
+display:block;
+opacity:1;
+}
+
+/* PROPOSAL */
+
+.marry{
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.5);
+display:none;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+opacity:0;
+z-index:30;
+backdrop-filter:blur(5px);
+transition:opacity 1s;
+}
+
+#proposalText{
+text-align:center;
+color:white;
+margin-bottom:30px;
+}
+
+.marry button{
+background:linear-gradient(145deg,#ff9ec4,#ff69b4);
+border:none;
+border-radius:25px;
+padding:12px 30px;
+margin:10px;
+color:white;
+font-family:'Great Vibes',cursive;
+font-size:1.4rem;
+cursor:pointer;
+}
+
+/* ENDING */
+
+.ending{
+position:absolute;
+inset:0;
+background:white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-family:'Great Vibes',cursive;
+font-size:clamp(2rem,7vw,5rem);
+opacity:0;
+transition:3s;
+z-index:40;
+}
+
+/* PETALS */
+
+.petal{
+position:absolute;
+width:15px;
+height:15px;
+background:pink;
+border-radius:50%;
+animation:fall linear infinite;
+pointer-events:none;
+}
+
+@keyframes fall{
+to{transform:translateY(110vh);}
+}
+
+/* GLITTER */
+
+.glitter{
+position:absolute;
+width:3px;
+height:3px;
+background:white;
+border-radius:50%;
+animation:fall linear infinite;
+pointer-events:none;
+}
+
+/* STUDY MODE */
+
+body.studyMode{
+background:linear-gradient(to bottom,#050814,#0f1b2b,#1a2545);
+}
+
+body.studyMode .love-text,
+body.studyMode .petal,
+body.studyMode .glitter,
+body.studyMode #headerProposal{
+display:none;
+}
+
+/* STUDY PANEL */
+
+#studyPanel{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+text-align:center;
+display:none;
+color:white;
+z-index:20;
+}
+
+#studyPanel h2{
+font-family:'Great Vibes',cursive;
+font-size:3rem;
+margin-bottom:10px;
+}
+
+#timerDisplay{
+font-size:3rem;
+margin:15px;
+}
+
+.studyButtons button{
+margin:5px;
+padding:10px 20px;
+border:none;
+border-radius:20px;
+background:#6a7cff;
+color:white;
+cursor:pointer;
+}
+
+#motivation{
+margin-top:15px;
+font-size:1.2rem;
+opacity:.9;
+}
+
+/* FOOTER */
+
 footer{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  text-align:center;
-  z-index:10;
-}
-#footerCounter{
-  font-size:clamp(0.8rem,2vw,1rem);
-  font-family:'Playfair Display',serif;
-  color:white;
-  text-shadow:0 0 10px black;
-  margin-bottom:2px;
-  transition:all 0.3s ease;
-}
-.footer-meta{
-  font-size:clamp(0.8rem,1.5vw,0.9rem);
-  color:white;
-  text-shadow:0 0 5px black;
-  margin-bottom:5px;
-}
-.footer-meta a{
-  color:white;
-  text-decoration:underline;
-  margin-left:5px;
-  transition:0.3s;
-}
-.footer-meta a:hover{
-  color:#ff69b4;
+position:absolute;
+bottom:0;
+width:100%;
+text-align:center;
+color:white;
+font-size:.9rem;
 }
 
-/* Letter */
-.letter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;max-width:500px;background:#fffef8;color:#333;padding:30px;border-radius:10px;display:none;opacity:0;font-family:cursive;z-index:20;pointer-events:all;transition:opacity 1s ease;}
-.letter.show{display:block;opacity:1;}
-
-/* Proposal */
-.marry{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:none;flex-direction:column;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;font-size:clamp(2rem,6vw,4rem);opacity:0;z-index:30;pointer-events:all;backdrop-filter: blur(5px);transition:opacity 1s ease;}
-#proposalText{text-align:center;color:white;text-shadow:0 0 10px #ffddaa,0 0 20px #ffbb88,0 0 30px #ff9966;margin-bottom:30px;}
-.marry p{font-size:1.5rem;text-align:center;margin-top:20px;}
-
-/* Proposal Buttons */
-.marry button {
-    background: linear-gradient(145deg, #ff9ec4, #ff69b4);
-    border: none;
-    border-radius: 25px;
-    padding: 12px 30px;
-    margin: 0 10px;
-    color: white;
-    font-family: 'Great Vibes', cursive;
-    font-size: clamp(1rem, 2vw, 1.5rem);
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255,105,180,0.6);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.marry button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(255,105,180,0.8);
-}
-.marry button:focus {outline:none;}
-
-/* Ending */
-.ending{position:absolute;inset:0;background:white;color:black;display:flex;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;font-size:clamp(2rem,7vw,5rem);opacity:0;pointer-events:none;transition:3s;z-index:40;text-shadow:0 0 20px #ff69b4,0 0 40px #ffb6c1;text-align:center;line-height:1.5;}
-
-/* Petals + Glitter */
-.petal,.glitter{position:absolute;width:15px;height:15px;background:radial-gradient(circle at 30% 30%,pink,#ff69b4);border-radius:50% 50% 50% 0;animation:fall linear infinite;pointer-events:none;z-index:5;}
-@keyframes fall{to{transform:translateY(110vh) rotate(360deg);} }
-.glitter{width:3px;height:3px;border-radius:50%;background:white;opacity:0.7;animation:glitterMove linear infinite;z-index:4;}
-@keyframes glitterMove{0%{transform:translateY(0) rotate(0deg);opacity:0.7;}50%{opacity:1;}100%{transform:translateY(100vh) rotate(360deg);opacity:0;}}
-
-/* Canvas */
-canvas{position:absolute;top:0;left:0;pointer-events:none;}
-#moon,#sun{position:absolute;top:0;left:0;pointer-events:none;z-index:6;}
 </style>
 </head>
+
 <body>
-<header>
-  💖 Our Magical Love 💖
-  <a href="https://letrollologist.github.io/anya.github.io/">HOME</a>
-  <span id="headerProposal" style="cursor:pointer;">💍</span>
-  <a href="https://letrollologist.github.io/anya.github.io/album.html">ALBUM</a>
-  <a href="https://letrollologist.github.io/anya.github.io/log.html">LOG</a>
-  <a href="https://letrollologist.github.io/anya.github.io/minigame.html">MINIGAME</a>
+
+<header id="siteTitle">
+
+💖 Our Magical Love 💖
+
+<a href="#">HOME</a>
+
+<span id="headerProposal">💍</span>
+
+<a href="#">ALBUM</a>
+
+<a href="#">LOG</a>
+
+<a href="#">MINIGAME</a>
+
+<span id="studyToggle">📚</span>
+
 </header>
 
 <canvas id="stars"></canvas>
-<canvas id="sun"></canvas>
-<canvas id="moon"></canvas>
 
-<div class="love-text">I love you Anya, forever and always.</br> I will never forget you</div>
+<div class="love-text">I love you Anya</div>
+
 <div class="counter" id="counter"></div>
+
 <div class="letter" id="letter"></div>
 
+<!-- PROPOSAL -->
+
 <div class="marry" id="marry">
-    <div class="ring"></div>
-    <div id="proposalText"></div>
-    <div>
-        <button class="yes" onclick="sayYes()">Yes</button>
-        <button class="no" onclick="sayNo()">No</button>
-    </div>
-    <p>Disclaimer: This isn’t a real proposal 💖 I wish it were, but this is a glimpse into <em>our</em> future.</p>
+
+<div id="proposalText"></div>
+
+<button onclick="sayYes()">Yes</button>
+<button onclick="sayNo()">No</button>
+
+<p style="color:white;">Disclaimer: This isn't a real proposal 💖</p>
+
 </div>
 
 <div class="ending" id="ending"></div>
 
+<!-- STUDY MODE -->
+
+<div id="studyPanel">
+
+<h2>📚 StudyBuddy</h2>
+
+<div>
+
+<input id="focusMinutes" type="number" value="25" min="1" style="width:80px;padding:5px;border-radius:10px;border:none;text-align:center;">
+
+minutes focus
+
+</div>
+
+<div id="timerDisplay">25:00</div>
+
+<div class="studyButtons">
+
+<button onclick="startTimer()">Start</button>
+<button onclick="pauseTimer()">Pause</button>
+<button onclick="resetTimer()">Reset</button>
+
+</div>
+
+<div id="motivation">
+
+Stay focused. Small steps create big futures.
+
+</div>
+
+</div>
+
 <footer>
-    <div id="footerCounter"></div>
-    <div class="footer-meta">
-        <p>© 2026 Our Magical Love. All rights reserved.</p>
-        <a href="privacy.html" target="_blank">Privacy Policy</a>
-    </div>
+
+<div id="footerCounter"></div>
+
+<p>© 2026 Our Magical Love</p>
+
 </footer>
 
-<!-- SunCalc -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+
 <script>
-// Coordinates for Anya (Kolkata)
-const lat = 22.5726, lng = 88.3639;
 
-// CANVASES
-const sunCanvas = document.getElementById("sun"), sunCtx = sunCanvas.getContext("2d"),
-      moonCanvas = document.getElementById("moon"), moonCtx = moonCanvas.getContext("2d");
+/* LOVE COUNTER */
 
-function resizeCanvases(){
-    sunCanvas.width = moonCanvas.width = innerWidth;
-    sunCanvas.height = moonCanvas.height = innerHeight;
-}
-resizeCanvases();
-window.addEventListener("resize", resizeCanvases);
+const startDate=new Date("2026-02-17T16:19:00+05:30")
 
-// Background gradient based on sun altitude
-function updateBackground(sunAlt){
-    const t = Math.max(0, Math.min(1, (sunAlt + Math.PI/2)/Math.PI));
-    const dayColor = `rgb(${25+205*t},${50+130*t},${80+175*t})`;
-    const nightColor = `rgb(15,25,50)`;
-    document.body.style.background = `linear-gradient(to bottom, ${dayColor}, ${nightColor})`;
-}
+setInterval(()=>{
 
-// Draw sky
-function drawSky(){
-    const now = new Date();
-    const sunPos = SunCalc.getPosition(now, lat, lng);
-    const sunAlt = sunPos.altitude, sunAz = sunPos.azimuth;
-    updateBackground(sunAlt);
+const diff=new Date()-startDate
 
-    sunCtx.clearRect(0,0,innerWidth,innerHeight);
-    if(sunAlt > -0.1){
-        const sx = (sunAz + Math.PI)/(2*Math.PI)*innerWidth;
-        const sy = innerHeight * (1 - (sunAlt + Math.PI/2)/Math.PI);
-        const glow = Math.max(0, Math.sin(sunAlt) * 0.8);
-        sunCtx.beginPath();
-        sunCtx.fillStyle = `rgba(255,240,150,${glow})`;
-        sunCtx.arc(sx, sy, 80, 0, Math.PI*2);
-        sunCtx.fill();
-        sunCtx.beginPath();
-        sunCtx.fillStyle = "yellow";
-        sunCtx.arc(sx, sy, 30, 0, Math.PI*2);
-        sunCtx.fill();
-    }
+const d=Math.floor(diff/86400000)
 
-    const moonPos = SunCalc.getMoonPosition(now, lat, lng);
-    const moonIll = SunCalc.getMoonIllumination(now);
-    const moonAlt = moonPos.altitude;
-    moonCtx.clearRect(0,0,innerWidth,innerHeight);
-    if(moonAlt > -0.1){
-        const mx = (moonPos.azimuth + Math.PI)/(2*Math.PI)*innerWidth;
-        const my = innerHeight*(1 - (moonAlt + Math.PI/2)/Math.PI);
-        const fraction = moonIll.fraction;
-        moonCtx.beginPath();
-        moonCtx.fillStyle = "#ddd";
-        moonCtx.arc(mx, my, 25, 0, Math.PI*2);
-        moonCtx.fill();
-        moonCtx.globalCompositeOperation = "destination-out";
-        moonCtx.beginPath();
-        const shift = 25*(1 - fraction);
-        moonCtx.ellipse(mx + (fraction>0.5 ? shift : -shift), my, 25, 25, 0, 0, Math.PI*2);
-        moonCtx.fill();
-        moonCtx.globalCompositeOperation = "source-over";
-    }
+const h=Math.floor(diff/3600000%24)
 
-    requestAnimationFrame(drawSky);
-}
-drawSky();
+const m=Math.floor(diff/60000%60)
 
-// Days counter
-const startDate = new Date("2026-02-17T16:19:00+05:30");
-const counterEl = document.getElementById("counter");
-function updateCounter(){
-    const diff=new Date()-startDate;
-    const d=Math.floor(diff/86400000),h=Math.floor(diff/3600000%24),m=Math.floor(diff/60000%60),s=Math.floor(diff/1000%60);
-    counterEl.innerHTML=`<span>${d} 💖 Days</span> <span>${h} 🕒 Hours</span> <span>${m} ⏳ Minutes</span> <span>${s} 💌 Seconds</span>`;
-}
-setInterval(updateCounter,1000);
+const s=Math.floor(diff/1000%60)
 
-// Footer visits
-let visits = localStorage.getItem("anya_visits")||0;
-visits++;
-localStorage.setItem("anya_visits",visits);
-document.getElementById("footerCounter").innerHTML=`You’ve visited ${visits} times 🌸`;
+document.getElementById("counter").innerHTML=
+`${d} 💖 Days ${h}h ${m}m ${s}s`
 
-// Petals
+},1000)
+
+/* VISIT COUNTER */
+
+let visits=localStorage.getItem("anya_visits")||0
+visits++
+localStorage.setItem("anya_visits",visits)
+
+document.getElementById("footerCounter").innerHTML=
+`You've visited ${visits} times 🌸`
+
+/* PETALS */
+
 for(let i=0;i<40;i++){
-    let p=document.createElement("div");p.className="petal";
-    p.style.left=Math.random()*100+"vw";
-    p.style.animationDuration=(5+Math.random()*5)+"s";
-    p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)];
-    p.style.transform=`rotate(${Math.random()*360}deg)`;
-    document.body.appendChild(p);
+let p=document.createElement("div")
+p.className="petal"
+p.style.left=Math.random()*100+"vw"
+p.style.animationDuration=(5+Math.random()*5)+"s"
+document.body.appendChild(p)
 }
 
-// Glitter
+/* GLITTER */
+
 for(let i=0;i<40;i++){
-    let g=document.createElement("div");g.className="glitter";
-    g.style.left=Math.random()*100+"vw";
-    g.style.animationDuration=(5+Math.random()*5)+"s";
-    document.body.appendChild(g);
+let g=document.createElement("div")
+g.className="glitter"
+g.style.left=Math.random()*100+"vw"
+g.style.animationDuration=(5+Math.random()*5)+"s"
+document.body.appendChild(g)
 }
 
-// 3-click letter
-let clickCount=0,iChar=0;
-const letter=document.getElementById("letter");
-const letterText="You are written in my sky and in every future I see.";
-function writeLetter(){if(iChar<letterText.length){letter.innerHTML+=letterText.charAt(iChar);iChar++;setTimeout(writeLetter,50);}}
-document.body.addEventListener("click",()=>{clickCount++;if(clickCount>=3 && !letter.classList.contains('show')){letter.classList.add('show');writeLetter();}});
+/* LETTER */
 
-// Proposal
-const headerProposal = document.getElementById("headerProposal");
-let proposalClockInterval;
+let clickCount=0
 
-function updateProposalClocks(){
-    const proposalText = document.getElementById("proposalText");
-    const now = new Date();
-    const istString = now.toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata', hour12:true});
-    const deviceString = now.toLocaleTimeString();
-    proposalText.innerHTML=`IST: ${istString}<br>Device: ${deviceString}`;
+document.body.addEventListener("click",()=>{
+
+clickCount++
+
+if(clickCount>=3){
+
+const letter=document.getElementById("letter")
+
+letter.classList.add("show")
+
+letter.innerHTML="You are written in my sky and every future I see."
+
 }
 
-headerProposal.addEventListener("click",(e)=>{
-    e.stopPropagation();
-    const marry=document.getElementById("marry");
-    updateProposalClocks();
-    proposalClockInterval=setInterval(updateProposalClocks,1000);
-    marry.style.display="flex";
-    setTimeout(()=>{marry.style.opacity=1;},10);
-});
+})
 
-// Proposal YES/NO
+/* PROPOSAL */
+
+document.getElementById("headerProposal").onclick=()=>{
+
+const marry=document.getElementById("marry")
+
+marry.style.display="flex"
+
+setTimeout(()=>marry.style.opacity=1,10)
+
+}
+
 function sayYes(){
-    clearInterval(proposalClockInterval);
-    const marry=document.getElementById("marry"); 
-    marry.style.opacity=0;
-    setTimeout(()=>{marry.style.display="none";},1000);
-    const ending=document.getElementById("ending");
-    const today=new Date(); const options={year:'numeric',month:'long',day:'numeric'};
-    ending.innerHTML=`Forever begins now ♡<br>${today.toLocaleDateString(undefined,options)}`;
-    ending.style.opacity=1; ending.style.pointerEvents="auto";
-}
-function sayNo(){
-    document.querySelector(".no").style.opacity=0;
-    setTimeout(()=>{alert("I’ll keep asking forever 💖");},500);
+
+document.getElementById("ending").innerHTML="Forever begins now ♡"
+
+document.getElementById("ending").style.opacity=1
+
 }
 
-// Stop propagation
-[letter,document.getElementById("marry"),headerProposal].forEach(el=>el.addEventListener("click",e=>e.stopPropagation()));
+function sayNo(){
+
+alert("I'll keep asking forever 💖")
+
+}
+
+/* STUDY MODE */
+
+let studyMode=false
+
+document.getElementById("studyToggle").onclick=()=>{
+
+studyMode=!studyMode
+
+document.body.classList.toggle("studyMode")
+
+document.getElementById("studyPanel").style.display=studyMode?"block":"none"
+
+document.getElementById("siteTitle").innerHTML=studyMode?
+
+"📚 StudyBuddy":
+
+"💖 Our Magical Love 💖"
+
+}
+
+/* TIMER */
+
+let timerInterval
+let remainingSeconds
+
+function startTimer(){
+
+const minutes=document.getElementById("focusMinutes").value
+
+remainingSeconds=minutes*60
+
+timerInterval=setInterval(updateTimer,1000)
+
+}
+
+function pauseTimer(){
+
+clearInterval(timerInterval)
+
+}
+
+function resetTimer(){
+
+clearInterval(timerInterval)
+
+remainingSeconds=document.getElementById("focusMinutes").value*60
+
+updateDisplay()
+
+}
+
+function updateTimer(){
+
+remainingSeconds--
+
+updateDisplay()
+
+if(remainingSeconds<=0){
+
+clearInterval(timerInterval)
+
+document.getElementById("motivation").innerText="Great work. Take a break ☕"
+
+}
+
+}
+
+function updateDisplay(){
+
+let m=Math.floor(remainingSeconds/60)
+
+let s=remainingSeconds%60
+
+document.getElementById("timerDisplay").innerText=
+
+`${m}:${s.toString().padStart(2,'0')}`
+
+}
+
+/* MOTIVATION */
+
+const messages=[
+
+"Focus now, freedom later.",
+
+"Every minute counts.",
+
+"Your future self is proud.",
+
+"Stay steady. Stay calm.",
+
+"Progress is happening."
+
+]
+
+setInterval(()=>{
+
+document.getElementById("motivation").innerText=
+
+messages[Math.floor(Math.random()*messages.length)]
+
+},20000)
+
 </script>
+
 </body>
 </html>
-
-
-
-
-
