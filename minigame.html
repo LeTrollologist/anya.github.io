@@ -7,33 +7,70 @@
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{overflow:hidden;min-height:100vh;font-family:'Playfair Display',serif;transition:background 1s linear;}
-body::after{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 60%,rgba(0,0,0,0.8));}
+body{overflow:hidden;min-height:100vh;font-family:'Playfair Display',serif;transition:background 1s linear; touch-action: none;} /* touch-action: none prevents scrolling while playing on mobile */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 60%,rgba(0,0,0,0.8)); z-index: 1;}
 
 /* Header */
-header{position:absolute;top:0;width:100%;padding:10px 20px;display:flex;justify-content:center;align-items:center;gap:20px;z-index:50;font-family:'Great Vibes',cursive;font-size:clamp(1rem,2vw,1.5rem);color:white;text-shadow:0 0 5px black;}
-header a{color:white;text-decoration:none;font-family:'Playfair Display',serif;font-weight:bold;transition:0.3s;}
+header{position:absolute;top:0;width:100%;padding:15px 20px;display:flex;justify-content:center;align-items:center;gap:20px;z-index:50;font-family:'Great Vibes',cursive;font-size:clamp(1.2rem,2.5vw,1.8rem);color:white;text-shadow:0 0 5px black;}
+header a{color:white;text-decoration:none;font-family:'Playfair Display',serif;font-weight:bold;font-size:1rem;transition:0.3s;}
 header a:hover{color:#ff69b4;cursor:pointer;}
 
-/* Score */
-#score{position:absolute;top:70px;width:100%;text-align:center;font-family:'Great Vibes',cursive;color:white;font-size:clamp(2rem,6vw,3rem);text-shadow:0 0 15px #ff69b4,0 0 25px #ffb6c1;z-index:20;}
+/* Top HUD */
+#hud{position:absolute;top:60px;width:100%;display:flex;justify-content:center;align-items:center;gap: 30px;z-index:20;}
+#score{font-family:'Great Vibes',cursive;color:white;font-size:clamp(2.5rem,6vw,4rem);text-shadow:0 0 15px #ff69b4,0 0 25px #ffb6c1;}
+.history-btn { background: rgba(255,105,180,0.3); border: 2px solid #ff69b4; color: white; padding: 8px 15px; border-radius: 20px; font-family: 'Playfair Display', serif; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px rgba(255,105,180,0.5); backdrop-filter: blur(5px);}
+.history-btn:hover { background: #ff69b4; transform: scale(1.05); }
 
 /* Game container */
-#gameContainer{position:absolute;top:120px;left:0;width:100%;height:calc(100% - 140px);display:flex;justify-content:center;align-items:center;z-index:10;}
-#pongCanvas{background:rgba(255,255,255,0.05);border:2px solid rgba(255,105,180,0.6);border-radius:15px;box-shadow:0 0 20px rgba(255,105,180,0.4);max-width:100%;max-height:100%;}
+#gameContainer{position:absolute;top:130px;left:0;width:100%;height:calc(100% - 170px);display:flex;justify-content:center;align-items:center;z-index:10;}
+#pongCanvas{
+    background:rgba(255,255,255,0.05); border:2px solid rgba(255,105,180,0.6);
+    border-radius:15px; box-shadow:0 0 30px rgba(255,105,180,0.4);
+    width: 95%; max-width: 800px; aspect-ratio: 4/3; 
+    backdrop-filter: blur(3px); cursor: crosshair;
+}
+
+/* Overlays (Start, End, History) */
+.overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+    display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 40;
+    color: white; font-family: 'Playfair Display', serif; text-align: center; opacity: 0; transition: opacity 0.5s;
+}
+.overlay.active { display: flex; opacity: 1; }
+.overlay h1 { font-family: 'Great Vibes', cursive; font-size: 4rem; text-shadow: 0 0 20px #ff69b4; margin-bottom: 10px; }
+.overlay p { font-size: 1.2rem; margin-bottom: 20px; }
+.overlay button {
+    background: linear-gradient(145deg, #ff9ec4, #ff69b4); border: none; border-radius: 25px;
+    padding: 12px 35px; color: white; font-family: 'Great Vibes', cursive; font-size: 1.8rem;
+    cursor: pointer; box-shadow: 0 4px 15px rgba(255,105,180,0.6); transition: 0.2s;
+}
+.overlay button:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(255,105,180,0.8); }
+
+/* History Panel */
+#historyPanel {
+    background: rgba(20, 10, 30, 0.8); border: 2px solid #ff69b4; border-radius: 20px;
+    width: 90%; max-width: 500px; padding: 20px; max-height: 70vh; overflow-y: auto;
+}
+.history-item {
+    background: rgba(255,255,255,0.1); margin: 10px 0; padding: 15px; border-radius: 10px;
+    display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #ff69b4;
+}
+.history-item.mbm { border-left: 4px solid gold; background: rgba(255, 215, 0, 0.15); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+.mbm-title { font-family: 'Great Vibes', cursive; color: gold; font-size: 1.8rem; }
+.close-history { background: transparent !important; border: 1px solid white !important; font-family: 'Playfair Display', serif !important; font-size: 1rem !important; margin-top: 20px;}
 
 /* Footer */
-footer{position:absolute;bottom:10px;width:100%;text-align:center;font-size:clamp(0.8rem,2vw,1rem);z-index:10;font-family:'Playfair Display',serif;color:white;text-shadow:0 0 10px black;transition:all 0.3s ease;}
+footer{position:absolute;bottom:10px;width:100%;text-align:center;font-size:clamp(0.8rem,2vw,1rem);z-index:20;font-family:'Playfair Display',serif;color:white;text-shadow:0 0 10px black;transition:all 0.3s ease;}
 
 /* Petals + Glitter */
-.petal,.glitter{position:absolute;width:15px;height:15px;background:radial-gradient(circle at 30% 30%,pink,#ff69b4);border-radius:50% 50% 50% 0;animation:fall linear infinite;pointer-events:none;z-index:5;}
+.petal,.glitter{position:fixed;width:15px;height:15px;background:radial-gradient(circle at 30% 30%,pink,#ff69b4);border-radius:50% 50% 50% 0;animation:fall linear infinite;pointer-events:none;z-index:5;}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
 .glitter{width:3px;height:3px;border-radius:50%;background:white;opacity:0.7;animation:glitterMove linear infinite;z-index:4;}
 @keyframes glitterMove{0%{transform:translateY(0) rotate(0deg);opacity:0.7;}50%{opacity:1;}100%{transform:translateY(100vh) rotate(360deg);opacity:0;}}
 
-/* Canvas */
-canvas{position:absolute;top:0;left:0;pointer-events:none;}
-#moon,#sun{position:absolute;top:0;left:0;pointer-events:none;z-index:6;}
+/* Canvas Backgrounds */
+canvas.bg-canvas{position:fixed;top:0;left:0;pointer-events:none;z-index:0;}
+#moon,#sun{z-index:2;}
 </style>
 </head>
 <body>
@@ -46,14 +83,41 @@ canvas{position:absolute;top:0;left:0;pointer-events:none;}
   <a href="status.html">STATUS</a>
 </header>
 
-<div id="score">0 💖 : 💖 0</div>
+<div id="hud">
+    <button class="history-btn" onclick="toggleHistory()">Score History</button>
+    <div id="score">0 💖 : 💖 0</div>
+</div>
+
 <div id="gameContainer">
   <canvas id="pongCanvas"></canvas>
 </div>
 
+<!-- Start Overlay -->
+<div id="startOverlay" class="overlay active">
+    <h1>Play with Me?</h1>
+    <p>First to 7 wins. I believe in you, Anya! 🌸</p>
+    <button onclick="startGame()">Start Game</button>
+</div>
+
+<!-- Game Over Overlay -->
+<div id="gameOverOverlay" class="overlay">
+    <h1 id="gameOverTitle">You Won!</h1>
+    <p id="gameOverText">You're amazing! 💖</p>
+    <button onclick="resetGame()">Play Again</button>
+</div>
+
+<!-- History Overlay -->
+<div id="historyOverlay" class="overlay">
+    <div id="historyPanel">
+        <h1 style="font-size: 2.5rem;">Match History</h1>
+        <div id="historyList"></div>
+        <button class="close-history" onclick="toggleHistory()">Close</button>
+    </div>
+</div>
+
 <footer id="footerCounter"></footer>
-<canvas id="sun"></canvas>
-<canvas id="moon"></canvas>
+<canvas id="sun" class="bg-canvas"></canvas>
+<canvas id="moon" class="bg-canvas"></canvas>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 <script>
@@ -62,12 +126,12 @@ const lat = 22.5726, lng = 88.3639;
 const sunCanvas = document.getElementById("sun"), sunCtx = sunCanvas.getContext("2d");
 const moonCanvas = document.getElementById("moon"), moonCtx = moonCanvas.getContext("2d");
 
-function resizeCanvases(){
+function resizeBgCanvases(){
   sunCanvas.width = moonCanvas.width = innerWidth;
   sunCanvas.height = moonCanvas.height = innerHeight;
 }
-resizeCanvases();
-window.addEventListener("resize", resizeCanvases);
+resizeBgCanvases();
+window.addEventListener("resize", resizeBgCanvases);
 
 function updateBackground(sunAlt){
   const t = Math.max(0, Math.min(1, (sunAlt + Math.PI/2)/Math.PI));
@@ -82,32 +146,25 @@ function drawSky(){
   const sunAlt = sunPos.altitude, sunAz = sunPos.azimuth;
   updateBackground(sunAlt);
 
-  // Sun
   sunCtx.clearRect(0,0,innerWidth,innerHeight);
   if(sunAlt>-0.1){
     const sx = (sunAz+Math.PI)/(2*Math.PI)*innerWidth;
     const sy = innerHeight*(1-(sunAlt+Math.PI/2)/Math.PI);
-    sunCtx.beginPath();
-    sunCtx.fillStyle = `rgba(255,240,150,${Math.max(0,Math.sin(sunAlt)*0.8)})`;
+    sunCtx.beginPath(); sunCtx.fillStyle = `rgba(255,240,150,${Math.max(0,Math.sin(sunAlt)*0.8)})`;
     sunCtx.arc(sx,sy,80,0,Math.PI*2); sunCtx.fill();
-    sunCtx.beginPath();
-    sunCtx.fillStyle="yellow"; sunCtx.arc(sx,sy,30,0,Math.PI*2); sunCtx.fill();
+    sunCtx.beginPath(); sunCtx.fillStyle="yellow"; sunCtx.arc(sx,sy,30,0,Math.PI*2); sunCtx.fill();
   }
 
-  // Moon
   const moonPos = SunCalc.getMoonPosition(now, lat, lng);
   const moonIll = SunCalc.getMoonIllumination(now);
-  const moonAlt = moonPos.altitude;
   moonCtx.clearRect(0,0,innerWidth,innerHeight);
-  if(moonAlt>-0.1){
+  if(moonPos.altitude>-0.1){
     const mx = (moonPos.azimuth+Math.PI)/(2*Math.PI)*innerWidth;
-    const my = innerHeight*(1-(moonAlt+Math.PI/2)/Math.PI);
+    const my = innerHeight*(1-(moonPos.altitude+Math.PI/2)/Math.PI);
     const fraction = moonIll.fraction;
-    moonCtx.beginPath();
-    moonCtx.fillStyle="#ddd"; moonCtx.arc(mx,my,25,0,Math.PI*2); moonCtx.fill();
+    moonCtx.beginPath(); moonCtx.fillStyle="#ddd"; moonCtx.arc(mx,my,25,0,Math.PI*2); moonCtx.fill();
     moonCtx.globalCompositeOperation="destination-out";
-    moonCtx.beginPath();
-    const shift=25*(1-fraction);
+    moonCtx.beginPath(); const shift=25*(1-fraction);
     moonCtx.ellipse(mx+(fraction>0.5?shift:-shift),my,25,25,0,0,Math.PI*2); moonCtx.fill();
     moonCtx.globalCompositeOperation="source-over";
   }
@@ -115,106 +172,316 @@ function drawSky(){
 }
 drawSky();
 
-// Petals & Glitter
-for(let i=0;i<40;i++){let p=document.createElement("div");p.className="petal";p.style.left=Math.random()*100+"vw";p.style.animationDuration=(5+Math.random()*5)+"s";p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)];p.style.transform=`rotate(${Math.random()*360}deg)`;document.body.appendChild(p);}
-for(let i=0;i<40;i++){let g=document.createElement("div");g.className="glitter";g.style.left=Math.random()*100+"vw";g.style.animationDuration=(5+Math.random()*5)+"s";document.body.appendChild(g);}
+// Petals & Glitter (Background ambience)
+function spawnBackgroundParticles() {
+    for(let i=0;i<30;i++){
+        let p=document.createElement("div");p.className="petal";
+        p.style.left=Math.random()*100+"vw";p.style.animationDuration=(5+Math.random()*5)+"s";
+        p.style.animationTimingFunction=["linear","ease-in","ease-out"][Math.floor(Math.random()*3)];
+        document.body.appendChild(p);
+    }
+    for(let i=0;i<40;i++){
+        let g=document.createElement("div");g.className="glitter";
+        g.style.left=Math.random()*100+"vw";g.style.animationDuration=(5+Math.random()*5)+"s";
+        document.body.appendChild(g);
+    }
+}
+spawnBackgroundParticles();
 
 // Visitor counter
 let visits = localStorage.getItem("anya_visits")||0; visits++;
 localStorage.setItem("anya_visits",visits);
 document.getElementById("footerCounter").innerHTML=`You’ve visited ${visits} times 🌸`;
 
-// ===== Pong Game =====
-const canvas = document.getElementById("pongCanvas"), ctx = canvas.getContext("2d");
 
-let paddleWidth=15, paddleHeight=100;
-let playerY, aiY, ballX, ballY, ballSpeedX, ballSpeedY;
-let playerScore=0, aiScore=0;
-let touchY = null;
-let upPressed=false, downPressed=false;
+// ===== Advanced Pong Game Engine =====
+const canvas = document.getElementById("pongCanvas");
+const ctx = canvas.getContext("2d");
 
-function resizeCanvasGame(){
-  // Max width/height for desktop, full width for mobile
-  canvas.width = Math.min(window.innerWidth-20, 500);
-  canvas.height = Math.min(window.innerHeight-160, 700);
-  playerY = canvas.height/2 - paddleHeight/2;
-  aiY = canvas.height/2 - paddleHeight/2;
-  ballX = canvas.width/2; ballY = canvas.height/2;
-  ballSpeedX = 5; ballSpeedY = 3;
-}
-resizeCanvasGame();
-window.addEventListener("resize", resizeCanvasGame);
+// Logical resolution (physics always calculate at 800x600, scales visually via CSS)
+const GAME_WIDTH = 800;
+const GAME_HEIGHT = 600;
+canvas.width = GAME_WIDTH;
+canvas.height = GAME_HEIGHT;
 
-// Touch controls
-canvas.addEventListener("touchmove",(e)=>{
-  const touch = e.touches[0].clientY - canvas.getBoundingClientRect().top;
-  touchY = touch - paddleHeight/2;
-});
+// Game State
+let gameState = "START"; // START, PLAYING, GAMEOVER
+const WIN_SCORE = 7;
+let playerScore = 0;
+let aiScore = 0;
+let shakeTime = 0;
 
-// Keyboard controls
-document.addEventListener("keydown",e=>{
+// Entities
+const paddleWidth = 15;
+const paddleHeight = 100;
+let playerY = GAME_HEIGHT/2 - paddleHeight/2;
+let aiY = GAME_HEIGHT/2 - paddleHeight/2;
+
+let ball = { x: GAME_WIDTH/2, y: GAME_HEIGHT/2, radius: 12, speed: 7, dx: 7, dy: 3 };
+let trails = [];
+let particles =[];
+
+// Input
+let upPressed = false;
+let downPressed = false;
+
+// --- Input Handling ---
+// Keyboard
+document.addEventListener("keydown", e => {
   if(e.key==="ArrowUp"||e.key==="w") upPressed=true;
   if(e.key==="ArrowDown"||e.key==="s") downPressed=true;
 });
-document.addEventListener("keyup",e=>{
+document.addEventListener("keyup", e => {
   if(e.key==="ArrowUp"||e.key==="w") upPressed=false;
   if(e.key==="ArrowDown"||e.key==="s") downPressed=false;
 });
 
-// Reset Ball
-function resetBall(){
-  ballX=canvas.width/2; ballY=canvas.height/2;
-  ballSpeedX = -ballSpeedX;
-  ballSpeedY = (Math.random()*6-3);
+// Mouse & Touch (maps screen coordinate to logical coordinate)
+function getMousePos(evt) {
+    let rect = canvas.getBoundingClientRect();
+    let scaleY = canvas.height / rect.height;
+    return (evt.clientY - rect.top) * scaleY;
+}
+canvas.addEventListener("mousemove", e => {
+    if(gameState === "PLAYING") playerY = getMousePos(e) - paddleHeight/2;
+});
+canvas.addEventListener("touchmove", e => {
+    if(gameState === "PLAYING") {
+        e.preventDefault(); // Stop scrolling
+        let touch = e.touches[0];
+        playerY = getMousePos(touch) - paddleHeight/2;
+    }
+}, {passive: false});
+
+// --- Score History Manager ---
+function loadHistory() {
+    let history = JSON.parse(localStorage.getItem('pong_history_anya')) ||[];
+    const list = document.getElementById("historyList");
+    list.innerHTML = `
+        <div class="history-item mbm">
+            <div>
+                <div class="mbm-title">MBM</div>
+                <div style="font-size:0.9rem; opacity:0.8;">Most Beautiful Memory</div>
+            </div>
+            <div style="font-size: 1.5rem; font-weight: bold; color: gold;">Anya 💖 Infinity - 0 AI</div>
+        </div>
+    `;
+    history.slice().reverse().forEach(match => {
+        list.innerHTML += `
+            <div class="history-item">
+                <div>
+                    <strong>${match.winner} Won</strong><br>
+                    <span style="font-size: 0.8rem; opacity: 0.7;">${match.date}</span>
+                </div>
+                <div style="font-size: 1.2rem;">Anya ${match.pScore} - ${match.aScore} AI</div>
+            </div>
+        `;
+    });
+}
+function saveMatch() {
+    let history = JSON.parse(localStorage.getItem('pong_history_anya')) ||[];
+    history.push({
+        pScore: playerScore, aScore: aiScore,
+        winner: playerScore >= WIN_SCORE ? "Anya 🌸" : "AI 🤖",
+        date: new Date().toLocaleDateString()
+    });
+    localStorage.setItem('pong_history_anya', JSON.stringify(history));
+    loadHistory();
+}
+function toggleHistory() {
+    const overlay = document.getElementById("historyOverlay");
+    overlay.classList.toggle("active");
+    if(overlay.classList.contains("active")) loadHistory();
 }
 
-// Draw & Update
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  // Center line
-  ctx.strokeStyle="rgba(255,182,193,0.3)"; ctx.setLineDash([10,15]);
-  ctx.beginPath(); ctx.moveTo(canvas.width/2,0); ctx.lineTo(canvas.width/2,canvas.height); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Paddles
-  ctx.fillStyle="pink"; ctx.fillRect(0,playerY,paddleWidth,paddleHeight);
-  ctx.fillStyle="hotpink"; ctx.fillRect(canvas.width-paddleWidth,aiY,paddleWidth,paddleHeight);
-
-  // Ball
-  ctx.fillStyle="white"; ctx.beginPath(); ctx.arc(ballX,ballY,10,0,Math.PI*2); ctx.fill();
-
-  // Move Ball
-  ballX += ballSpeedX; ballY += ballSpeedY;
-
-  // Wall collision
-  if(ballY<10 || ballY>canvas.height-10) ballSpeedY*=-1;
-
-  // Paddle collision
-  if(ballX-10 < paddleWidth && ballY>playerY && ballY<playerY+paddleHeight) ballSpeedX*=-1;
-  if(ballX+10 > canvas.width-paddleWidth && ballY>aiY && ballY<aiY+paddleHeight) ballSpeedX*=-1;
-
-  // Score
-  if(ballX<0){ aiScore++; resetBall(); }
-  if(ballX>canvas.width){ playerScore++; resetBall(); }
-  document.getElementById("score").innerHTML = `${playerScore} 💖 : 💖 ${aiScore}`;
-
-  // AI movement
-  const aiCenter=aiY+paddleHeight/2;
-  const difficulty=0.08;
-  if(aiCenter<ballY) aiY += 5*difficulty*60;
-  else aiY -= 5*difficulty*60;
-
-  // Player movement
-  if(touchY!==null) playerY += (touchY-playerY)*0.2;
-  if(upPressed) playerY -=8;
-  if(downPressed) playerY +=8;
-  if(playerY<0) playerY=0;
-  if(playerY+paddleHeight>canvas.height) playerY=canvas.height-paddleHeight;
-
-  requestAnimationFrame(draw);
+// --- Effects ---
+function spawnImpactParticles(x, y, color) {
+    for(let i=0; i<15; i++) {
+        particles.push({
+            x: x, y: y,
+            vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10,
+            life: 1, color: color, size: Math.random() * 4 + 2
+        });
+    }
 }
-draw();
+
+// --- Game Logic ---
+function startGame() {
+    document.getElementById("startOverlay").classList.remove("active");
+    gameState = "PLAYING";
+    playerScore = 0; aiScore = 0;
+    updateScoreUI(); resetBall();
+}
+
+function resetGame() {
+    document.getElementById("gameOverOverlay").classList.remove("active");
+    startGame();
+}
+
+function endGame(playerWon) {
+    gameState = "GAMEOVER";
+    saveMatch();
+    const overlay = document.getElementById("gameOverOverlay");
+    const title = document.getElementById("gameOverTitle");
+    const text = document.getElementById("gameOverText");
+    
+    if(playerWon) {
+        title.innerText = "You Won! 🎉"; title.style.color = "#ff69b4";
+        text.innerText = "You're amazing, Anya! My champion 💖";
+        // Massive petal explosion
+        for(let i=0; i<50; i++) spawnImpactParticles(GAME_WIDTH/2, GAME_HEIGHT/2, "pink");
+    } else {
+        title.innerText = "Good Try! 🌸"; title.style.color = "#fff";
+        text.innerText = "I'll let you win next time. I promise 💖";
+    }
+    overlay.classList.add("active");
+}
+
+function updateScoreUI() {
+    document.getElementById("score").innerHTML = `${playerScore} 💖 : 💖 ${aiScore}`;
+}
+
+function resetBall() {
+    ball.x = GAME_WIDTH/2; ball.y = GAME_HEIGHT/2;
+    ball.speed = 7;
+    ball.dx = (Math.random() > 0.5 ? 1 : -1) * ball.speed;
+    ball.dy = (Math.random() * 2 - 1) * ball.speed;
+    trails =[];
+}
+
+function update() {
+    if(gameState !== "PLAYING") return;
+
+    // Player Move
+    if(upPressed) playerY -= 10;
+    if(downPressed) playerY += 10;
+    if(playerY < 0) playerY = 0;
+    if(playerY + paddleHeight > GAME_HEIGHT) playerY = GAME_HEIGHT - paddleHeight;
+
+    // Beateable AI Move
+    let aiCenter = aiY + paddleHeight/2;
+    let aiMaxSpeed = 5; // AI is slower than ball's max speed
+    if(ball.dx > 0) { // Only track if ball is moving towards AI
+        if(aiCenter < ball.y - 10) aiY += aiMaxSpeed;
+        else if(aiCenter > ball.y + 10) aiY -= aiMaxSpeed;
+    } else { // Return to center gracefully
+        if(aiCenter < GAME_HEIGHT/2 - 10) aiY += 2;
+        else if(aiCenter > GAME_HEIGHT/2 + 10) aiY -= 2;
+    }
+    if(aiY < 0) aiY = 0;
+    if(aiY + paddleHeight > GAME_HEIGHT) aiY = GAME_HEIGHT - paddleHeight;
+
+    // Ball Move
+    ball.x += ball.dx; ball.y += ball.dy;
+    
+    // Trail tracking
+    trails.push({x: ball.x, y: ball.y});
+    if(trails.length > 8) trails.shift();
+
+    // Wall Collision
+    if(ball.y - ball.radius < 0 || ball.y + ball.radius > GAME_HEIGHT) {
+        ball.dy *= -1;
+        shakeTime = 5;
+    }
+
+    // Paddle Collision Dynamics
+    function checkCollision(paddleX, pY, isPlayer) {
+        if(ball.y + ball.radius > pY && ball.y - ball.radius < pY + paddleHeight) {
+            if((isPlayer && ball.x - ball.radius < paddleX + paddleWidth) || 
+               (!isPlayer && ball.x + ball.radius > paddleX)) {
+                
+                // Calculate dynamic bounce angle based on where it hit
+                let hitPoint = ball.y - (pY + paddleHeight/2);
+                let normalizedHit = hitPoint / (paddleHeight/2);
+                let bounceAngle = normalizedHit * (Math.PI / 3); // Max 60 deg angle
+
+                ball.speed += 0.5; // Escalate speed
+                let direction = isPlayer ? 1 : -1;
+                
+                ball.dx = direction * ball.speed * Math.cos(bounceAngle);
+                ball.dy = ball.speed * Math.sin(bounceAngle);
+                
+                // Adjust position to prevent sticking
+                ball.x = isPlayer ? paddleX + paddleWidth + ball.radius : paddleX - ball.radius;
+                
+                shakeTime = 10;
+                spawnImpactParticles(ball.x, ball.y, isPlayer ? "#ffb6c1" : "#ff69b4");
+            }
+        }
+    }
+    checkCollision(10, playerY, true); // Player
+    checkCollision(GAME_WIDTH - 10 - paddleWidth, aiY, false); // AI
+
+    // Scoring
+    if(ball.x < 0) { aiScore++; updateScoreUI(); checkWin(); }
+    else if(ball.x > GAME_WIDTH) { playerScore++; updateScoreUI(); checkWin(); }
+}
+
+function checkWin() {
+    if(playerScore >= WIN_SCORE) endGame(true);
+    else if(aiScore >= WIN_SCORE) endGame(false);
+    else resetBall();
+}
+
+// --- Render ---
+function drawGame() {
+    ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Screen Shake
+    ctx.save();
+    if(shakeTime > 0) {
+        let dx = (Math.random()-0.5)*10; let dy = (Math.random()-0.5)*10;
+        ctx.translate(dx, dy);
+        shakeTime--;
+    }
+
+    // Center Dashed Line
+    ctx.strokeStyle="rgba(255,182,193,0.2)"; ctx.lineWidth = 4; ctx.setLineDash([15, 20]);
+    ctx.beginPath(); ctx.moveTo(GAME_WIDTH/2, 0); ctx.lineTo(GAME_WIDTH/2, GAME_HEIGHT); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Paddles
+    ctx.shadowBlur = 15; ctx.shadowColor = "#ffb6c1"; ctx.fillStyle = "#fff0f5";
+    ctx.fillRect(10, playerY, paddleWidth, paddleHeight); // Player
+    ctx.shadowColor = "#ff69b4"; ctx.fillStyle = "#ffb6c1";
+    ctx.fillRect(GAME_WIDTH - 10 - paddleWidth, aiY, paddleWidth, paddleHeight); // AI
+    ctx.shadowBlur = 0;
+
+    // Ball Trails
+    trails.forEach((t, i) => {
+        let alpha = (i / trails.length) * 0.5;
+        ctx.fillStyle = `rgba(255, 105, 180, ${alpha})`;
+        ctx.beginPath(); ctx.arc(t.x, t.y, ball.radius * (i/trails.length), 0, Math.PI*2); ctx.fill();
+    });
+
+    // Ball
+    ctx.shadowBlur = 20; ctx.shadowColor = "#ff69b4"; ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Particles
+    for(let i=particles.length-1; i>=0; i--) {
+        let p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+        if(p.life <= 0) { particles.splice(i, 1); continue; }
+        ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+}
+
+function gameLoop() {
+    update();
+    drawGame();
+    requestAnimationFrame(gameLoop);
+}
+
+// Initialize
+loadHistory();
+gameLoop();
+
 </script>
 </body>
 </html>
