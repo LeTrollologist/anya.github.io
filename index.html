@@ -39,6 +39,11 @@ header{
     text-shadow:0 0 5px black;
     transition: 0.5s ease;
 }
+#navLinks {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
 header a{color:white;text-decoration:none;font-family:'Playfair Display',serif;font-weight:bold;font-size: 1rem;transition:0.3s;}
 header a:hover{color:#ff69b4;cursor:pointer;}
 #studyToggle, #headerProposal { cursor:pointer; font-size: 1.5rem; transition: transform 0.2s; }
@@ -124,15 +129,23 @@ header a:hover{color:#ff69b4;cursor:pointer;}
 }
 @keyframes glitterMove{0%{transform:translateY(0) rotate(0deg);opacity:0.7;}50%{opacity:1;}100%{transform:translateY(100vh) rotate(360deg);opacity:0;}}
 
-/* Canvas */
+/* Celestial Bodies (SVGs & Canvas) */
 canvas{position:absolute;top:0;left:0;pointer-events:none;}
-#moon,#sun{z-index:2;}
 #stars{z-index: 1;}
+
+#sunSvg, #moonSvg {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
 
 /* ================== STUDY MODE OVERHAUL ================== */
 body.studyMode { background: linear-gradient(to bottom, #0f1b2b, #1a2545, #050814) !important; }
 body.studyMode .love-text, body.studyMode .sub-text, body.studyMode .counter, 
-body.studyMode .petal, body.studyMode .glitter, body.studyMode #headerProposal, body.studyMode #sun, body.studyMode #moon {
+body.studyMode .petal, body.studyMode .glitter, body.studyMode #headerProposal, 
+body.studyMode #sunSvg, body.studyMode #moonSvg {
     opacity: 0; pointer-events: none;
 }
 
@@ -193,7 +206,6 @@ footer{ position:absolute; bottom:0; width:100%; text-align:center; z-index:20; 
 .footer-meta a{ color:white; text-decoration:underline; margin-left:5px; transition:0.3s; }
 .footer-meta a:hover{ color:#ff69b4; }
 
-/* Custom Scrollbar for Todo */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
@@ -202,18 +214,38 @@ footer{ position:absolute; bottom:0; width:100%; text-align:center; z-index:20; 
 <body>
 
 <header id="siteTitle">
-  💖 Our Magical Love 💖
-  <a href="https://letrollologist.github.io/anya.github.io/">HOME</a>
-  <span id="headerProposal" title="Proposal">💍</span>
-  <a href="https://letrollologist.github.io/anya.github.io/album.html">ALBUM</a>
-  <a href="https://letrollologist.github.io/anya.github.io/contact.html">CONTACT</a>
-  <a href="https://letrollologist.github.io/anya.github.io/minigame.html">MINIGAME</a>
-  <span id="studyToggle" title="StudyBuddy">📚 StudyBuddy</span>
+  <span id="titleText">💖 Our Magical Love 💖</span>
+  <div id="navLinks">
+      <a href="https://letrollologist.github.io/anya.github.io/">HOME</a>
+      <span id="headerProposal" title="Proposal">💍</span>
+      <a href="https://letrollologist.github.io/anya.github.io/album.html">ALBUM</a>
+      <a href="https://letrollologist.github.io/anya.github.io/contact.html">CONTACT</a>
+      <a href="https://letrollologist.github.io/anya.github.io/minigame.html">MINIGAME</a>
+  </div>
+  <span id="studyToggle" title="StudyBuddy" onclick="toggleStudyMode()">📚 StudyBuddy</span>
 </header>
 
 <canvas id="stars"></canvas>
-<canvas id="sun"></canvas>
-<canvas id="moon"></canvas>
+
+<!-- New SVG Sun -->
+<svg id="sunSvg" width="160" height="160">
+    <circle id="sunGlowLayer" cx="80" cy="80" r="80" fill="rgba(255,240,150,0.5)" />
+    <circle cx="80" cy="80" r="30" fill="yellow" />
+</svg>
+
+<!-- New SVG Moon with Phase Masking -->
+<svg id="moonSvg" width="60" height="60">
+    <defs>
+        <mask id="moonPhaseMask">
+            <rect width="60" height="60" fill="white" />
+            <circle id="moonMaskShadow" cx="30" cy="30" r="26" fill="black" />
+        </mask>
+    </defs>
+    <!-- Base solid moon masked by the shadow -->
+    <circle cx="30" cy="30" r="25" fill="#ddd" mask="url(#moonPhaseMask)" />
+    <!-- Subtle outline to indicate the dark side of the moon -->
+    <circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+</svg>
 
 <div class="love-text">I love you Anya</div>
 <div class="sub-text">Forever and always. I will never forget you</div>
@@ -282,15 +314,13 @@ footer{ position:absolute; bottom:0; width:100%; text-align:center; z-index:20; 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 <script>
 // --- CORE SETUP ---
-const lat = 22.5726, lng = 88.3639; // Kolkata
-const sunCanvas = document.getElementById("sun"), sunCtx = sunCanvas.getContext("2d");
-const moonCanvas = document.getElementById("moon"), moonCtx = moonCanvas.getContext("2d");
+const lat = 22.5726, lng = 88.3639; // Kolkata Coordinates
 const starCanvas = document.getElementById("stars"), starCtx = starCanvas.getContext("2d");
 let studyMode = false;
 
 function resizeCanvases(){
-    sunCanvas.width = moonCanvas.width = starCanvas.width = innerWidth;
-    sunCanvas.height = moonCanvas.height = starCanvas.height = innerHeight;
+    starCanvas.width = innerWidth;
+    starCanvas.height = innerHeight;
     initStars();
 }
 window.addEventListener("resize", resizeCanvases);
@@ -316,9 +346,9 @@ function drawStars() {
     });
 }
 
-// --- SUN & MOON (Hidden in Study Mode) ---
+// --- SVG SUN & MOON LOGIC ---
 function updateBackground(sunAlt){
-    if(studyMode) return; // CSS class handles study background
+    if(studyMode) return;
     const t = Math.max(0, Math.min(1, (sunAlt + Math.PI/2)/Math.PI));
     const dayColor = `rgb(${25+205*t},${50+130*t},${80+175*t})`;
     const nightColor = `rgb(15,25,50)`;
@@ -327,36 +357,50 @@ function updateBackground(sunAlt){
 
 function drawSky(){
     drawStars();
-    const now = new Date();
+    const now = new Date(); // Accurate absolute time for SunCalc
     const sunPos = SunCalc.getPosition(now, lat, lng);
     const sunAlt = sunPos.altitude, sunAz = sunPos.azimuth;
     
     updateBackground(sunAlt);
-    sunCtx.clearRect(0,0,innerWidth,innerHeight);
-    moonCtx.clearRect(0,0,innerWidth,innerHeight);
 
     if(!studyMode) {
-        // Draw Sun
+        // --- Position & Style SVG Sun ---
+        const sunSvg = document.getElementById("sunSvg");
         if(sunAlt > -0.1){
             const sx = (sunAz + Math.PI)/(2*Math.PI)*innerWidth;
             const sy = innerHeight * (1 - (sunAlt + Math.PI/2)/Math.PI);
-            const glow = Math.max(0, Math.sin(sunAlt) * 0.8);
-            sunCtx.beginPath(); sunCtx.fillStyle = `rgba(255,240,150,${glow})`; sunCtx.arc(sx, sy, 80, 0, Math.PI*2); sunCtx.fill();
-            sunCtx.beginPath(); sunCtx.fillStyle = "yellow"; sunCtx.arc(sx, sy, 30, 0, Math.PI*2); sunCtx.fill();
+            sunSvg.style.left = `${sx}px`;
+            sunSvg.style.top = `${sy}px`;
+            sunSvg.style.display = "block";
+            
+            // Dynamic sun glow
+            const glowAlpha = Math.max(0, Math.sin(sunAlt) * 0.8);
+            document.getElementById("sunGlowLayer").setAttribute("fill", `rgba(255,240,150,${glowAlpha})`);
+        } else {
+            sunSvg.style.display = "none";
         }
 
-        // Draw Moon
+        // --- Position & Style SVG Moon ---
+        const moonSvg = document.getElementById("moonSvg");
         const moonPos = SunCalc.getMoonPosition(now, lat, lng);
         const moonIll = SunCalc.getMoonIllumination(now);
+        
         if(moonPos.altitude > -0.1){
             const mx = (moonPos.azimuth + Math.PI)/(2*Math.PI)*innerWidth;
             const my = innerHeight*(1 - (moonPos.altitude + Math.PI/2)/Math.PI);
+            moonSvg.style.left = `${mx}px`;
+            moonSvg.style.top = `${my}px`;
+            moonSvg.style.display = "block";
+            
+            // Accurate Lunar Phase Calculation
             const fraction = moonIll.fraction;
-            moonCtx.beginPath(); moonCtx.fillStyle = "#ddd"; moonCtx.arc(mx, my, 25, 0, Math.PI*2); moonCtx.fill();
-            moonCtx.globalCompositeOperation = "destination-out";
-            moonCtx.beginPath(); const shift = 25*(1 - fraction);
-            moonCtx.ellipse(mx + (fraction>0.5 ? shift : -shift), my, 25, 25, 0, 0, Math.PI*2); moonCtx.fill();
-            moonCtx.globalCompositeOperation = "source-over";
+            const isWaxing = moonIll.phase <= 0.5;
+            // Shift mask shadow based on illuminated fraction
+            const shift = 50 * fraction; 
+            const shadowCx = isWaxing ? 30 - shift : 30 + shift;
+            document.getElementById("moonMaskShadow").setAttribute("cx", shadowCx);
+        } else {
+            moonSvg.style.display = "none";
         }
     }
     requestAnimationFrame(drawSky);
@@ -444,18 +488,31 @@ function sayNo(){
     setTimeout(()=> alert("I’ll keep asking forever 💖"), 300);
 }
 
-// --- STUDYBUDDY ---
-document.getElementById("studyToggle").onclick = () => {
+// --- JAVASCRIPT RETURN / STUDYBUDDY TOGGLE ---
+function toggleStudyMode() {
     studyMode = !studyMode;
+    
+    // Toggle CSS classes for visual updates (backgrounds, fading celestial bodies)
     document.body.classList.toggle("studyMode", studyMode);
     document.getElementById("studyPanel").style.display = studyMode ? "flex" : "none";
-    document.getElementById("siteTitle").innerHTML = studyMode ? "📚 StudyBuddy <span id='studyToggle' title='Back to Love'>💖</span>" : "💖 Our Magical Love 💖 <a href='#'>HOME</a> <span id='headerProposal' title='Proposal'>💍</span> <a href='#'>ALBUM</a> <a href='#'>LOG</a> <a href='#'>MINIGAME</a> <span id='studyToggle' title='StudyBuddy'>📚</span>";
     
-    // Rebind toggles as innerHTML resets them
-    document.getElementById("studyToggle").onclick = arguments.callee;
-    const propBtn = document.getElementById("headerProposal");
-    if(propBtn) propBtn.onclick = () => { document.getElementById("headerProposal").click(); };
-};
+    // Smoothly swap Header UI without breaking functionality
+    const titleText = document.getElementById("titleText");
+    const navLinks = document.getElementById("navLinks");
+    const studyToggle = document.getElementById("studyToggle");
+
+    if (studyMode) {
+        titleText.innerHTML = "📚 StudyBuddy";
+        navLinks.style.display = "none";
+        studyToggle.innerHTML = "💖 Back to Love";
+        studyToggle.title = "Return to Love";
+    } else {
+        titleText.innerHTML = "💖 Our Magical Love 💖";
+        navLinks.style.display = "flex";
+        studyToggle.innerHTML = "📚 StudyBuddy";
+        studyToggle.title = "StudyBuddy";
+    }
+}
 
 // Study Timer Logic
 let timerInterval, isRunning = false;
@@ -512,7 +569,7 @@ function tick() {
         document.getElementById("btnToggleTimer").innerText = "Start";
         document.getElementById("motivation").innerText = "Time's up! Great job 🌸";
         let audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-        audio.play(); // gentle beep notification
+        audio.play(); 
     }
 }
 
@@ -539,6 +596,3 @@ updateDisplay();
 </script>
 </body>
 </html>
-
-
-
