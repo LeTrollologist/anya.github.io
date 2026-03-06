@@ -2,91 +2,47 @@
 import os
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
-import random
+from flask import Flask, request, jsonify
+from threading import Thread
 
-load_dotenv()
+# ---------------- CONFIG ----------------
+DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")  # Bot token in Render secrets
+ANYA_CHANNEL_ID = int(os.environ.get("ANYA_CHANNEL_ID"))  # channel for Anya
+MICHEAL_CHANNEL_ID = int(os.environ.get("MICHEAL_CHANNEL_ID"))  # channel for you
+RANDOM_CHANNEL_ID = int(os.environ.get("RANDOM_CHANNEL_ID"))  # random users
 
-TOKEN = os.getenv("DISCORD_TOKEN")
-
-# Channel IDs from Discord (replace with your actual channel IDs)
-ANYA_CHANNEL = int(os.getenv("ANYA_CHANNEL_ID"))
-MICHAEL_CHANNEL = int(os.getenv("MICHAEL_CHANNEL_ID"))
-RANDOM_CHANNEL = int(os.getenv("RANDOM_CHANNEL_ID"))
-
+# ---------------- DISCORD BOT ----------------
 intents = discord.Intents.default()
-intents.messages = True
-
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Loving messages for Anya
-ANYA_MESSAGES = [
-    "I love you mostest times infinity times perpetuity 💖",
-    "I love you more than chocos 🍫💗",
-    "Forever and always, my Anya 🌸",
-    "You are my universe 🌌❤️",
-    "Every heartbeat is yours 💓",
-    "I love you more than all the stars ✨💖",
-    "My heart belongs to you forever 💘",
-    "You are my sunshine and moonlight 🌞🌙",
-    "I adore you endlessly 💞",
-]
+# ---------------- FLASK APP ----------------
+app = Flask(__name__)
 
-# Responses when someone checks in
-MICHAEL_MESSAGES = [
-    "Micheal checked in with love 💖",
-    "Micheal says hi! 💗",
-    "Another loving thought from Micheal 🌸",
-]
-
-RANDOM_MESSAGES = [
-    "Someone just paid their respects 💌",
-    "A visitor sends love ❤️",
-    "A random heart joins the celebration 💖",
-]
-
-@bot.event
-async def on_ready():
-    print(f"{bot.user} is online!")
-
-@bot.event
-async def on_message(message):
-    # Ignore bot messages
-    if message.author == bot.user:
-        return
-
-    # We listen for POST requests via a command-like interface (we will send from JS)
-    await bot.process_commands(message)
-
-# Commands triggered via JS fetch
-@bot.command()
-async def anya(ctx):
-    channel = bot.get_channel(ANYA_CHANNEL)
+@app.route("/send", methods=["POST"])
+def send_message():
+    data = request.get_json()
+    user = data.get("user")
+    message = data.get("message")
+    
+    if user == "anya":
+        channel_id = ANYA_CHANNEL_ID
+    elif user == "micheal":
+        channel_id = MICHEAL_CHANNEL_ID
+    else:
+        channel_id = RANDOM_CHANNEL_ID
+    
+    channel = bot.get_channel(channel_id)
     if channel:
-        msg = random.choice(ANYA_MESSAGES)
-        await channel.send(msg)
-        await ctx.send("Anya check-in sent!")
+        bot.loop.create_task(channel.send(message))
+        return jsonify({"status":"sent"}), 200
+    else:
+        return jsonify({"status":"channel not found"}), 404
 
-@bot.command()
-async def michael(ctx):
-    channel = bot.get_channel(MICHAEL_CHANNEL)
-    if channel:
-        msg = random.choice(MICHAEL_MESSAGES)
-        await channel.send(msg)
-        await ctx.send("Micheal check-in sent!")
+# ---------------- RUN FLASK IN THREAD ----------------
+def run_flask():
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
-@bot.command()
-async def random_user(ctx):
-    channel = bot.get_channel(RANDOM_CHANNEL)
-    if channel:
-        msg = random.choice(RANDOM_MESSAGES)
-        await channel.send(msg)
-        await ctx.send("Random check-in sent!")
+Thread(target=run_flask).start()
 
-# For ping from server (optional)
-@bot.command()
-async def ping(ctx):
-    await ctx.send("Pong! 💖")
-
-# Run the bot
-bot.run(TOKEN)
+# ---------------- RUN DISCORD BOT ----------------
+bot.run(DISCORD_TOKEN)
