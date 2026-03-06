@@ -67,10 +67,11 @@ footer{ position:absolute; bottom:10px; width:100%; text-align:center; color:rgb
 <a href="index.html">ALBUM</a>
 <a href="index.html">CONTACT</a>
 </div>
+</br>
 </header>
 
 <canvas id="stars"></canvas>
-
+</br>
 <div class="sleep-container">
   <div class="page-title">Dreamland 🌙</div>
   <div class="sub-title" id="sleepSubText">Close your eyes and let the stars watch over you...</div>
@@ -85,9 +86,11 @@ footer{ position:absolute; bottom:10px; width:100%; text-align:center; color:rgb
     <input type="range" id="ytVolSlider" min="0" max="100" value="40" oninput="changeYTVolume(this.value)">
     <select id="sleepTimer" onchange="setSleepTimer(this.value)">
       <option value="0">Timer Off</option>
-      <option value="15">15 min</option>
       <option value="30">30 min</option>
       <option value="60">1 hour</option>
+      <option value="240">4 hour</option>
+      <option value="480">8 hour</option>
+      <option value="600">10 hour</option>
     </select>
     <span id="timerDisplayCountdown"></span>
   </div>
@@ -101,7 +104,7 @@ let ytPlayer, timer=null, countdown=null;
 
 function onYouTubeIframeAPIReady(){
   ytPlayer=new YT.Player('ytplayer',{
-    videoId:'rUxyKA_-grg',
+    videoId:'Dfm2rB-nQ9Y',
     playerVars:{ controls:0, modestbranding:1, rel:0 }
   });
 }
