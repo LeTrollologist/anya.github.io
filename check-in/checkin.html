@@ -6,17 +6,10 @@
     <title>Check-In 💖</title>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --pink: #ff69b4;
-            --glow: #ff1493;
-            --glass: rgba(255, 255, 255, 0.1);
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Playfair Display', serif;
-            background: #0a0a0c;
+            background: radial-gradient(circle at center, #1a002a 0%, #000 100%);
             height: 100vh;
             display: flex;
             align-items: center;
@@ -24,164 +17,88 @@
             overflow: hidden;
             color: white;
         }
-
-        /* Animated Nebula Background */
-        .nebula {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, #2c003e 0%, #000 100%);
-            z-index: -1;
-        }
-
-        #starCanvas {
-            position: absolute;
-            top: 0; left: 0; z-index: 0;
-        }
-
         .container {
-            position: relative;
             z-index: 10;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 50px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 105, 180, 0.3);
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            max-width: 500px;
+            box-shadow: 0 0 50px rgba(255, 20, 147, 0.2);
             width: 90%;
-            animation: fadeIn 1.5s ease;
+            max-width: 450px;
         }
-
         h1 {
             font-family: 'Great Vibes', cursive;
             font-size: 4rem;
-            color: var(--pink);
-            text-shadow: 0 0 20px var(--glow);
-            margin-bottom: 10px;
+            color: #ff69b4;
+            text-shadow: 0 0 20px #ff1493;
+            margin-bottom: 20px;
         }
-
-        p { font-size: 1.1rem; opacity: 0.8; margin-bottom: 30px; letter-spacing: 1px; }
-
-        .btn-list { display: flex; flex-direction: column; gap: 15px; }
-
+        .btn-group { display: flex; flex-direction: column; gap: 15px; }
         button {
-            padding: 15px;
+            padding: 18px;
             font-family: 'Great Vibes', cursive;
-            font-size: 1.8rem;
+            font-size: 2rem;
             border: none;
-            border-radius: 15px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.4s;
             color: white;
-            background: rgba(255, 105, 180, 0.2);
-            border: 1px solid var(--pink);
+            background: rgba(255, 105, 180, 0.1);
+            border: 1px solid #ff69b4;
         }
-
         button:hover {
-            background: var(--pink);
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 0 20px var(--glow);
+            background: #ff69b4;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #ff1493;
         }
-
-        #status {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            height: 1.5em;
-            color: var(--pink);
-        }
-
+        #status { margin-top: 25px; font-size: 1.2rem; color: #ffb6c1; min-height: 1.5em; }
         .home-link {
             margin-top: 30px;
             display: block;
             text-decoration: none;
-            color: white;
+            color: rgba(255,255,255,0.5);
             font-family: 'Great Vibes', cursive;
-            font-size: 1.5rem;
-            opacity: 0.6;
-            transition: 0.3s;
+            font-size: 1.6rem;
         }
-
-        .home-link:hover { opacity: 1; color: var(--pink); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .home-link:hover { color: #ff69b4; }
     </style>
 </head>
 <body>
-    <div class="nebula"></div>
-    <canvas id="starCanvas"></canvas>
-
     <div class="container">
         <h1>Check-In</h1>
-        <p>Sending Love Across the Stars</p>
-
-        <div class="btn-list">
+        <div class="btn-group">
             <button onclick="sendLove('anya')">🌸 Anya</button>
             <button onclick="sendLove('micheal')">💙 Micheal</button>
-            <button onclick="sendLove('random')">✨ Pay Respects</button>
+            <button onclick="sendLove('random')">✨ Respect</button>
         </div>
-
         <div id="status"></div>
-
+        <!-- IMPORTANT: Update this URL to your actual home page -->
         <a href="https://yourusername.github.io/" class="home-link">🏡 Return Home</a>
     </div>
 
     <script>
-        // Star Particle System
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-
-        function initStars() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            for(let i=0; i<150; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    speed: Math.random() * 0.5
-                });
-            }
-        }
-
-        function drawStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "white";
-            stars.forEach(s => {
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
-                ctx.fill();
-                s.y -= s.speed;
-                if(s.y < 0) s.y = canvas.height;
-            });
-            requestAnimationFrame(drawStars);
-        }
-
         async function sendLove(type) {
             const status = document.getElementById('status');
             status.innerText = "✨ Sending Love...";
-            
             try {
                 const res = await fetch('/api/checkin', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({type})
+                    body: JSON.stringify({type: type})
                 });
                 const data = await res.json();
                 if(res.ok) {
                     status.innerText = "💖 " + data.message;
                 } else {
-                    status.innerText = "❌ Connection Failed";
+                    status.innerText = "❌ Error: " + (data.error || "Failed");
                 }
-            } catch {
-                status.innerText = "❌ Server Error";
+            } catch (e) {
+                status.innerText = "❌ Server Unreachable";
             }
         }
-
-        initStars();
-        drawStars();
     </script>
 </body>
 </html>
