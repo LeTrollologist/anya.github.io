@@ -1,55 +1,65 @@
-# checkin_bot.py
 import discord
 from discord.ext import commands
-from flask import Flask, request, jsonify
-import threading
 import os
+import random
+from keep_alive import keep_alive
 
-TOKEN = "YOUR_DISCORD_BOT_TOKEN" # Removed for security purposes
+# Load environment variable
+TOKEN = os.environ['DISCORD_TOKEN']
 
-# Channel IDs
-ANYA_CHANNEL = 123456789012345678  # Placeholder
-MICHEAL_CHANNEL = 234567890123456789  # Placeholder
-GUEST_CHANNEL = 345678901234567890  # Placeholder
-
-# ===== Discord Bot =====
+# Intents for bot
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix="!", intents=intents)
+intents.message_content = True
 
-@bot.event
-async def on_ready():
-    print(f"Logged in as {bot.user}")
+bot = commands.Bot(command_prefix='!', intents=intents)
 
-async def send_checkin(channel_id, message):
+# Anya messages
+anya_messages = [
+    "I love you mostest times infinity times perpetuity ❤️",
+    "I love you more than chocos 🍫💖",
+    "You make my heart dance every day 💃💖",
+    "Forever and always, my love 💞",
+    "You're my favorite human in the multiverse 🌌❤️"
+]
+
+# Micheal messages
+micheal_messages = [
+    "Micheal says: I miss you 💖",
+    "Micheal says: You're amazing ❤️",
+    "Micheal says: Sending you love 💌",
+    "Micheal says: Can't wait to see you 🌟"
+]
+
+# Guest messages
+guest_messages = [
+    "Someone paid their respects ❤️",
+    "A kind soul checked in 💖",
+    "Love and light to this page 🌸",
+    "A guest sends a warm hug 🤗"
+]
+
+# Commands to send messages to specific channels
+@bot.command()
+async def checkin(ctx, person):
+    if person.lower() == "anya":
+        channel_id = int(os.environ['ANYA_CHANNEL'])
+        msg = random.choice(anya_messages)
+    elif person.lower() == "micheal":
+        channel_id = int(os.environ['MICHEAL_CHANNEL'])
+        msg = random.choice(micheal_messages)
+    else:
+        channel_id = int(os.environ['GUEST_CHANNEL'])
+        msg = random.choice(guest_messages)
+
     channel = bot.get_channel(channel_id)
     if channel:
-        await channel.send(message)
-
-# ===== Flask Webserver =====
-app = Flask("CheckInServer")
-
-@app.route("/checkin", methods=["POST"])
-def checkin():
-    data = request.json
-    checkin_type = data.get("type")
-    message = data.get("message")
-    
-    if not checkin_type or not message:
-        return jsonify({"error":"Invalid payload"}), 400
-    
-    if checkin_type == "anya":
-        bot.loop.create_task(send_checkin(ANYA_CHANNEL, message))
-    elif checkin_type == "micheal":
-        bot.loop.create_task(send_checkin(MICHEAL_CHANNEL, message))
+        await channel.send(msg)
+        await ctx.send(f"Check-in sent! 💖 ({msg})")
     else:
-        bot.loop.create_task(send_checkin(GUEST_CHANNEL, message))
-    
-    return jsonify({"status":"ok"}), 200
+        await ctx.send("Channel not found 😢")
 
-# ===== Run Flask in Thread =====
-def run_flask():
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+# Keep bot alive for Render.com
+keep_alive()
 
-threading.Thread(target=run_flask).start()
+# Run bot
 bot.run(TOKEN)
