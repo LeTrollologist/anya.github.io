@@ -2,238 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dreamland 🌙💖</title>
-
 <link rel="shortcut icon" href="https://raw.githubusercontent.com/LeTrollologist/anya.github.io/refs/heads/main/favicon.ico">
-
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
-
-/* ================= GLOBAL ================= */
-
 *{margin:0;padding:0;box-sizing:border-box;}
-
 body{
-overflow:hidden;
-height:100vh;
-font-family:'Playfair Display',serif;
-transition:background 1.5s ease;
-touch-action: manipulation;
+  overflow:hidden; height:100vh;
+  font-family:'Playfair Display',serif;
+  background: linear-gradient(to bottom, #050510, #1a1a2e, #16213e);
 }
-
-body::after{
-content:'';
-position:fixed;
-inset:0;
-pointer-events:none;
-background:radial-gradient(circle at center,transparent 50%,rgba(0,0,0,0.9));
-z-index:1;
-}
-
-/* ================= HEADER ================= */
-
 header{
-position:absolute;
-top:0;
-width:100%;
-padding:15px 20px;
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-align-items:center;
-gap:20px;
-z-index:60;
-font-family:'Great Vibes',cursive;
-font-size:clamp(1.5rem,3vw,2rem);
-color:white;
-text-shadow:0 0 5px black;
+  position:absolute; top:0; width:100%; padding:15px 20px;
+  display:flex; flex-wrap:wrap; justify-content:center; gap:20px;
+  z-index:10; font-family:'Great Vibes',cursive; font-size:clamp(1.5rem,3vw,2rem);
+  color:white; text-shadow:0 0 5px black;
 }
-
-#navLinks{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-}
-
+#navLinks{display:flex; gap:15px; flex-wrap:wrap;}
 header a{
-color:rgba(255,255,255,0.8);
-text-decoration:none;
-font-weight:bold;
-font-size:clamp(.7rem,1.5vw,.9rem);
-transition:.3s;
-text-transform:uppercase;
-letter-spacing:1px;
+  color:rgba(255,255,255,0.8); text-decoration:none; font-weight:bold;
+  font-size:clamp(.7rem,1.5vw,.9rem); transition:.3s;
+  text-transform:uppercase; letter-spacing:1px;
 }
-
-header a:hover,
-header a.active-link{
-color:#ff69b4;
-text-shadow:0 0 10px rgba(255,105,180,.8);
+header a:hover, header a.active-link{
+  color:#ff69b4; text-shadow:0 0 10px rgba(255,105,180,.8);
 }
-
-/* ================= UI ================= */
-
 .sleep-container{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:20px;
-width:95%;
-max-width:750px;
-z-index:20;
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  display:flex; flex-direction:column; align-items:center; gap:20px;
+  width:95%; max-width:750px; z-index:5;
+  text-align:center; color:white;
 }
-
-.page-title{
-font-family:'Great Vibes',cursive;
-font-size:clamp(3rem,8vw,4.5rem);
-color:white;
-animation:floatText 6s infinite ease-in-out;
-text-shadow:0 0 25px rgba(255,105,180,.8);
-}
-
-.sub-title{
-font-size:clamp(1rem,2.5vw,1.2rem);
-opacity:.9;
-color:#ffd6f0;
-text-shadow:0 0 10px black;
-}
-
-@keyframes floatText{
-50%{transform:translateY(-10px);}
-}
-
-/* ================= PLAYER ================= */
-
+.page-title{ font-family:'Great Vibes',cursive; font-size:clamp(3rem,8vw,4.5rem); }
+.sub-title{ font-size:clamp(1rem,2.5vw,1.2rem); opacity:.9; color:#ffd6f0; }
+canvas{position:fixed; top:0; left:0; width:100%; height:100%; z-index:0;}
 .player-wrapper{
-position:relative;
-width:100%;
-aspect-ratio:16/9;
-border-radius:20px;
-overflow:hidden;
-background:#050510;
-border:1px solid rgba(255,255,255,.15);
-box-shadow:0 0 30px rgba(0,0,0,.8);
-transition:box-shadow 3s ease;
+  position:relative; width:100%; aspect-ratio:16/9; border-radius:20px;
+  overflow:hidden; background:#050510; border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 0 30px rgba(0,0,0,.8);
 }
-
-.player-wrapper iframe{
-position:absolute;
-top:-50%;
-left:-50%;
-width:200%;
-height:200%;
-transform:scale(.6);
-pointer-events:none;
-filter:brightness(.8) contrast(1.1);
-}
-
-.click-blocker{
-position:absolute;
-inset:0;
-z-index:10;
-}
-
-.player-wrapper.playing{
-animation:auraPulse 8s infinite alternate ease-in-out;
-}
-
-@keyframes auraPulse{
-
-0%{
-box-shadow:0 0 40px rgba(75,0,130,.6),0 0 80px rgba(75,0,130,.3);
-}
-
-50%{
-box-shadow:0 0 60px rgba(138,43,226,.5),0 0 100px rgba(138,43,226,.2);
-}
-
-100%{
-box-shadow:0 0 50px rgba(255,105,180,.4),0 0 90px rgba(255,105,180,.2);
-}
-
-}
-
-/* ================= CONTROLS ================= */
-
+.click-blocker{position:absolute; inset:0; z-index:10;}
 .glass-controls{
-
-background:rgba(20,15,35,.6);
-backdrop-filter:blur(20px);
-
-border:1px solid rgba(255,105,180,.3);
-border-radius:25px;
-
-display:flex;
-gap:20px;
-padding:15px 25px;
-width:100%;
-
-justify-content:space-between;
-align-items:center;
-color:white;
-
+  display:flex; gap:20px; justify-content:center; align-items:center;
+  margin-top:15px;
 }
-
 .play-btn{
-background:linear-gradient(145deg,#ff9ec4,#ff69b4);
-border:none;
-color:white;
-border-radius:50%;
-width:55px;
-height:55px;
-font-size:1.5rem;
-cursor:pointer;
+  background:linear-gradient(145deg,#ff9ec4,#ff69b4); border:none;
+  color:white; border-radius:50%; width:55px; height:55px; font-size:1.5rem;
+  cursor:pointer;
 }
-
-input[type=range]{
-width:120px;
-}
-
-/* ================= SKY ================= */
-
-canvas{
-position:fixed;
-top:0;
-left:0;
-z-index:0;
-pointer-events:none;
-}
-
-.particle{
-position:fixed;
-width:3px;
-height:3px;
-border-radius:50%;
-opacity:.7;
-animation:glitterMove linear infinite;
-}
-
-@keyframes glitterMove{
-
-0%{transform:translateY(0) rotate(0deg)}
-
-100%{transform:translateY(100vh) rotate(360deg)}
-
-}
-
-footer{
-position:absolute;
-bottom:15px;
-width:100%;
-text-align:center;
-color:rgba(255,255,255,.5);
-font-size:.8rem;
-}
-
+input[type=range]{ width:120px; }
+select{padding:5px 10px; border-radius:10px; outline:none;}
+footer{ position:absolute; bottom:10px; width:100%; text-align:center; color:rgba(255,255,255,.5); font-size:.8rem; }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -249,197 +72,87 @@ font-size:.8rem;
 <canvas id="stars"></canvas>
 
 <div class="sleep-container">
+  <div class="page-title">Dreamland 🌙</div>
+  <div class="sub-title" id="sleepSubText">Close your eyes and let the stars watch over you...</div>
 
-<div class="page-title">Dreamland 🌙</div>
-<div class="sub-title" id="sleepSubText">
-Close your eyes and let the stars watch over you...
-</div>
+  <div class="player-wrapper" id="ytWrapper">
+    <div id="ytplayer"></div>
+    <div class="click-blocker"></div>
+  </div>
 
-<div class="player-wrapper" id="ytWrapper">
-
-<div id="ytplayer"></div>
-
-<div class="click-blocker"></div>
-
-</div>
-
-<div class="glass-controls">
-
-<button class="play-btn" onclick="toggleYTPlayer()" id="ytPlayBtn">
-▶️
-</button>
-
-<input type="range" min="0" max="100" value="40" id="ytVolSlider"
-oninput="changeYTVolume(this.value)">
-
-<select id="sleepTimer" onchange="setSleepTimer(this.value)">
-<option value="0">Timer Off</option>
-<option value="15">15 min</option>
-<option value="30">30 min</option>
-<option value="60">1 hour</option>
-</select>
-
-<span id="timerDisplayCountdown"></span>
-
-</div>
-
+  <div class="glass-controls">
+    <button class="play-btn" onclick="toggleYTPlayer()" id="ytPlayBtn">▶️</button>
+    <input type="range" id="ytVolSlider" min="0" max="100" value="40" oninput="changeYTVolume(this.value)">
+    <select id="sleepTimer" onchange="setSleepTimer(this.value)">
+      <option value="0">Timer Off</option>
+      <option value="15">15 min</option>
+      <option value="30">30 min</option>
+      <option value="60">1 hour</option>
+    </select>
+    <span id="timerDisplayCountdown"></span>
+  </div>
 </div>
 
 <footer>© 2026 Our Magical Love</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
-
 <script>
-
-/* ================= YOUTUBE ================= */
-
-let ytPlayer
+let ytPlayer, timer=null, countdown=null;
 
 function onYouTubeIframeAPIReady(){
-
-ytPlayer=new YT.Player('ytplayer',{
-
-videoId:'rUxyKA_-grg',
-
-playerVars:{
-controls:0,
-modestbranding:1,
-rel:0
-}
-
-})
-
+  ytPlayer=new YT.Player('ytplayer',{
+    videoId:'rUxyKA_-grg',
+    playerVars:{ controls:0, modestbranding:1, rel:0 }
+  });
 }
 
 function toggleYTPlayer(){
-
-if(!ytPlayer)return
-
-let state=ytPlayer.getPlayerState()
-
-if(state===1){
-ytPlayer.pauseVideo()
-}else{
-ytPlayer.playVideo()
+  if(!ytPlayer)return;
+  ytPlayer.getPlayerState()===1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
 }
 
+function changeYTVolume(val){
+  if(ytPlayer)ytPlayer.setVolume(val);
 }
-
-function changeYTVolume(v){
-
-if(ytPlayer)ytPlayer.setVolume(v)
-
-}
-
-/* ================= TIMER ================= */
-
-let timer=null
-let countdown=null
 
 function setSleepTimer(minutes){
+  clearTimeout(timer); clearInterval(countdown);
+  document.getElementById("timerDisplayCountdown").innerText="";
+  if(minutes==0)return;
 
-clearTimeout(timer)
-clearInterval(countdown)
+  let seconds=minutes*60;
+  countdown=setInterval(()=>{
+    seconds--;
+    let m=Math.floor(seconds/60), s=seconds%60;
+    document.getElementById("timerDisplayCountdown").innerText=
+      `${m}:${s.toString().padStart(2,'0')}`;
+  },1000);
 
-if(minutes==0)return
-
-let seconds=minutes*60
-
-countdown=setInterval(()=>{
-
-seconds--
-
-let m=Math.floor(seconds/60)
-let s=seconds%60
-
-document.getElementById("timerDisplayCountdown").innerText=
-`${m}:${s.toString().padStart(2,'0')}`
-
-},1000)
-
-timer=setTimeout(()=>{
-
-fadeOut()
-
-},minutes*60000)
-
+  timer=setTimeout(()=>{
+    let vol=ytPlayer.getVolume();
+    let fade=setInterval(()=>{
+      vol-=2;
+      if(vol<=0){ clearInterval(fade); ytPlayer.pauseVideo(); }
+      else{ ytPlayer.setVolume(vol); document.getElementById("ytVolSlider").value=vol; }
+    },200);
+  },minutes*60000);
 }
 
-function fadeOut(){
-
-let vol=ytPlayer.getVolume()
-
-let fade=setInterval(()=>{
-
-vol-=2
-
-ytPlayer.setVolume(vol)
-
-if(vol<=0){
-
-clearInterval(fade)
-
-ytPlayer.pauseVideo()
-
-}
-
-},200)
-
-}
-
-/* ================= STARS ================= */
-
-const canvas=document.getElementById("stars")
-const ctx=canvas.getContext("2d")
-
-let stars=[]
-
+/* ====== STARS ====== */
+const canvas=document.getElementById("stars"), ctx=canvas.getContext("2d");
+let stars=[];
 function resize(){
-
-canvas.width=innerWidth
-canvas.height=innerHeight
-
-stars=[]
-
-for(let i=0;i<250;i++){
-
-stars.push({
-
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-size:Math.random()*1.5,
-blink:Math.random()*0.02
-
-})
-
+  canvas.width=innerWidth; canvas.height=innerHeight;
+  stars=[];
+  for(let i=0;i<150;i++){ stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,size:Math.random()*1.5}); }
 }
-
-}
-
-window.onresize=resize
-resize()
-
+window.onresize=resize; resize();
 function draw(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height)
-
-stars.forEach(s=>{
-
-ctx.beginPath()
-ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
-ctx.fillStyle="white"
-ctx.fill()
-
-})
-
-requestAnimationFrame(draw)
-
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{ ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fillStyle="white"; ctx.fill(); });
+  requestAnimationFrame(draw);
 }
-
-draw()
-
+draw();
 </script>
-
 </body>
 </html>
