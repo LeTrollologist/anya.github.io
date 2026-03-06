@@ -3,185 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dreamland 🌙 | Our Magical Love</title>
+    <title>Dreamland 🌙 | Celestial Sleep</title>
     <link rel="shortcut icon" href="https://raw.githubusercontent.com/LeTrollologist/anya.github.io/refs/heads/main/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --pink: #ff69b4;
-            --purple: #7b61ff;
-            --glass: rgba(15, 15, 35, 0.7);
-            --border: rgba(255, 255, 255, 0.12);
-            --glow: 0 0 20px rgba(255, 105, 180, 0.3);
+            --pink: #ff89cc;
+            --purple: #9d85ff;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-heavy: rgba(10, 10, 20, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent-gradient: linear-gradient(135deg, var(--pink), var(--purple));
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background: #05050a;
+            background: #020205;
             color: white;
             font-family: 'Inter', sans-serif;
             height: 100vh;
-            height: -webkit-fill-available;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* Animated Celestial Background */
-        #bg-canvas { position: fixed; inset: 0; z-index: 0; }
-        .nebula {
+        /* --- BACKGROUND ENGINE --- */
+        #canvas-wrap { position: fixed; inset: 0; z-index: 0; }
+        .nebula-glow {
             position: fixed; inset: 0;
-            background: radial-gradient(circle at 50% 100%, rgba(123, 97, 255, 0.15), transparent 60%);
-            z-index: 1; pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(157, 133, 255, 0.1), transparent 70%);
+            pointer-events: none; z-index: 1;
         }
 
         header {
-            position: relative; z-index: 10;
-            padding: 20px;
-            text-align: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+            position: relative; z-index: 20;
+            padding: 25px;
+            display: flex; flex-direction: column; align-items: center;
         }
 
         header h1 {
             font-family: 'Great Vibes', cursive;
-            font-size: clamp(1.5rem, 6vw, 2.2rem);
-            color: var(--pink);
-            text-shadow: var(--glow);
+            font-size: 2.2rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255, 137, 204, 0.3));
         }
 
-        nav {
-            display: flex; justify-content: center; gap: 15px; margin-top: 10px;
-        }
-
+        nav { display: flex; gap: 20px; margin-top: 12px; }
         nav a {
-            text-decoration: none; color: rgba(255,255,255,0.5);
-            font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px;
-            text-transform: uppercase; transition: 0.3s;
+            text-decoration: none; color: rgba(255,255,255,0.4);
+            font-size: 0.7rem; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; transition: 0.4s;
         }
+        nav a.active { color: white; text-shadow: 0 0 10px var(--pink); }
 
-        nav a.active { color: white; border-bottom: 1px solid var(--pink); }
-
-        /* Main Content App Container */
+        /* --- MAIN UI --- */
         main {
             position: relative; z-index: 10;
-            flex: 1;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            flex: 1; display: flex; align-items: center; justify-content: center;
             padding: 20px;
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
-        .hero-section { text-align: center; }
-        .hero-section h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 10vw, 5rem);
-            font-style: italic;
-            margin-bottom: 5px;
-            background: linear-gradient(to bottom, #fff, #ffd6f0);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        /* The Player Card */
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+        .app-shell {
+            width: 100%; max-width: 480px;
+            background: var(--glass-heavy);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             border: 1px solid var(--border);
-            border-radius: 32px;
-            padding: 25px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            animation: slideUp 0.8s cubic-bezier(0.2, 1, 0.3, 1);
-        }
-
-        #yt-placeholder {
-            width: 100%; aspect-ratio: 16/9;
-            background: #000; border-radius: 18px;
-            overflow: hidden; margin-bottom: 20px;
+            border-radius: 40px;
+            padding: 30px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
             position: relative;
         }
-        
-        #yt-placeholder iframe { pointer-events: none; }
-        .click-blocker { position: absolute; inset: 0; z-index: 5; }
 
-        /* Controls Grid */
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        /* Player Visual */
+        .player-container {
+            width: 100%; aspect-ratio: 16/9;
+            background: #000; border-radius: 25px;
+            overflow: hidden; position: relative;
+            box-shadow: 0 0 30px rgba(157, 133, 255, 0.1);
+            margin-bottom: 25px;
+        }
+        #ytplayer { pointer-events: none; opacity: 0.8; }
+        .click-shield { position: absolute; inset: 0; z-index: 5; }
+
+        .play-trigger {
+            width: 70px; height: 70px;
+            background: white; border: none; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            margin: -60px auto 25px; position: relative; z-index: 15;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .play-trigger:active { transform: scale(0.9); }
+        .play-trigger svg { width: 28px; fill: #000; }
+
+        /* --- ADVANCED CONTROLS --- */
+        .controls-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
         }
 
-        .full-width { grid-column: span 2; }
-
-        .btn-play {
-            background: white; border: none;
-            width: 60px; height: 60px; border-radius: 50%;
-            cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 15px;
-        }
-        .btn-play svg { width: 24px; fill: black; }
-        .btn-play:active { transform: scale(0.9); }
-
-        .input-group {
-            display: flex; flex-direction: column; gap: 5px;
+        .control-item { display: flex; flex-direction: column; gap: 8px; }
+        .label {
+            font-size: 0.65rem; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--pink); font-weight: 600;
         }
 
-        .input-group label {
-            font-size: 0.6rem; text-transform: uppercase;
-            letter-spacing: 1px; color: rgba(255,255,255,0.5);
-        }
-
-        select, input[type="time"] {
+        /* Custom Dropdown Styling */
+        .custom-select {
+            position: relative; cursor: pointer;
             background: rgba(255,255,255,0.05);
             border: 1px solid var(--border);
-            color: white; padding: 10px; border-radius: 12px;
-            outline: none; font-size: 0.9rem;
+            border-radius: 15px; padding: 12px;
+            font-size: 0.9rem; transition: 0.3s;
+        }
+        .custom-select:hover { background: rgba(255,255,255,0.1); }
+
+        /* Advanced Date/Time Selector */
+        input[type="datetime-local"] {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 15px; padding: 10px;
+            color: white; color-scheme: dark; font-family: inherit;
+            outline: none; font-size: 0.85rem; width: 100%;
         }
 
-        .timer-display {
-            font-family: monospace; color: var(--pink);
-            font-size: 1.2rem; text-align: center; margin-top: 10px;
+        input[type="range"] {
+            width: 100%; accent-color: var(--pink); margin-top: 10px;
         }
 
-        /* Alarm Notification */
-        #alarm-modal {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: var(--pink); color: white; padding: 15px 30px;
-            border-radius: 50px; z-index: 100; font-weight: bold;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(255,105,180,0.5);
+        .timer-countdown {
+            text-align: center; font-family: 'monospace';
+            font-size: 1.4rem; margin-top: 15px; color: var(--purple);
+            text-shadow: 0 0 10px rgba(157, 133, 255, 0.5);
         }
-        #alarm-modal.active { transform: translateX(-50%) translateY(0); }
+
+        /* Alarm Modal */
+        #alarm-ring {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px;
+            background: white; color: black; padding: 20px;
+            border-radius: 20px; z-index: 1000; text-align: center;
+            transition: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        #alarm-ring.active { top: 30px; }
+        .stop-btn {
+            background: var(--pink); border: none; color: white;
+            padding: 10px 25px; border-radius: 30px; margin-top: 10px;
+            cursor: pointer; font-weight: bold;
+        }
 
         footer {
-            position: relative; z-index: 10;
-            padding: 20px; text-align: center;
-            font-size: 0.7rem; opacity: 0.4;
+            padding: 20px; text-align: center; font-size: 0.65rem;
+            opacity: 0.4; letter-spacing: 1px;
         }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Mobile Adjustments */
-        @media (max-width: 480px) {
-            .glass-card { padding: 20px; border-radius: 24px; }
-            .hero-section h2 { font-size: 2.5rem; }
-            .controls { grid-template-columns: 1fr; }
-            .full-width { grid-column: span 1; }
+        @media (max-width: 400px) {
+            .app-shell { padding: 20px; }
+            .controls-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="nebula"></div>
-<canvas id="bg-canvas"></canvas>
+<div id="canvas-wrap"><canvas id="bg-canvas"></canvas></div>
+<div class="nebula-glow"></div>
 
-<div id="alarm-modal">🌅 Good Morning, My Love!</div>
+<div id="alarm-ring">
+    <h3 style="font-family: 'Playfair Display'">Time to wake up, my love 🤍</h3>
+    <button class="stop-btn" onclick="stopAlarm()">Dismiss Alarm</button>
+</div>
 
 <header>
     <h1>Our Magical Love</h1>
@@ -193,60 +187,57 @@
 </header>
 
 <main>
-    <div class="hero-section">
-        <h2 id="greet">Dreamland</h2>
-        <p style="font-size: 0.8rem; opacity: 0.7; letter-spacing: 2px; text-transform: uppercase;">A sanctuary for your soul</p>
-    </div>
-
-    <div class="glass-card">
-        <div id="yt-placeholder">
+    <div class="app-shell">
+        <div class="player-container">
             <div id="ytplayer"></div>
-            <div class="click-blocker"></div>
+            <div class="click-shield"></div>
         </div>
 
-        <button class="btn-play" onclick="togglePlay()" id="playBtn">
+        <button class="play-trigger" onclick="togglePlay()" id="playBtn">
             <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
 
-        <div class="controls">
+        <div class="controls-grid">
             <!-- Sleep Timer -->
-            <div class="input-group">
-                <label>Sleep Timer</label>
-                <select id="sleepTimer" onchange="setSleepTimer(this.value)">
-                    <option value="0">Off</option>
+            <div class="control-item">
+                <span class="label">Sleep Timer</span>
+                <select class="custom-select" id="sleepTimer" onchange="setSleepTimer(this.value)">
+                    <option value="0">Disabled</option>
                     <option value="30">30 Minutes</option>
                     <option value="60">1 Hour</option>
                     <option value="240">4 Hours</option>
                     <option value="480">8 Hours</option>
                     <option value="600">10 Hours</option>
                 </select>
-                <div id="timerDisplay" class="timer-display"></div>
             </div>
 
-            <!-- Alarm Clock -->
-            <div class="input-group">
-                <label>Set Alarm</label>
-                <input type="time" id="alarmTime" onchange="setAlarm(this.value)">
-                <div id="alarmStatus" style="font-size: 0.6rem; text-align: center; margin-top: 5px; color: var(--purple);"></div>
+            <!-- Date/Time Alarm -->
+            <div class="control-item">
+                <span class="label">Set Alarm</span>
+                <input type="datetime-local" id="alarmDateTime" onchange="setAlarm(this.value)">
             </div>
 
-            <!-- Volume -->
-            <div class="input-group full-width" style="margin-top: 10px;">
-                <label>Atmosphere Volume</label>
-                <input type="range" id="volSlider" min="0" max="100" value="40" oninput="changeVolume(this.value)" style="accent-color: var(--pink);">
+            <!-- Volume Slider -->
+            <div class="control-item" style="grid-column: span 2; margin-top: 10px;">
+                <div style="display:flex; justify-content:space-between">
+                    <span class="label">Volume</span>
+                    <span id="volLevel" class="label">40%</span>
+                </div>
+                <input type="range" id="volSlider" min="0" max="100" value="40" oninput="changeVolume(this.value)">
             </div>
         </div>
+
+        <div id="timerDisplay" class="timer-countdown"></div>
     </div>
 </main>
 
-<footer>© 2026 • HANDCRAFTED WITH LOVE</footer>
+<footer>EST. 2026 • DESIGNED FOR DREAMERS</footer>
 
-<!-- Audio for Alarm -->
-<audio id="alarmSound" loop src="https://assets.mixkit.co/sfx/preview/mixkit-morning-clock-alarm-1003.mp3"></audio>
+<audio id="alarmAudio" loop src="https://assets.mixkit.co/sfx/preview/mixkit-morning-clock-alarm-1003.mp3"></audio>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-    let ytPlayer, sleepTimeout, countdownInterval, alarmTime = null;
+    let ytPlayer, sleepTimeout, countdownInterval, alarmTarget = null;
     const playIcon = `<path d="M8 5v14l11-7z"/>`;
     const pauseIcon = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
 
@@ -254,9 +245,11 @@
     function onYouTubeIframeAPIReady() {
         ytPlayer = new YT.Player('ytplayer', {
             height: '100%', width: '100%',
-            videoId: 'Dfm2rB-nQ9Y', // Cosmic Lullaby
+            videoId: 'Dfm2rB-nQ9Y',
             playerVars: { controls: 0, modestbranding: 1, rel: 0, loop: 1, playlist: 'Dfm2rB-nQ9Y' },
-            events: { 'onStateChange': updatePlayButton }
+            events: { 'onStateChange': (e) => {
+                document.getElementById('play-icon').innerHTML = (e.data === 1) ? pauseIcon : playIcon;
+            }}
         });
     }
 
@@ -265,14 +258,12 @@
         ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
     }
 
-    function updatePlayButton(e) {
-        const svg = document.getElementById('play-icon');
-        svg.innerHTML = (e.data === 1) ? pauseIcon : playIcon;
+    function changeVolume(v) {
+        if(ytPlayer) ytPlayer.setVolume(v);
+        document.getElementById('volLevel').innerText = v + "%";
     }
 
-    function changeVolume(v) { if(ytPlayer) ytPlayer.setVolume(v); }
-
-    // ORIGINAL SLEEP TIMER LOGIC
+    // --- SLEEP TIMER ---
     function setSleepTimer(minutes) {
         clearTimeout(sleepTimeout);
         clearInterval(countdownInterval);
@@ -282,13 +273,15 @@
         let seconds = minutes * 60;
         countdownInterval = setInterval(() => {
             seconds--;
-            let m = Math.floor(seconds / 60);
+            let h = Math.floor(seconds / 3600);
+            let m = Math.floor((seconds % 3600) / 60);
             let s = seconds % 60;
-            display.innerText = `${m}:${s.toString().padStart(2, '0')}`;
+            display.innerText = `${h > 0 ? h + ':' : ''}${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             if (seconds <= 0) clearInterval(countdownInterval);
         }, 1000);
 
         sleepTimeout = setTimeout(() => {
+            // Smooth Fade Out Logic
             let vol = ytPlayer.getVolume();
             let fade = setInterval(() => {
                 vol -= 2;
@@ -303,39 +296,37 @@
         }, minutes * 60000);
     }
 
-    // ALARM SYSTEM
-    function setAlarm(time) {
-        alarmTime = time;
-        document.getElementById("alarmStatus").innerText = time ? `🔔 Set for ${time}` : "";
+    // --- ADVANCED DATE ALARM ---
+    function setAlarm(val) {
+        if(!val) return;
+        alarmTarget = new Date(val).getTime();
     }
 
     function checkAlarm() {
-        if (!alarmTime) return;
-        const now = new Date();
-        const current = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        if (!alarmTarget) return;
+        const now = new Date().getTime();
         
-        if (current === alarmTime) {
+        if (now >= alarmTarget) {
             triggerAlarm();
-            alarmTime = null; // Reset
-            document.getElementById("alarmStatus").innerText = "";
+            alarmTarget = null;
+            document.getElementById('alarmDateTime').value = "";
         }
     }
     setInterval(checkAlarm, 1000);
 
     function triggerAlarm() {
-        const modal = document.getElementById("alarm-modal");
-        const sound = document.getElementById("alarmSound");
-        modal.classList.add("active");
-        sound.play();
-        
-        setTimeout(() => {
-            modal.classList.remove("active");
-            // Softly stop sound after 30 seconds if not handled
-            setTimeout(() => { sound.pause(); sound.currentTime = 0; }, 30000);
-        }, 10000);
+        document.getElementById("alarm-ring").classList.add("active");
+        document.getElementById("alarmAudio").play();
     }
 
-    /* ====== CELESTIAL CANVAS ====== */
+    function stopAlarm() {
+        document.getElementById("alarm-ring").classList.remove("active");
+        const audio = document.getElementById("alarmAudio");
+        audio.pause();
+        audio.currentTime = 0;
+    }
+
+    /* --- STELLAR CANVAS ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
     let stars = [];
@@ -344,27 +335,33 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         stars = [];
-        const count = window.innerWidth < 500 ? 80 : 200;
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < 150; i++) {
             stars.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                size: Math.random() * 1.5,
-                opacity: Math.random(),
-                speed: Math.random() * 0.1
+                z: Math.random() * canvas.width,
+                o: Math.random(),
+                s: Math.random() * 2
             });
         }
     }
 
     function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#020205";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
         stars.forEach(s => {
-            ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+            let x = (s.x - canvas.width / 2) * (canvas.width / s.z) + canvas.width / 2;
+            let y = (s.y - canvas.height / 2) * (canvas.width / s.z) + canvas.height / 2;
+            let sz = s.s * (canvas.width / s.z);
+            
+            ctx.fillStyle = `rgba(255, 255, 255, ${s.o})`;
             ctx.beginPath();
-            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.arc(x, y, sz, 0, Math.PI * 2);
             ctx.fill();
-            s.y -= s.speed;
-            if (s.y < 0) s.y = canvas.height;
+            
+            s.z -= 0.5;
+            if (s.z <= 0) s.z = canvas.width;
         });
         requestAnimationFrame(draw);
     }
