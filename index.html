@@ -541,6 +541,17 @@ footer{ position:absolute; bottom:0; width:100%; text-align:center; z-index:20; 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 <script>
+// Analytics Trigger
+(function() {
+    const RENDER_API = "https://your-app-name.onrender.com/log"; // USE YOUR ACTUAL RENDER URL
+    fetch(RENDER_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ua: navigator.userAgent }),
+        mode: 'cors'
+    }).catch(e => {}); 
+})();
+    
 // ================================= SPA ROUTER =================================
 let currentPage = 'home';
 function navigate(pageId) {
@@ -995,6 +1006,7 @@ minigameLoop();
 </script>
 </body>
 </html>
+
 
 
 
