@@ -1,154 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Check In ❤️</title>
-<style>
-/* --- General Page Styles --- */
-body {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    background: radial-gradient(circle at top, #2c003e, #1b001f);
-    color: #ffe4f0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loving Check-In 💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #ff69b4;
+            --dark-pink: #ff1493;
+            --soft-white: #ffe4e1;
+            --bg-gradient: radial-gradient(circle at center, #2c003e 0%, #000000 100%);
+        }
 
-h1 {
-    font-size: 3em;
-    margin-top: 1em;
-    text-align: center;
-    color: #ff7fe0;
-    text-shadow: 0 0 10px #ff7fe0, 0 0 20px #ff4fcf;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-p#message {
-    font-size: 1.5em;
-    margin: 1em 0;
-    text-align: center;
-    color: #ffd1e8;
-    transition: all 0.3s ease;
-    min-height: 2em;
-}
+        body {
+            font-family: 'Playfair Display', serif;
+            background: var(--bg-gradient);
+            color: var(--soft-white);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
-/* --- Buttons --- */
-.button-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1em;
-    margin-top: 2em;
-}
+        /* Canvas for magical particles */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
 
-button {
-    background: linear-gradient(145deg, #ff66c4, #ff1f96);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 1em 2em;
-    font-size: 1.2em;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(255,0,150,0.4);
-}
+        .content {
+            z-index: 10;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 3rem;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            box-shadow: 0 0 50px rgba(255, 20, 147, 0.2);
+            max-width: 90%;
+        }
 
-button:hover {
-    transform: scale(1.1) rotate(-2deg);
-    box-shadow: 0 8px 20px rgba(255,0,150,0.7);
-}
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(3rem, 8vw, 5rem);
+            color: var(--pink);
+            text-shadow: 0 0 20px var(--dark-pink);
+            margin-bottom: 10px;
+        }
 
-/* --- Hearts animation --- */
-.heart {
-    position: absolute;
-    font-size: 2em;
-    animation: floatUp 2s ease-out forwards;
-}
+        #status-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            min-height: 1.5em;
+            color: var(--soft-white);
+            opacity: 0.8;
+        }
 
-@keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateY(-150px) scale(1.5); }
-}
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
 
-/* --- Return Home Link --- */
-a#homeLink {
-    margin-top: 3em;
-    font-size: 1.2em;
-    color: #ffb3d9;
-    text-decoration: underline;
-}
-a#homeLink:hover {
-    color: #ff66c4;
-}
-</style>
+        button {
+            padding: 15px 35px;
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.8rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-anya { background: linear-gradient(45deg, #ff1493, #ff69b4); box-shadow: 0 10px 20px rgba(255, 20, 147, 0.4); }
+        .btn-micheal { background: linear-gradient(45deg, #00bfff, #1e90ff); box-shadow: 0 10px 20px rgba(30, 144, 255, 0.4); }
+        .btn-random { background: linear-gradient(45deg, #9370db, #da70d6); box-shadow: 0 10px 20px rgba(147, 112, 219, 0.4); }
+
+        button:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 105, 180, 0.6);
+        }
+
+        button:active { transform: scale(0.95); }
+
+        .back-home {
+            margin-top: 50px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .back-home a {
+            color: var(--soft-white);
+            text-decoration: none;
+            font-family: 'Great Vibes', cursive;
+            font-size: 2rem;
+            transition: color 0.3s;
+        }
+
+        .back-home a:hover { color: var(--pink); }
+
+        /* Floating Animation */
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating { animation: floating 3s ease-in-out infinite; }
+    </style>
 </head>
 <body>
 
-<h1>Check In ❤️</h1>
-<p id="message">Welcome! Choose your check-in 💌</p>
+    <canvas id="particleCanvas"></canvas>
 
-<div class="button-container">
-    <button id="anyaBtn">Anya 💖</button>
-    <button id="michealBtn">Micheal 💙</button>
-    <button id="randomBtn">Random 💌</button>
-</div>
+    <div class="content floating">
+        <h1>💖 Check-In 💖</h1>
+        <p id="status-text">Choose a heart to send to Discord...</p>
 
-<a href="index.html" id="homeLink">Return Home 🏠</a>
+        <div class="btn-group">
+            <button class="btn-anya" onclick="sendCheckin('anya')">Anya 🌸</button>
+            <button class="btn-micheal" onclick="sendCheckin('micheal')">Michael 💙</button>
+            <button class="btn-random" onclick="sendCheckin('random')">Respect 💌</button>
+        </div>
 
-<script>
-// --- API Config ---
-const API_URL = "/api/checkin"; // Flask endpoint
-const ANYA_MESSAGES = [
-    "I love you mostest times infinity times perpetuity 💖",
-    "I love you more than chocos 🍫❤️",
-    "You are my sunshine every day ☀️💕",
-    "Forever and always, my heart is yours 💞",
-    "You're my favorite human in the universe 🌌💖"
-];
+        <div class="back-home">
+            <a href="index.html">🏡 Return Home</a>
+        </div>
+    </div>
 
-// --- Utility: Animate heart ---
-function createHeart(x, y) {
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.style.left = `${x}px`;
-    heart.style.top = `${y}px`;
-    heart.textContent = "💖";
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 2000);
-}
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
 
-// --- Handle Check-in ---
-async function sendCheckIn(type) {
-    try {
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ type })
-        });
-        const data = await res.json();
-        document.getElementById("message").textContent = data.message;
-
-        // Heart animation at random positions
-        for (let i=0; i<5; i++) {
-            const x = Math.random() * window.innerWidth;
-            const y = Math.random() * window.innerHeight * 0.6;
-            createHeart(x, y);
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
-    } catch (err) {
-        document.getElementById("message").textContent = "Oops! Something went wrong 💔";
-        console.error(err);
-    }
-}
+        window.addEventListener('resize', resize);
+        resize();
 
-// --- Event Listeners ---
-document.getElementById("anyaBtn").addEventListener("click", () => sendCheckIn("anya"));
-document.getElementById("michealBtn").addEventListener("click", () => sendCheckIn("micheal"));
-document.getElementById("randomBtn").addEventListener("click", () => sendCheckIn("random"));
-</script>
+        class Particle {
+            constructor(x, y, color, speedX, speedY) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.speedX = speedX;
+                this.speedY = speedY;
+                this.size = Math.random() * 5 + 2;
+                this.opacity = 1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= 0.01;
+            }
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
 
+        function createBurst(x, y, color) {
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle(
+                    x, y, color, 
+                    (Math.random() - 0.5) * 10, 
+                    (Math.random() - 0.5) * 10
+                ));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = particles.filter(p => p.opacity > 0);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        async function sendCheckin(type) {
+            const status = document.getElementById('status-text');
+            const colors = { anya: '#ff1493', micheal: '#00bfff', random: '#9370db' };
+            
+            // Visual Burst
+            createBurst(window.innerWidth / 2, window.innerHeight / 2, colors[type]);
+            status.innerText = "Sending your love... ✨";
+
+            try {
+                const response = await fetch('/api/checkin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type })
+                });
+
+                if (response.ok) {
+                    status.innerText = "💖 Love delivered to Discord!";
+                    setTimeout(() => status.innerText = "Send another?", 3000);
+                } else {
+                    status.innerText = "❌ Discord is sleeping. Try again later.";
+                }
+            } catch (err) {
+                status.innerText = "🚀 Error reaching the server.";
+            }
+        }
+
+        // Mouse trail
+        window.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.8) {
+                particles.push(new Particle(e.clientX, e.clientY, '#ffb6c1', (Math.random()-0.5)*2, (Math.random()-0.5)*2));
+            }
+        });
+    </script>
 </body>
 </html>
