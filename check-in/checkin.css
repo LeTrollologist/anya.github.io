@@ -1,0 +1,61 @@
+/* General styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #1c1c2a, #2a1c2a, #1c2a2a);
+    overflow: hidden;
+    color: #ffb6c1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#container {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+#title {
+    font-family: 'Great Vibes', cursive;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff1493;
+}
+
+#message {
+    font-size: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* Back link */
+.back-link a {
+    font-family: 'Great Vibes', cursive;
+    font-size: 1.8rem;
+    color: #ffb6c1;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    background: rgba(255, 182, 193, 0.1);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 15px rgba(255, 182, 193, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.back-link a:hover {
+    transform: scale(1.2);
+    color: #ff69b4;
+    box-shadow: 0 0 25px #ff1493, 0 0 50px #ff69b4;
+}
+
+/* Canvas covers entire page */
+#canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
