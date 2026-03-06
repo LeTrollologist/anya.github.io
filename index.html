@@ -541,16 +541,27 @@ footer{ position:absolute; bottom:0; width:100%; text-align:center; z-index:20; 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 <script>
-// Analytics Trigger
+// --- ANYA SITE TRACKER ---
 (function() {
-    const RENDER_API = "https://your-app-name.onrender.com/log"; // USE YOUR ACTUAL RENDER URL
-    fetch(RENDER_API, {
+    const TRACKING_URL = "https://analytics-server-bdrm.onrender.com/log";
+    
+    const data = {
+        ua: navigator.userAgent,
+        page: document.title // This will send "For Anya 💖" or "Our Magical Love"
+    };
+
+    fetch(TRACKING_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ua: navigator.userAgent }),
-        mode: 'cors'
-    }).catch(e => {}); 
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data),
+        mode: 'cors' // This allows the GitHub site to talk to the Render site
+    })
+    .then(response => console.log("Visit logged 🌸"))
+    .catch(error => console.log("Analytics failed (Server might be sleeping)"));
 })();
+// -------------------------
     
 // ================================= SPA ROUTER =================================
 let currentPage = 'home';
@@ -1006,6 +1017,7 @@ minigameLoop();
 </script>
 </body>
 </html>
+
 
 
 
