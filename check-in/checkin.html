@@ -3,28 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Check-In 💖</title>
+<title>Check In 💖</title>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="checkin.css">
+<style>
+  /* ================= GLOBAL ================= */
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Playfair Display',serif;
+    background: linear-gradient(160deg,#0d0d1a,#1a1a2e,#0f0f1a);
+    overflow:hidden; min-height:100vh; display:flex; justify-content:center; align-items:center;
+    color:white; position:relative;
+  }
+  a { color:#ff69b4; text-decoration:none; transition:0.3s;}
+  a:hover { text-decoration:underline; }
+
+  /* ================= PARTICLES ================= */
+  .heart { position:absolute; width:20px; height:20px; background:radial-gradient(circle at 30% 30%,#ff69b4,#ff1a7f); clip-path:polygon(50% 0%, 100% 35%, 80% 100%, 50% 80%, 20% 100%, 0% 35%); pointer-events:none; opacity:0.9; animation:floatHeart 2s ease-out forwards; z-index:10;}
+  @keyframes floatHeart {0%{transform:translateY(0) scale(0.5) rotate(0deg);opacity:1;}100%{transform:translateY(-150px) scale(1.2) rotate(45deg);opacity:0;}}
+
+  /* ================= CONTAINER ================= */
+  .container{
+    text-align:center; max-width:700px; padding:30px; background:rgba(255,255,255,0.05); border-radius:25px;
+    backdrop-filter:blur(12px); box-shadow:0 10px 30px rgba(255,105,180,0.4);
+  }
+  h1{ font-family:'Great Vibes',cursive; font-size:3.5rem; text-shadow:0 0 20px #ff69b4; margin-bottom:20px;}
+  p{ font-size:1.2rem; margin-bottom:30px; line-height:1.4; }
+  
+  /* ================= BUTTONS ================= */
+  .btn-container{ display:flex; flex-wrap:wrap; justify-content:center; gap:15px; margin-bottom:30px;}
+  button{
+    background:linear-gradient(145deg,#ff9ec4,#ff69b4);
+    border:none; border-radius:25px; padding:12px 30px; font-size:1.2rem; cursor:pointer;
+    color:white; font-family:'Great Vibes',cursive; box-shadow:0 5px 20px rgba(255,105,180,0.6); transition:0.2s;
+  }
+  button:hover{ transform:scale(1.1); box-shadow:0 8px 30px rgba(255,105,180,0.8);}
+  #returnHome{ background:linear-gradient(145deg,#6a7cff,#4a5eff); }
+
+  /* ================= MESSAGE ================= */
+  #messageBox{
+    min-height:60px; font-family:'Great Vibes',cursive; font-size:1.8rem; margin-bottom:20px;
+    color:#ffb6c1; text-shadow:0 0 15px #ff69b4,0 0 25px #ffb6c1;
+    transition:all 0.5s;
+  }
+
+  /* ================= RETURN HOME LINK ================= */
+  #returnLink{ margin-top:20px; display:inline-block; font-size:1.1rem; color:#ffe4e1; }
+  #returnLink:hover{ color:#ff69b4; text-decoration:underline;}
+</style>
 </head>
 <body>
-<div id="container">
-    <h1 id="title">💖 Loving Check-In 💖</h1>
-    <p id="message">Sending you love and good vibes...</p>
 
-    <div class="buttons">
-        <button onclick="sendCheckin('anya')">💌 Anya Check-In</button>
-        <button onclick="sendCheckin('micheal')">💖 Micheal Check-In</button>
-        <button onclick="sendCheckin('random')">🌟 Pay Respect</button>
-    </div>
+<div class="container">
+  <h1>💖 Check In 💖</h1>
+  <p>Click your button to send love to Discord! Each click will float hearts and share your loving message.</p>
+  
+  <div class="btn-container">
+    <button id="anyaBtn">💌 Anya</button>
+    <button id="michealBtn">💖 Micheal</button>
+    <button id="randomBtn">✨ Random User</button>
+  </div>
 
-    <div class="back-link">
-        <a href="index.html" id="homeLink">🏡 Back to Home</a>
-    </div>
+  <div id="messageBox">Nothing yet…</div>
 
-    <canvas id="canvas"></canvas>
+  <a id="returnLink" href="index.html">🏡 Return Home</a>
 </div>
 
-<script src="checkin.js"></script>
+<script>
+  // ================= MESSAGE POOLS =================
+  const anyaMessages = [
+    "I love you mostest times infinity times perpetuity ❤️",
+    "I love you more than chocos 🍫💖",
+    "You are my universe 🌌💗",
+    "Forever yours, my love 💘",
+    "You make my heart dance 💃💖",
+    "To infinity and beyond with you 🚀💖",
+    "You are my favorite everything 🌸❤️"
+  ];
+  const michealMessages = [
+    "I adore you endlessly 💖",
+    "Thinking of you always 🌹",
+    "You are my everything 💞",
+    "My heart beats for you ❤️",
+    "Forever and always 💌"
+  ];
+  const randomMessages = [
+    "Someone just checked in to send love 💖",
+    "A loving soul sends a heart your way 💌",
+    "Random check-in with warm vibes ✨",
+    "You are loved, always 🌸"
+  ];
+
+  // ================= HEART ANIMATION =================
+  function spawnHeart(x, y){
+    const heart = document.createElement('div');
+    heart.className='heart';
+    heart.style.left=(x-10)+'px';
+    heart.style.top=(y-10)+'px';
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),2000);
+  }
+
+  // ================= BUTTON HANDLERS =================
+  function pickMessage(pool){
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+
+  async function sendCheckIn(user){
+    let pool, channel;
+    switch(user){
+      case 'anya': pool=anyaMessages; channel='anya-channel'; break;
+      case 'micheal': pool=michealMessages; channel='micheal-channel'; break;
+      case 'random': pool=randomMessages; channel='random-channel'; break;
+    }
+    const msg = pickMessage(pool);
+    document.getElementById('messageBox').textContent = msg;
+    
+    // Spawn hearts
+    for(let i=0;i<5;i++){
+      const x = window.innerWidth/2 + (Math.random()-0.5)*200;
+      const y = window.innerHeight/2 + (Math.random()-0.5)*200;
+      spawnHeart(x,y);
+    }
+
+    // POST to backend API (placeholder URL)
+    try{
+      await fetch('YOUR_BACKEND_ENDPOINT/send',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({user:user,message:msg,channel:channel})
+      });
+    }catch(err){ console.warn('Check-in API not reachable, message shown locally.'); }
+  }
+
+  document.getElementById('anyaBtn').addEventListener('click',()=>sendCheckIn('anya'));
+  document.getElementById('michealBtn').addEventListener('click',()=>sendCheckIn('micheal'));
+  document.getElementById('randomBtn').addEventListener('click',()=>sendCheckIn('random'));
+</script>
+
 </body>
 </html>
