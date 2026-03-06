@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Playfair Display', serif;
-            background: radial-gradient(circle at center, #1a002a 0%, #000 100%);
+            background: #050505;
             height: 100vh;
             display: flex;
             align-items: center;
@@ -17,17 +17,19 @@
             overflow: hidden;
             color: white;
         }
+        #starCanvas { position: absolute; top: 0; left: 0; z-index: 1; }
         .container {
+            position: relative;
             z-index: 10;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            padding: 50px;
-            border-radius: 40px;
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 30px;
             border: 1px solid rgba(255, 105, 180, 0.3);
             text-align: center;
-            box-shadow: 0 0 50px rgba(255, 20, 147, 0.2);
             width: 90%;
             max-width: 450px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
         h1 {
             font-family: 'Great Vibes', cursive;
@@ -36,50 +38,60 @@
             text-shadow: 0 0 20px #ff1493;
             margin-bottom: 20px;
         }
-        .btn-group { display: flex; flex-direction: column; gap: 15px; }
+        .btn-list { display: flex; flex-direction: column; gap: 15px; }
         button {
-            padding: 18px;
+            padding: 15px;
             font-family: 'Great Vibes', cursive;
             font-size: 2rem;
             border: none;
-            border-radius: 20px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: 0.4s;
+            transition: 0.3s;
             color: white;
             background: rgba(255, 105, 180, 0.1);
             border: 1px solid #ff69b4;
         }
-        button:hover {
-            background: #ff69b4;
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #ff1493;
-        }
-        #status { margin-top: 25px; font-size: 1.2rem; color: #ffb6c1; min-height: 1.5em; }
+        button:hover { background: #ff69b4; transform: scale(1.05); box-shadow: 0 0 20px #ff1493; }
+        #status { margin-top: 20px; font-size: 1.2rem; color: #ffb6c1; min-height: 1.5em; }
         .home-link {
             margin-top: 30px;
             display: block;
             text-decoration: none;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.6);
             font-family: 'Great Vibes', cursive;
             font-size: 1.6rem;
         }
-        .home-link:hover { color: #ff69b4; }
     </style>
 </head>
 <body>
+    <canvas id="starCanvas"></canvas>
     <div class="container">
         <h1>Check-In</h1>
-        <div class="btn-group">
+        <div class="btn-list">
             <button onclick="sendLove('anya')">🌸 Anya</button>
             <button onclick="sendLove('micheal')">💙 Micheal</button>
             <button onclick="sendLove('random')">✨ Respect</button>
         </div>
         <div id="status"></div>
-        <!-- IMPORTANT: Update this URL to your actual home page -->
         <a href="https://yourusername.github.io/" class="home-link">🏡 Return Home</a>
     </div>
 
     <script>
+        // Star Background
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        function init() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            for(let i=0; i<100; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2});
+        }
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "white";
+            stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill(); s.y -= 0.5; if(s.y<0) s.y=canvas.height; });
+            requestAnimationFrame(draw);
+        }
+        init(); draw();
+
         async function sendLove(type) {
             const status = document.getElementById('status');
             status.innerText = "✨ Sending Love...";
@@ -87,17 +99,12 @@
                 const res = await fetch('/api/checkin', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({type: type})
+                    body: JSON.stringify({type})
                 });
                 const data = await res.json();
-                if(res.ok) {
-                    status.innerText = "💖 " + data.message;
-                } else {
-                    status.innerText = "❌ Error: " + (data.error || "Failed");
-                }
-            } catch (e) {
-                status.innerText = "❌ Server Unreachable";
-            }
+                if(res.ok) status.innerText = "💖 " + data.message;
+                else status.innerText = "❌ " + data.error;
+            } catch (e) { status.innerText = "❌ Server Offline"; }
         }
     </script>
 </body>
