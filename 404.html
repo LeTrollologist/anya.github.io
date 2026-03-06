@@ -8,163 +8,128 @@
 <style>
 /* ================= GLOBAL ================= */
 *{margin:0;padding:0;box-sizing:border-box;}
-body{
-    height:100vh; overflow:hidden; font-family:'Playfair Display',serif; background:#0b0b1e; color:white;
-}
-canvas{position:absolute; top:0; left:0; z-index:1;}
-header{
-    position:absolute; top:20px; width:100%; text-align:center; z-index:50;
-    font-family:'Great Vibes',cursive; font-size:clamp(2rem,5vw,4rem); text-shadow:0 0 25px #ff69b4;
-}
-#loveMessage{
-    position:absolute; top:20%; width:100%; text-align:center; font-size:clamp(1.5rem,4vw,3rem);
-    font-family:'Great Vibes',cursive; color:#ffb6c1; text-shadow:0 0 15px #ff69b4;
-    z-index:50;
-}
-#subMessage{
-    position:absolute; top:35%; width:100%; text-align:center; font-size:clamp(1rem,3vw,2rem);
-    color:#ffe4e1; z-index:50;
-}
-
-/* ================= HEART SNAKE GAME ================= */
-#gameContainer{
-    position:absolute; bottom:50px; left:50%; transform:translateX(-50%);
-    width:90%; max-width:600px; aspect-ratio:1; z-index:50;
-}
-#gameCanvas{
-    width:100%; height:100%; background:rgba(0,0,0,0.1); border:2px solid #ff69b4;
-    border-radius:15px; backdrop-filter: blur(3px); box-shadow:0 0 25px rgba(255,105,180,0.5);
-}
-
-/* ================= SCORE & CONTROLS ================= */
-#score{
-    position:absolute; bottom:10px; width:100%; text-align:center; font-family:'Great Vibes',cursive;
-    font-size:clamp(1.2rem,3vw,2rem); color:#ff69b4; text-shadow:0 0 10px white; z-index:50;
-}
-#homeBtn{
-    position:absolute; bottom:10px; right:20px; font-family:'Great Vibes',cursive; background:#ff69b4;
-    border:none; border-radius:25px; padding:10px 20px; color:white; font-size:1rem;
-    cursor:pointer; z-index:50; box-shadow:0 4px 15px rgba(255,105,180,0.6); transition:0.3s;
-}
-#homeBtn:hover{transform:scale(1.1); box-shadow:0 6px 25px rgba(255,105,180,0.8);}
-
-/* ================= PARTICLE BACKGROUND ================= */
-.petal{
-    position:absolute; width:12px; height:12px;
-    background:radial-gradient(circle at 30% 30%,pink,#ff69b4);
-    border-radius:50%; animation:fall linear infinite; pointer-events:none; z-index:1;
-}
-@keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
-
-.glitter{
-    position:absolute; width:4px; height:4px; background:white; border-radius:50%; opacity:0.8;
-    animation:glitterMove linear infinite; z-index:1;
-}
-@keyframes glitterMove{0%{transform:translateY(0) rotate(0deg);opacity:0.7;}50%{opacity:1;}100%{transform:translateY(100vh) rotate(360deg);opacity:0;}}
-
+body{overflow:hidden;height:100vh;font-family:'Playfair Display',serif;background:linear-gradient(135deg,#ff9ec4,#ff69b4);display:flex;align-items:center;justify-content:center;flex-direction:column;}
+h1{font-family:'Great Vibes',cursive;font-size:clamp(3rem,8vw,6rem);color:white;text-shadow:0 0 15px #ff69b4,0 0 25px #ffb6c1;margin-bottom:10px;text-align:center;}
+#subtext{font-family:'Playfair Display',serif;color:white;text-align:center;margin-bottom:30px;text-shadow:0 0 10px rgba(0,0,0,0.4);}
+#gameContainer{position:relative;}
+canvas{border-radius:20px;box-shadow:0 0 40px rgba(255,105,180,0.6);}
+#scoreBoard{color:white;font-family:'Great Vibes',cursive;font-size:2rem;margin-top:15px;text-shadow:0 0 10px black;}
+.pedal-controls{display:flex;gap:20px;margin-top:20px;}
+.pedal{background:rgba(255,255,255,0.2);padding:15px 25px;border-radius:25px;color:white;font-family:'Great Vibes',cursive;font-size:1.5rem;text-shadow:0 0 5px black;cursor:pointer;user-select:none;transition:0.2s;}
+.pedal:active{transform:scale(1.1);background:rgba(255,105,180,0.6);}
+.restart-btn{margin-top:20px;padding:12px 35px;background:linear-gradient(145deg,#ff9ec4,#ff69b4);border:none;border-radius:25px;color:white;font-family:'Great Vibes',cursive;font-size:1.8rem;cursor:pointer;box-shadow:0 4px 15px rgba(255,105,180,0.6);transition:0.2s;}
+.restart-btn:hover{transform:scale(1.1);box-shadow:0 6px 25px rgba(255,105,180,0.8);}
 </style>
 </head>
 <body>
 
-<header>💔 Oops! Lost in Love 💔</header>
-<div id="loveMessage">Anya, you are always in my heart 💖</div>
-<div id="subMessage">This page doesn't exist… but love always does 🌸</div>
-
+<h1>Oops! You crashed 💔</h1>
+<div id="subtext">Hearts eaten: <span id="heartsEaten">0</span></div>
 <div id="gameContainer">
-    <canvas id="gameCanvas"></canvas>
-    <div id="score">Hearts eaten: 0</div>
+    <canvas id="heartSnake" width="500" height="500"></canvas>
 </div>
-
-<button id="homeBtn" onclick="location.href='index.html'">Return Home 💖</button>
+<div class="pedal-controls">
+    <div class="pedal" id="leftPedal">⬆️ / W</div>
+    <div class="pedal" id="rightPedal">⬇️ / S</div>
+</div>
+<button class="restart-btn" onclick="resetGame()">Restart</button>
 
 <script>
-/* ================= PARTICLES ================= */
-const petals=[], glitters=[];
-for(let i=0;i<50;i++){
-    const p=document.createElement('div'); p.classList.add('petal');
-    p.style.left=Math.random()*100+'vw';
-    p.style.top=Math.random()*100+'vh';
-    p.style.animationDuration=(5+Math.random()*5)+'s';
-    document.body.appendChild(p); petals.push(p);
-}
-for(let i=0;i<80;i++){
-    const g=document.createElement('div'); g.classList.add('glitter');
-    g.style.left=Math.random()*100+'vw';
-    g.style.top=Math.random()*100+'vh';
-    g.style.animationDuration=(3+Math.random()*4)+'s';
-    document.body.appendChild(g); glitters.push(g);
-}
+const canvas = document.getElementById('heartSnake');
+const ctx = canvas.getContext('2d');
+const size = 20; // snake segment
+let snake = [{x:10,y:10}];
+let hearts = [];
+let dir = {x:0,y:0};
+let score = 0;
+let gameOver = false;
+const gridWidth = canvas.width/size;
+const gridHeight = canvas.height/size;
 
-/* ================= HEART SNAKE GAME ================= */
-const canvas=document.getElementById('gameCanvas');
-const ctx=canvas.getContext('2d');
-const grid=20;
-let snake=[{x:10,y:10}];
-let heart={x:15,y:15};
-let dx=1, dy=0;
-let score=0;
-
-function drawHeart(x,y){
-    ctx.fillStyle='red';
-    ctx.beginPath();
-    const s=grid/2;
-    ctx.moveTo(x*s, y*s+s/4);
-    ctx.bezierCurveTo(x*s, y*s, x*s+s/4, y*s, x*s+s/2, y*s/4);
-    ctx.bezierCurveTo(x*s+3*s/4, y*s, x*s+s, y*s, x*s+s, y*s+s/4);
-    ctx.bezierCurveTo(x*s+s, y*s+s/2, x*s+s/2, y*s+3*s/4, x*s+s/2, y*s+s);
-    ctx.bezierCurveTo(x*s+s/2, y*s+3*s/4, x*s, y*s+s/2, x*s, y*s+s/4);
-    ctx.fill();
+// Create random heart
+function spawnHeart(){
+    let hx = Math.floor(Math.random()*gridWidth);
+    let hy = Math.floor(Math.random()*gridHeight);
+    hearts.push({x:hx,y:hy});
 }
 
+// Reset game
+function resetGame(){
+    snake=[{x:10,y:10}];
+    dir={x:0,y:0};
+    hearts=[];
+    spawnHeart();
+    score=0;
+    gameOver=false;
+    document.getElementById('heartsEaten').innerText=score;
+    draw();
+}
+
+// Draw everything
 function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    // draw heart
-    drawHeart(heart.x, heart.y);
-    // draw snake
-    for(let i=0;i<snake.length;i++){
-        drawHeart(snake[i].x, snake[i].y);
-    }
+
+    // Draw hearts
+    hearts.forEach(h=>{
+        ctx.fillStyle='red';
+        ctx.beginPath();
+        ctx.moveTo(h.x*size+size/2,h.y*size+size/4);
+        ctx.bezierCurveTo(h.x*size,h.y*size,h.x*size,h.y*size+size/2,h.x*size+size/2,h.y*size+size);
+        ctx.bezierCurveTo(h.x*size+size,h.y*size+size/2,h.x*size+size,h.y*size,h.x*size+size/2,h.y*size+size/4);
+        ctx.fill();
+    });
+
+    // Draw snake
+    snake.forEach((s,i)=>{
+        ctx.fillStyle=i===0?'#fff':'#ff69b4';
+        ctx.fillRect(s.x*size,s.y*size,size,size);
+    });
 }
+
+// Update snake
 function update(){
-    const head={x:snake[0].x+dx, y:snake[0].y+dy};
+    if(gameOver) return;
+
+    const head = {x:snake[0].x + dir.x, y:snake[0].y + dir.y};
+
+    // Collision wall
+    if(head.x<0||head.y<0||head.x>=gridWidth||head.y>=gridHeight) return crash();
+    // Collision self
+    if(snake.some(s=>s.x===head.x&&s.y===head.y)) return crash();
+
     snake.unshift(head);
-    if(head.x===heart.x && head.y===heart.y){
+
+    // Eat heart
+    let eatenIndex = hearts.findIndex(h=>h.x===head.x && h.y===head.y);
+    if(eatenIndex>-1){
+        hearts.splice(eatenIndex,1);
         score++;
-        document.getElementById('score').innerText=`Hearts eaten: ${score}`;
-        heart={x:Math.floor(Math.random()*(canvas.width/grid)), y:Math.floor(Math.random()*(canvas.height/grid))};
-    } else {
+        document.getElementById('heartsEaten').innerText=score;
+        spawnHeart();
+    }else{
         snake.pop();
     }
-    // collision with walls
-    if(head.x<0||head.y<0||head.x>=canvas.width/grid||head.y>=canvas.height/grid){
-        alert(`Oops! You crashed 💔. Hearts eaten: ${score}`);
-        snake=[{x:10,y:10}]; dx=1; dy=0; score=0;
-        document.getElementById('score').innerText=`Hearts eaten: ${score}`;
-    }
-    // collision with self
-    for(let i=1;i<snake.length;i++){
-        if(snake[i].x===head.x && snake[i].y===head.y){
-            alert(`Oops! Self-collision 💔. Hearts eaten: ${score}`);
-            snake=[{x:10,y:10}]; dx=1; dy=0; score=0;
-            document.getElementById('score').innerText=`Hearts eaten: ${score}`;
-        }
-    }
 }
-document.addEventListener('keydown', e=>{
-    switch(e.key){
-        case'ArrowUp': if(dy===0){dx=0;dy=-1;} break;
-        case'ArrowDown': if(dy===0){dx=0;dy=1;} break;
-        case'ArrowLeft': if(dx===0){dx=-1;dy=0;} break;
-        case'ArrowRight': if(dx===0){dx=1;dy=0;} break;
-    }
+
+// Crash
+function crash(){
+    gameOver=true;
+    alert(`You crashed! 💔 Hearts eaten: ${score}`);
+}
+
+// Pedal keyboard controls
+document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowUp'||e.key==='w'||e.key==='W'){dir={x:0,y:-1};}
+    if(e.key==='ArrowDown'||e.key==='s'||e.key==='S'){dir={x:0,y:1};}
 });
 
-function gameLoop(){
-    update();
-    draw();
-    requestAnimationFrame(gameLoop);
-}
-gameLoop();
+// Pedal on-screen controls
+document.getElementById('leftPedal').addEventListener('click',()=>{dir={x:0,y:-1};});
+document.getElementById('rightPedal').addEventListener('click',()=>{dir={x:0,y:1};});
+
+// Main loop
+spawnHeart();
+setInterval(()=>{update();draw();},150);
 </script>
 </body>
 </html>
