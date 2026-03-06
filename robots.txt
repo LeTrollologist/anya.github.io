@@ -1,0 +1,8 @@
+User-agent: *
+
+# Allow indexing of main pages
+Allow: /index.html
+Allow: /sleep.html
+Allow: /404.html
+
+Disallow: /favicon.ico
