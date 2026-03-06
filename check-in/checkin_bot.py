@@ -33,7 +33,7 @@ def api_checkin():
             url = os.environ.get("WEBHOOK_ANYA")
         elif target == "micheal":
             msg = "💙 Micheal has checked in with love!"
-            url = os.environ.get("WEBHOOK_MICHAEL")
+            url = os.environ.get("WEBHOOK_MICHEAL")
         else:
             msg = "🌟 Someone has paid their respects!"
             url = os.environ.get("WEBHOOK_RANDOM")
