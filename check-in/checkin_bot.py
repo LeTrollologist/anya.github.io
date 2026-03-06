@@ -30,8 +30,8 @@ def api_checkin():
             msg = random.choice(ANYA_MESSAGES)
             url = os.getenv("WEBHOOK_ANYA")
         elif check_type == "micheal":
-            msg = "💙 Michael has checked in with love!"
-            url = os.getenv("WEBHOOK_MICHAEL")
+            msg = "💙 Micheel has checked in with love!"
+            url = os.getenv("WEBHOOK_MICHEAL")
         else:
             msg = "🌟 A visitor has paid their respects!"
             url = os.getenv("WEBHOOK_RANDOM")
