@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>For Anya 💖</title>
+<title>Our Magical Love 💖</title>
 <meta property="og:title" content="Our Magical Love">
 <meta property="og:description" content="A website built for a lovely Anya.">
 <meta property="og:image" content="https://raw.githubusercontent.com/LeTrollologist/anya.github.io/refs/heads/main/OurMagicalLove.png">
@@ -82,10 +82,13 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 }
 #mob-overlay.open{display:flex}
 .mob-close{
-  position:absolute;top:14px;right:14px;background:none;
-  border:1px solid var(--border);color:white;border-radius:var(--rp);
-  padding:7px 13px;cursor:pointer;font-size:.9rem;
+  position:absolute;top:14px;right:14px;
+  background:rgba(255,111,171,.2);border:1px solid var(--border-p);
+  color:white;border-radius:var(--rp);
+  padding:9px 16px;cursor:pointer;font-size:.9rem;font-weight:600;
+  letter-spacing:.04em;transition:.2s;
 }
+.mob-close:hover{background:rgba(255,111,171,.4);}
 .mob-link{
   color:white;text-decoration:none;font-family:var(--fd);font-size:2rem;
   cursor:pointer;text-shadow:0 0 10px var(--pink-g);width:100%;text-align:center;
@@ -490,7 +493,7 @@ body.studyMode .page-section{display:none!important}
 <span id="mobile-brand" onclick="navigate('home')">💖 Anya</span>
 <button id="nav-toggle" onclick="openMob()">☰</button>
 <div id="mob-overlay">
-  <button class="mob-close" onclick="closeMob()">✕</button>
+  <button class="mob-close" onclick="closeMob()">✕ Close</button>
   <a class="mob-link" onclick="navigate('home');closeMob()">🏠 Home</a>
   <a class="mob-link" onclick="openProposal();closeMob()">💍 Proposal</a>
   <a class="mob-link" onclick="toggleStudyMode();closeMob()">📚 StudyBuddy</a>
@@ -770,8 +773,15 @@ var istO = {timeZone:'Asia/Kolkata',    hour:'2-digit',minute:'2-digit',second:'
 // ══════════════════════════════════════════════════════════
 
 // ── MOBILE NAV ──
-function openMob()  { document.getElementById('mob-overlay').classList.add('open'); }
-function closeMob() { document.getElementById('mob-overlay').classList.remove('open'); }
+function openMob()  {
+  document.getElementById('mob-overlay').classList.add('open');
+  // Prevent body scroll while menu is open
+  document.body.style.overflow = 'hidden';
+}
+function closeMob() {
+  document.getElementById('mob-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
 
 // ── ROUTER ──
 function navigate(pageId) {
@@ -1062,6 +1072,8 @@ function exitStudyMode() {
   document.getElementById('studyPanel').style.display = 'none';
   var tog = document.getElementById('studyToggle');
   tog.innerText = '📚'; tog.title = 'StudyBuddy';
+  // CRITICAL: remove inline display:none set by enterStudyMode so .active class can show the page
+  document.querySelectorAll('.page-section').forEach(function(el){ el.style.display = ''; });
   navigate('home');
 }
 
@@ -1090,18 +1102,25 @@ function onYouTubeIframeAPIReady() {
 }
 function initYTPlayer() {
   if (ytPlayer) return;
+  // Use enablejsapi=1 and origin param to avoid postMessage origin errors
+  var origin = window.location.origin || 'https://letrollologist.github.io';
   ytPlayer = new YT.Player('ytplayer', {
     height:'100%', width:'100%', videoId:'Dfm2rB-nQ9Y',
-    playerVars:{controls:0,modestbranding:1,rel:0,loop:1,playlist:'Dfm2rB-nQ9Y'},
-    events:{onStateChange:function(e){
-      var icon = document.getElementById('dl-play-icon');
-      if (icon) icon.innerHTML = (e.data===1) ? DL_PAUSE : DL_PLAY;
-    }}
+    playerVars:{controls:0,modestbranding:1,rel:0,loop:1,playlist:'Dfm2rB-nQ9Y',enablejsapi:1,origin:origin},
+    events:{
+      onReady:function(e){ e.target.setVolume(40); },
+      onStateChange:function(e){
+        var icon = document.getElementById('dl-play-icon');
+        if (icon) icon.innerHTML = (e.data===1) ? DL_PAUSE : DL_PLAY;
+      }
+    }
   });
 }
 function toggleDLPlay() {
-  if (!ytPlayer) { initYTPlayer(); return; }
-  ytPlayer.getPlayerState()===1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+  if (!ytPlayer || typeof ytPlayer.getPlayerState !== 'function') { initYTPlayer(); return; }
+  try {
+    ytPlayer.getPlayerState()===1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+  } catch(e) { console.warn('YT player not ready yet'); }
 }
 function changeDLVolume(v) {
   if (ytPlayer) ytPlayer.setVolume(v);
@@ -1218,7 +1237,8 @@ function updatePong() {
   aY = Math.max(0, Math.min(GH-PH, aY));
   ball.x+=ball.dx; ball.y+=ball.dy;
   trails.push({x:ball.x,y:ball.y}); if(trails.length>9) trails.shift();
-  if (ball.y-ball.r<0||ball.y+ball.r>GH) { ball.dy*=-1; shk=4; }
+  if (ball.y-ball.r<0) { ball.y=ball.r; ball.dy=Math.abs(ball.dy); shk=4; }
+  else if (ball.y+ball.r>GH) { ball.y=GH-ball.r; ball.dy=-Math.abs(ball.dy); shk=4; }
   function hit(px,py,isP) {
     if (ball.y+ball.r>py && ball.y-ball.r<py+PH) {
       if ((isP&&ball.x-ball.r<px+PW)||(!isP&&ball.x+ball.r>px)) {
@@ -1284,6 +1304,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Music
   bgAud   = document.getElementById('bgAudio');
+  bgAud.addEventListener('error', function() {
+    if (mLabel) mLabel.innerText = 'Audio unavailable';
+    vinylEl.classList.remove('spin');
+    clearInterval(noteInt);
+  });
   vinylEl = document.getElementById('vinyl');
   mLabel  = document.getElementById('musicStatus');
 
