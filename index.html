@@ -705,391 +705,689 @@ body.studyMode .page-section{display:none!important}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-'use strict';
+/*
+ * ALL shared mutable variables are declared with var at the top level.
+ * var hoists to function/global scope so inline onclick attrs and
+ * event listeners that fire before DOMContentLoaded can still see them.
+ * Function declarations also hoist, so calling navigate(), closeLetter()
+ * etc. from onclick attrs is safe even before the init block runs.
+ */
+
+// ── SHARED STATE (all var, no const/let at top level) ──
+var currentPage  = 'home';
+var studyMode    = false;
+
+// Sky
+var LAT = 22.5726, LNG = 88.3639;
+var sc, sx, stars = [];
+
+// Music
+var bgAud, vinylEl, mLabel, noteInt;
+
+// Letter
+var clickCount = 0, iChar = 0;
+var letterEl, letterBox;
+var ltxt = 'You are written in my sky and in every future I see.';
+
+// Proposal
+var propTick;
+
+// StudyBuddy
+var timerInt2, isRun = false, defMins = 25, totSec = 1500, remSec = 1500, phase = 'POMODORO';
+var sessCount = 0, focMins = 0, taskDone = 0;
+var ring, CIRC = 2 * Math.PI * 70;
+var ambAud = null;
+var ambSrc = {
+  rain:  'https://assets.mixkit.co/sfx/preview/mixkit-rain-and-thunder-storm-2390.mp3',
+  white: 'https://assets.mixkit.co/sfx/preview/mixkit-white-noise-ambience-2358.mp3',
+  lofi:  'https://res.cloudinary.com/dwpisauuy/video/upload/v1772744236/Interstellar-Space-Sounds_ux8nf2.mp3'
+};
+var motivMsgs = [
+  'Every minute counts.','Your future self is proud.','Stay steady. Stay calm.',
+  'Small steps, big futures.','You can do this, Anya. 💖','Deep breaths. Then deep work.',
+  'Progress, not perfection.','You are doing amazing. Keep going.'
+];
+
+// Dreamland
+var ytPlayer = null, sleepTmr = null, cntIntDL = null, alarmTarget = null;
+var DL_PLAY  = '<path d="M8 5v14l11-7z"/>';
+var DL_PAUSE = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+
+// Pong
+var canvas, ctx, GW = 800, GH = 600;
+var gState = 'START', pScore = 0, aScore = 0, shk = 0;
+var WIN = 7, PW = 14, PH = 100;
+var pY, aY, ball, trails = [], parts = [];
+var upP = false, dnP = false;
+
+// Dates / timers
+var startDate = new Date('2026-02-17T16:19:00+05:30');
+var estO = {timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
+var istO = {timeZone:'Asia/Kolkata',    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
+
+// ══════════════════════════════════════════════════════════
+//  FUNCTION DECLARATIONS  (hoist — safe to call from onclick)
+// ══════════════════════════════════════════════════════════
 
 // ── MOBILE NAV ──
 function openMob()  { document.getElementById('mob-overlay').classList.add('open'); }
 function closeMob() { document.getElementById('mob-overlay').classList.remove('open'); }
 
 // ── ROUTER ──
-let currentPage = 'home';
 function navigate(pageId) {
-  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
-  const pg = document.getElementById('page-' + pageId);
+  document.querySelectorAll('.page-section').forEach(function(el){ el.classList.remove('active'); });
+  var pg = document.getElementById('page-' + pageId);
   if (pg) pg.classList.add('active');
   currentPage = pageId;
 
-  document.querySelectorAll('.nl').forEach(a => a.classList.remove('active'));
-  document.querySelectorAll(`.nl[onclick*="${pageId}"]`).forEach(a => a.classList.add('active'));
+  document.querySelectorAll('.nl').forEach(function(a){ a.classList.remove('active'); });
+  document.querySelectorAll('.nl[onclick*="' + pageId + '"]').forEach(function(a){ a.classList.add('active'); });
 
   document.body.style.touchAction = pageId === 'minigame' ? 'none' : 'auto';
   if (pageId === 'status') runDiagnostics();
   if (pageId !== 'home') {
     closeLetter();
-    const m = document.getElementById('marry');
-    m.style.opacity = '0'; setTimeout(() => m.style.display='none', 300);
+    var m = document.getElementById('marry');
+    m.style.opacity = '0';
+    setTimeout(function(){ m.style.display = 'none'; }, 300);
   }
   if (pageId === 'dreamland' && !ytPlayer && window.YT && window.YT.Player) initYTPlayer();
-  if (pageId === 'minigame') { setTimeout(resizePong, 60); }
+  if (pageId === 'minigame') setTimeout(resizePong, 60);
   if (studyMode && pageId !== 'home') exitStudyMode();
 }
 
-// ── SKY / BACKGROUND ──
-const LAT=22.5726, LNG=88.3639;
-const sc = document.getElementById('stars');
-const sx = sc.getContext('2d');
-let stars=[], studyMode=false;
+// ── STATUS / DIAGNOSTICS ──
+function runDiagnostics() {
+  var msg = document.getElementById('statusMessage');
+  var nodes = ['mainSite','analytics','database','checkIns'];
+  msg.innerText = 'Running pings… (may take 30s)';
+  nodes.forEach(function(n){
+    document.getElementById('txt-'+n).innerText = 'PINGING…';
+    document.getElementById('txt-'+n).style.color = '#facc15';
+    document.getElementById('dot-'+n).className = 'dot loading';
+  });
+  fetch('https://analytics-server-bdrm.onrender.com/api/health')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      nodes.forEach(function(n){
+        var ok = d[n] === 'ONLINE';
+        document.getElementById('txt-'+n).innerText = ok ? 'ONLINE' : 'OFFLINE';
+        document.getElementById('txt-'+n).style.color = ok ? '#00ff88' : '#ff4040';
+        document.getElementById('dot-'+n).className = 'dot ' + (ok ? 'online' : 'offline');
+      });
+      msg.innerText = 'Diagnostics complete.';
+    })
+    .catch(function(){
+      nodes.forEach(function(n){
+        document.getElementById('txt-'+n).innerText = 'UNREACHABLE';
+        document.getElementById('txt-'+n).style.color = '#ff4040';
+        document.getElementById('dot-'+n).className = 'dot offline';
+      });
+      document.getElementById('txt-mainSite').innerText = 'ONLINE';
+      document.getElementById('txt-mainSite').style.color = '#00ff88';
+      document.getElementById('dot-mainSite').className = 'dot online';
+      msg.innerText = 'CRITICAL: Sentinel Core unreachable.';
+    });
+}
 
+// ── SKY ──
 function initStars() {
-  stars = Array.from({length:155},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.2,a:Math.random()}));
+  stars = [];
+  for (var i = 0; i < 155; i++) {
+    stars.push({x:Math.random()*innerWidth, y:Math.random()*innerHeight, r:Math.random()*1.4+.2, a:Math.random()});
+  }
 }
 function resizeAll() {
-  sc.width=innerWidth; sc.height=innerHeight; initStars();
-  if (currentPage==='minigame') resizePong();
+  if (!sc) return;
+  sc.width = innerWidth; sc.height = innerHeight; initStars();
+  if (currentPage === 'minigame') resizePong();
 }
-window.addEventListener('resize', resizeAll);
-
 function drawStars() {
+  if (!sx) return;
   sx.clearRect(0,0,innerWidth,innerHeight);
-  stars.forEach(s => {
-    sx.beginPath(); sx.fillStyle=`rgba(255,255,255,${s.a})`; sx.arc(s.x,s.y,s.r,0,Math.PI*2); sx.fill();
-    s.a=Math.max(.08,Math.min(1,s.a+(Math.random()-.5)*.04));
+  stars.forEach(function(s){
+    sx.beginPath(); sx.fillStyle = 'rgba(255,255,255,'+s.a+')';
+    sx.arc(s.x,s.y,s.r,0,Math.PI*2); sx.fill();
+    s.a = Math.max(.08, Math.min(1, s.a+(Math.random()-.5)*.04));
   });
 }
 function updateBg(alt) {
-  if (studyMode || currentPage==='dreamland') return;
-  const t=Math.max(0,Math.min(1,(alt+Math.PI/2)/Math.PI));
-  document.body.style.background=`linear-gradient(to bottom,rgb(${~~(25+205*t)},${~~(50+130*t)},${~~(80+175*t)}),rgb(15,25,50))`;
+  if (studyMode || currentPage === 'dreamland') return;
+  var t = Math.max(0, Math.min(1, (alt+Math.PI/2)/Math.PI));
+  document.body.style.background = 'linear-gradient(to bottom,rgb('+
+    Math.round(25+205*t)+','+Math.round(50+130*t)+','+Math.round(80+175*t)+'),rgb(15,25,50))';
 }
 function drawSky() {
   drawStars();
-  const now=new Date(), sp=SunCalc.getPosition(now,LAT,LNG);
+  var now = new Date(), sp = SunCalc.getPosition(now, LAT, LNG);
   updateBg(sp.altitude);
-  const show=!studyMode && currentPage!=='dreamland';
-  const sun=document.getElementById('sunSvg'), moon=document.getElementById('moonSvg');
+  var show = !studyMode && currentPage !== 'dreamland';
+  var sun  = document.getElementById('sunSvg');
+  var moon = document.getElementById('moonSvg');
   if (show) {
-    if (sp.altitude>-.1) {
-      sun.style.left=`${(sp.azimuth+Math.PI)/(2*Math.PI)*innerWidth}px`;
-      sun.style.top=`${innerHeight*(1-(sp.altitude+Math.PI/2)/Math.PI)}px`;
-      sun.style.display='block';
-      document.getElementById('sunGlowLayer').setAttribute('fill',`rgba(255,240,150,${Math.max(0,Math.sin(sp.altitude)*.8)})`);
-    } else sun.style.display='none';
-    const mp=SunCalc.getMoonPosition(now,LAT,LNG), mil=SunCalc.getMoonIllumination(now);
-    if (mp.altitude>-.1) {
-      moon.style.left=`${(mp.azimuth+Math.PI)/(2*Math.PI)*innerWidth}px`;
-      moon.style.top=`${innerHeight*(1-(mp.altitude+Math.PI/2)/Math.PI)}px`;
-      moon.style.display='block';
-      const sh=50*mil.fraction; document.getElementById('moonShadow').setAttribute('cx',mil.phase<=.5?25-sh:25+sh);
-    } else moon.style.display='none';
+    if (sp.altitude > -.1) {
+      sun.style.left = ((sp.azimuth+Math.PI)/(2*Math.PI)*innerWidth) + 'px';
+      sun.style.top  = (innerHeight*(1-(sp.altitude+Math.PI/2)/Math.PI)) + 'px';
+      sun.style.display = 'block';
+      document.getElementById('sunGlowLayer').setAttribute('fill',
+        'rgba(255,240,150,'+Math.max(0,Math.sin(sp.altitude)*.8)+')');
+    } else { sun.style.display = 'none'; }
+    var mp = SunCalc.getMoonPosition(now,LAT,LNG), mil = SunCalc.getMoonIllumination(now);
+    if (mp.altitude > -.1) {
+      moon.style.left = ((mp.azimuth+Math.PI)/(2*Math.PI)*innerWidth) + 'px';
+      moon.style.top  = (innerHeight*(1-(mp.altitude+Math.PI/2)/Math.PI)) + 'px';
+      moon.style.display = 'block';
+      var sh = 50*mil.fraction;
+      document.getElementById('moonShadow').setAttribute('cx', mil.phase<=.5 ? 25-sh : 25+sh);
+    } else { moon.style.display = 'none'; }
   } else {
-    sun.style.display=moon.style.display='none';
-    if (currentPage==='dreamland') document.body.style.background='#020205';
-    if (studyMode) document.body.style.background='linear-gradient(160deg,#0a1020,#111830,#060c18)';
+    sun.style.display = moon.style.display = 'none';
+    if (currentPage === 'dreamland') document.body.style.background = '#020205';
+    if (studyMode) document.body.style.background = 'linear-gradient(160deg,#0a1020,#111830,#060c18)';
   }
   requestAnimationFrame(drawSky);
 }
-resizeAll(); drawSky();
-
-// ── ANALYTICS ──
-(function(){
-  if(localStorage.getItem('admin')==='true')return;
-  fetch('https://analytics-server-bdrm.onrender.com/log',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ua:navigator.userAgent,page:document.title,screen:`${screen.width}x${screen.height}`}),mode:'cors'}).catch(()=>{});
-})();
-
-// ── STATUS ──
-async function runDiagnostics() {
-  const msg=document.getElementById('statusMessage');
-  const nodes=['mainSite','analytics','database','checkIns'];
-  msg.innerText='Running pings… (may take 30s)';
-  nodes.forEach(n=>{document.getElementById(`txt-${n}`).innerText='PINGING…';document.getElementById(`txt-${n}`).style.color='#facc15';document.getElementById(`dot-${n}`).className='dot loading';});
-  try {
-    const d=await(await fetch('https://analytics-server-bdrm.onrender.com/api/health')).json();
-    nodes.forEach(n=>{const ok=d[n]==='ONLINE';document.getElementById(`txt-${n}`).innerText=ok?'ONLINE':'OFFLINE';document.getElementById(`txt-${n}`).style.color=ok?'#00ff88':'#ff4040';document.getElementById(`dot-${n}`).className=`dot ${ok?'online':'offline'}`;});
-    msg.innerText='Diagnostics complete.';
-  } catch {
-    nodes.forEach(n=>{document.getElementById(`txt-${n}`).innerText='UNREACHABLE';document.getElementById(`txt-${n}`).style.color='#ff4040';document.getElementById(`dot-${n}`).className='dot offline';});
-    document.getElementById('txt-mainSite').innerText='ONLINE';document.getElementById('txt-mainSite').style.color='#00ff88';document.getElementById('dot-mainSite').className='dot online';
-    msg.innerText='CRITICAL: Sentinel Core unreachable.';
-  }
-}
-
-// ── COUNTERS ──
-const startDate=new Date('2026-02-17T16:19:00+05:30');
-const estO={timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
-const istO={timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
-
-function tick2() {
-  const now=new Date(), diff=now-startDate;
-  const d=Math.floor(diff/86400000),h=Math.floor(diff/3600000%24),m=Math.floor(diff/60000%60),s=Math.floor(diff/1000%60);
-  const cEl=document.getElementById('counter');
-  if(cEl) cEl.innerHTML=`<span>${d} 💖 Days</span><span>${h} 🕒 Hours</span><span>${m} ⏳ Mins</span><span>${s} 💌 Secs</span>`;
-  const alt=`${d} Days Together 💖`;
-  ['album-counter','contact-counter'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=alt;});
-  const e1=document.getElementById('time-est'),e2=document.getElementById('time-ist');
-  if(e1)e1.innerText=now.toLocaleTimeString('en-US',estO);
-  if(e2)e2.innerText=now.toLocaleTimeString('en-US',istO);
-  checkAlarm();
-}
-tick2(); setInterval(tick2,1000);
-
-const visits=parseInt(localStorage.getItem('anya_visits')||'0')+1;
-localStorage.setItem('anya_visits',visits);
-document.getElementById('footerCounter').innerHTML=`You've visited ${visits} times 🌸`;
 
 // ── MUSIC ──
-const bgAud=document.getElementById('bgAudio'),vinylEl=document.getElementById('vinyl'),mLabel=document.getElementById('musicStatus');
-let noteInt;
 function toggleMusic() {
-  if(bgAud.paused){
-    bgAud.play().then(()=>{vinylEl.classList.add('spin');mLabel.innerText='Playing… 🎵';noteInt=setInterval(spawnNote,1500);}).catch(()=>alert('Audio blocked.'));
+  if (!bgAud) return;
+  if (bgAud.paused) {
+    bgAud.play()
+      .then(function(){
+        vinylEl.classList.add('spin');
+        mLabel.innerText = 'Playing… 🎵';
+        noteInt = setInterval(spawnNote, 1500);
+      })
+      .catch(function(){ alert('Audio blocked by browser. Tap the player to try again.'); });
   } else {
-    bgAud.pause();vinylEl.classList.remove('spin');mLabel.innerText='Interstellar Space Sounds';clearInterval(noteInt);
+    bgAud.pause();
+    vinylEl.classList.remove('spin');
+    mLabel.innerText = 'Interstellar Space Sounds';
+    clearInterval(noteInt);
   }
 }
-function spawnNote(){
-  const r=document.getElementById('musicPlayer').getBoundingClientRect();
-  const n=document.createElement('div');
-  n.innerText=['🎵','🎶','💖','✨'][~~(Math.random()*4)];
-  n.style.cssText=`position:fixed;left:${r.left+Math.random()*40+10}px;top:${r.top}px;font-size:1.25rem;pointer-events:none;z-index:100;animation:floatNote 2s ease-out forwards;`;
-  document.body.appendChild(n);setTimeout(()=>n.remove(),2000);
+function spawnNote() {
+  var r = document.getElementById('musicPlayer').getBoundingClientRect();
+  var n = document.createElement('div');
+  n.innerText = ['🎵','🎶','💖','✨'][Math.floor(Math.random()*4)];
+  n.style.cssText = 'position:fixed;left:'+(r.left+Math.random()*40+10)+'px;top:'+r.top+'px;'
+    +'font-size:1.25rem;pointer-events:none;z-index:100;animation:floatNote 2s ease-out forwards;';
+  document.body.appendChild(n);
+  setTimeout(function(){ n.remove(); }, 2000);
 }
-
-// ── PARTICLES ──
-(function(){
-  const cnt=innerWidth<480?16:32;
-  for(let i=0;i<cnt;i++){
-    const p=document.createElement('div');p.className='petal';
-    p.style.left=Math.random()*100+'vw';p.style.top='-14px';
-    p.style.animationDuration=(5+Math.random()*6)+'s';p.style.animationDelay=(Math.random()*8)+'s';
-    document.body.appendChild(p);
-    const g=document.createElement('div');g.className='glitter';
-    g.style.left=Math.random()*100+'vw';g.style.top='-4px';
-    g.style.animationDuration=(3+Math.random()*5)+'s';g.style.animationDelay=(Math.random()*6)+'s';
-    document.body.appendChild(g);
-  }
-})();
 
 // ── LETTER ──
-let clickCount=0,iChar=0;
-const letterEl=document.getElementById('letter'),letterBox=document.getElementById('letterContent');
-const ltxt='You are written in my sky and in every future I see.';
-function writeLetter(){if(iChar<ltxt.length){letterBox.innerHTML+=ltxt[iChar++];setTimeout(writeLetter,60);}}
-document.body.addEventListener('click',e=>{
-  if(currentPage!=='home'||studyMode)return;
-  if(e.target.closest('button,a,.letter,.marry,#musicPlayer,nav,#nav-toggle,#mobile-brand,#mob-overlay'))return;
-  if(++clickCount>=3&&!letterEl.classList.contains('show')){letterEl.classList.add('show');if(iChar===0)writeLetter();}
-});
-function closeLetter(){letterEl.classList.remove('show');clickCount=0;}
-
-// ── PROPOSAL ──
-let propTick;
-function updatePropClocks(){const now=new Date();document.getElementById('proposalText').innerHTML=`IST: ${now.toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour12:true})}<br>Device: ${now.toLocaleTimeString()}`;}
-function openProposal(){
-  if(studyMode)return;
-  if(currentPage!=='home')navigate('home');
-  const m=document.getElementById('marry');
-  updatePropClocks();propTick=setInterval(updatePropClocks,1000);
-  m.style.display='flex';setTimeout(()=>m.style.opacity='1',10);
-}
-document.getElementById('headerProposal').addEventListener('click',openProposal);
-function sayYes(){clearInterval(propTick);const m=document.getElementById('marry');m.style.opacity='0';setTimeout(()=>m.style.display='none',400);const e=document.getElementById('ending');e.innerHTML=`Forever begins now ♡<br>${new Date().toLocaleDateString()}`;e.style.opacity='1';e.style.pointerEvents='auto';}
-function sayNo(){setTimeout(()=>alert("I'll keep asking forever 💖"),300);}
-
-// ── STUDYBUDDY ──
-let timerInt2, isRun=false, defMins=25, totSec=1500, remSec=1500, phase='POMODORO';
-let sessCount=0, focMins=0, taskDone=0;
-const ring=document.querySelector('.progress-ring__circle');
-const CIRC=2*Math.PI*70; ring.style.strokeDasharray=CIRC; ring.style.strokeDashoffset=0;
-function setRing(pct){ring.style.strokeDashoffset=CIRC-(pct/100)*CIRC;}
-function refreshDisp(){
-  const m=~~(remSec/60),s=remSec%60;
-  document.getElementById('timerDisplay').innerText=`${m}:${String(s).padStart(2,'0')}`;
-  document.getElementById('timerPhase').innerText=phase;
-  setRing((remSec/totSec)*100);
-}
-function setPreset(mins,btn,ph){
-  document.querySelectorAll('.study-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  defMins=mins;phase=ph;resetTimer();
-  document.getElementById('motivation').innerText=(ph==='POMODORO'||ph==='DEEP WORK')?'Focus now, freedom later.':'Breathe. You earned this.';
-}
-function toggleTimer(){
-  const btn=document.getElementById('btnToggle');
-  if(isRun){clearInterval(timerInt2);isRun=false;btn.innerText='Resume';btn.style.background='rgba(255,105,180,.4)';}
-  else{if(remSec<=0)resetTimer();isRun=true;timerInt2=setInterval(timerTick,1000);btn.innerText='Pause';btn.style.background='var(--pink)';}
-}
-function resetTimer(){clearInterval(timerInt2);isRun=false;totSec=remSec=defMins*60;document.getElementById('btnToggle').innerText='Start';document.getElementById('btnToggle').style.background='var(--pink)';refreshDisp();}
-function timerTick(){
-  remSec--;refreshDisp();
-  if(remSec<=0){
-    clearInterval(timerInt2);isRun=false;document.getElementById('btnToggle').innerText='Start';
-    document.getElementById('motivation').innerText='✅ Time\'s up! Great work, Anya.';
-    if(phase==='POMODORO'||phase==='DEEP WORK'){sessCount++;focMins+=defMins;}
-    updateStats();
-    try{new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();}catch(e){}
+function writeLetter() {
+  if (!letterBox) return;
+  if (iChar < ltxt.length) {
+    letterBox.innerHTML += ltxt[iChar++];
+    setTimeout(writeLetter, 60);
   }
 }
-function updateStats(){document.getElementById('statSessions').innerText=sessCount;document.getElementById('statMinutes').innerText=focMins;document.getElementById('statTasks').innerText=taskDone;}
-refreshDisp();
-
-let ambAud=null;
-const ambSrc={rain:'https://assets.mixkit.co/sfx/preview/mixkit-rain-and-thunder-storm-2390.mp3',white:'https://assets.mixkit.co/sfx/preview/mixkit-white-noise-ambience-2358.mp3',lofi:'https://res.cloudinary.com/dwpisauuy/video/upload/v1772744236/Interstellar-Space-Sounds_ux8nf2.mp3'};
-function setAmbient(type,btn){
-  document.querySelectorAll('.amb-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  if(ambAud){ambAud.pause();ambAud=null;}
-  if(type!=='none'){ambAud=new Audio(ambSrc[type]);ambAud.loop=true;ambAud.volume=.4;ambAud.play().catch(()=>{});}
+function closeLetter() {
+  if (letterEl) letterEl.classList.remove('show');
+  clickCount = 0;
 }
 
-const motivMsgs=['Every minute counts.','Your future self is proud.','Stay steady. Stay calm.','Small steps create big futures.','You can do this, Anya. 💖','Deep breaths. Then deep work.','Progress, not perfection.'];
-setInterval(()=>{if(studyMode&&isRun)document.getElementById('motivation').innerText=motivMsgs[~~(Math.random()*motivMsgs.length)];},30000);
-
-function addTask(){
-  const inp=document.getElementById('taskInput');if(!inp.value.trim())return;
-  const li=document.createElement('li');
-  li.innerHTML=`<span>${inp.value}</span><button onclick="markDone(this.parentElement)" title="Done">✔</button>`;
-  document.getElementById('todoList').appendChild(li);inp.value='';
+// ── PROPOSAL ──
+function updatePropClocks() {
+  var now = new Date();
+  document.getElementById('proposalText').innerHTML =
+    'IST: '+now.toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour12:true})+
+    '<br>Device: '+now.toLocaleTimeString();
 }
-function markDone(li){li.classList.add('done');taskDone++;updateStats();setTimeout(()=>li.remove(),1100);}
-
-function toggleStudyMode(){studyMode?exitStudyMode():enterStudyMode();}
-function enterStudyMode(){
-  studyMode=true;document.body.classList.add('studyMode');
-  document.querySelectorAll('.page-section').forEach(el=>el.style.display='none');
-  document.getElementById('studyPanel').style.display='flex';
-  document.getElementById('studyToggle').innerText='✕';document.getElementById('studyToggle').title='Exit StudyBuddy';
+function openProposal() {
+  if (studyMode) return;
+  if (currentPage !== 'home') navigate('home');
+  updatePropClocks();
+  propTick = setInterval(updatePropClocks, 1000);
+  var m = document.getElementById('marry');
+  m.style.display = 'flex';
+  setTimeout(function(){ m.style.opacity = '1'; }, 10);
 }
-function exitStudyMode(){
-  studyMode=false;document.body.classList.remove('studyMode');
-  clearInterval(timerInt2);isRun=false;
-  if(ambAud){ambAud.pause();ambAud=null;}
-  document.querySelectorAll('.amb-btn').forEach(b=>b.classList.remove('active'));document.getElementById('ambNone').classList.add('active');
-  document.getElementById('studyPanel').style.display='none';
-  document.getElementById('studyToggle').innerText='📚';document.getElementById('studyToggle').title='StudyBuddy';
+function sayYes() {
+  clearInterval(propTick);
+  var m = document.getElementById('marry');
+  m.style.opacity = '0';
+  setTimeout(function(){ m.style.display='none'; }, 400);
+  var e = document.getElementById('ending');
+  e.innerHTML = 'Forever begins now ♡<br>'+new Date().toLocaleDateString();
+  e.style.opacity = '1'; e.style.pointerEvents = 'auto';
+}
+function sayNo() {
+  setTimeout(function(){ alert("I'll keep asking forever 💖"); }, 300);
+}
+
+// ── STUDYBUDDY ──
+function setRing(pct) {
+  if (ring) ring.style.strokeDashoffset = CIRC - (pct/100)*CIRC;
+}
+function refreshDisp() {
+  var m = Math.floor(remSec/60), s = remSec%60;
+  var td = document.getElementById('timerDisplay');
+  var tp = document.getElementById('timerPhase');
+  if (td) td.innerText = m+':'+(s<10?'0':'')+s;
+  if (tp) tp.innerText = phase;
+  setRing((remSec/totSec)*100);
+}
+function setPreset(mins, btn, ph) {
+  document.querySelectorAll('.study-tab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  defMins = mins; phase = ph;
+  resetTimer();
+  var mot = document.getElementById('motivation');
+  if (mot) mot.innerText = (ph==='POMODORO'||ph==='DEEP WORK') ? 'Focus now, freedom later.' : 'Breathe. You earned this.';
+}
+function toggleTimer() {
+  var btn = document.getElementById('btnToggle');
+  if (isRun) {
+    clearInterval(timerInt2); isRun = false;
+    if (btn) { btn.innerText = 'Resume'; btn.style.background = 'rgba(255,105,180,.4)'; }
+  } else {
+    if (remSec <= 0) resetTimer();
+    isRun = true;
+    timerInt2 = setInterval(timerTick, 1000);
+    if (btn) { btn.innerText = 'Pause'; btn.style.background = 'var(--pink)'; }
+  }
+}
+function resetTimer() {
+  clearInterval(timerInt2); isRun = false;
+  totSec = remSec = defMins * 60;
+  var btn = document.getElementById('btnToggle');
+  if (btn) { btn.innerText = 'Start'; btn.style.background = 'var(--pink)'; }
+  refreshDisp();
+}
+function timerTick() {
+  remSec--;
+  refreshDisp();
+  if (remSec <= 0) {
+    clearInterval(timerInt2); isRun = false;
+    var btn = document.getElementById('btnToggle');
+    if (btn) btn.innerText = 'Start';
+    var mot = document.getElementById('motivation');
+    if (mot) mot.innerText = "✅ Time's up! Great work, Anya.";
+    if (phase==='POMODORO'||phase==='DEEP WORK') { sessCount++; focMins += defMins; }
+    updateStats();
+    try { new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); } catch(e){}
+  }
+}
+function updateStats() {
+  var ss = document.getElementById('statSessions');
+  var sm = document.getElementById('statMinutes');
+  var st = document.getElementById('statTasks');
+  if (ss) ss.innerText = sessCount;
+  if (sm) sm.innerText = focMins;
+  if (st) st.innerText = taskDone;
+}
+function setAmbient(type, btn) {
+  document.querySelectorAll('.amb-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  if (ambAud) { ambAud.pause(); ambAud = null; }
+  if (type !== 'none') {
+    ambAud = new Audio(ambSrc[type]);
+    ambAud.loop = true; ambAud.volume = .4;
+    ambAud.play().catch(function(){});
+  }
+}
+function addTask() {
+  var inp = document.getElementById('taskInput');
+  if (!inp || !inp.value.trim()) return;
+  var li = document.createElement('li');
+  li.innerHTML = '<span>'+inp.value+'</span><button onclick="markDone(this.parentElement)" title="Done">✔</button>';
+  document.getElementById('todoList').appendChild(li);
+  inp.value = '';
+}
+function markDone(li) {
+  li.classList.add('done');
+  taskDone++; updateStats();
+  setTimeout(function(){ li.remove(); }, 1100);
+}
+function toggleStudyMode() { studyMode ? exitStudyMode() : enterStudyMode(); }
+function enterStudyMode() {
+  studyMode = true;
+  document.body.classList.add('studyMode');
+  document.querySelectorAll('.page-section').forEach(function(el){ el.style.display='none'; });
+  document.getElementById('studyPanel').style.display = 'flex';
+  var tog = document.getElementById('studyToggle');
+  tog.innerText = '✕'; tog.title = 'Exit StudyBuddy';
+}
+function exitStudyMode() {
+  studyMode = false;
+  document.body.classList.remove('studyMode');
+  clearInterval(timerInt2); isRun = false;
+  if (ambAud) { ambAud.pause(); ambAud = null; }
+  document.querySelectorAll('.amb-btn').forEach(function(b){ b.classList.remove('active'); });
+  var an = document.getElementById('ambNone');
+  if (an) an.classList.add('active');
+  document.getElementById('studyPanel').style.display = 'none';
+  var tog = document.getElementById('studyToggle');
+  tog.innerText = '📚'; tog.title = 'StudyBuddy';
   navigate('home');
 }
 
 // ── CONTACT ──
-async function copyText(e,text,card){
-  try{
-    await navigator.clipboard.writeText(text);
-    const rect=card.getBoundingClientRect();
-    const h=document.createElement('div');h.className='click-heart';
-    h.innerText=['💖','✨','💌','🌸'][~~(Math.random()*4)];
-    h.style.left=(e.clientX-rect.left)+'px';h.style.top=(e.clientY-rect.top)+'px';
+function copyText(e, text, card) {
+  navigator.clipboard.writeText(text).then(function(){
+    var rect = card.getBoundingClientRect();
+    var h = document.createElement('div'); h.className = 'click-heart';
+    h.innerText = ['💖','✨','💌','🌸'][Math.floor(Math.random()*4)];
+    h.style.left = (e.clientX-rect.left)+'px'; h.style.top = (e.clientY-rect.top)+'px';
     card.appendChild(h);
-    const hint=card.querySelector('.copy-hint'),orig=hint.innerHTML;
-    card.classList.add('anim-pop','success-glow');hint.innerHTML='Copied! ✓';hint.classList.add('success-hint');
-    setTimeout(()=>{card.classList.remove('anim-pop','success-glow');hint.innerHTML=orig;hint.classList.remove('success-hint');h.remove();},2000);
-  }catch{alert('Copy failed.');}
+    var hint = card.querySelector('.copy-hint'), orig = hint.innerHTML;
+    card.classList.add('anim-pop','success-glow');
+    hint.innerHTML = 'Copied! ✓'; hint.classList.add('success-hint');
+    setTimeout(function(){
+      card.classList.remove('anim-pop','success-glow');
+      hint.innerHTML = orig; hint.classList.remove('success-hint');
+      h.remove();
+    }, 2000);
+  }).catch(function(){ alert('Copy failed.'); });
 }
 
 // ── DREAMLAND ──
-let ytPlayer=null,sleepTmr=null,cntInt=null,alarmTarget=null;
-const dlPlay='<path d="M8 5v14l11-7z"/>',dlPause='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-function onYouTubeIframeAPIReady(){if(currentPage==='dreamland')initYTPlayer();}
-function initYTPlayer(){
-  if(ytPlayer)return;
-  ytPlayer=new YT.Player('ytplayer',{height:'100%',width:'100%',videoId:'Dfm2rB-nQ9Y',playerVars:{controls:0,modestbranding:1,rel:0,loop:1,playlist:'Dfm2rB-nQ9Y'},events:{onStateChange:e=>{document.getElementById('dl-play-icon').innerHTML=e.data===1?dlPause:dlPlay;}}});
+function onYouTubeIframeAPIReady() {
+  if (currentPage === 'dreamland') initYTPlayer();
 }
-function toggleDLPlay(){if(!ytPlayer){initYTPlayer();return;}ytPlayer.getPlayerState()===1?ytPlayer.pauseVideo():ytPlayer.playVideo();}
-function changeDLVolume(v){if(ytPlayer)ytPlayer.setVolume(v);document.getElementById('dlVolLevel').innerText=v+'%';}
-function setSleepTimer(m){
-  clearTimeout(sleepTmr);clearInterval(cntInt);
-  const d=document.getElementById('dlTimerCountdown');
-  if(!+m){d.innerText='';return;}
-  let s=m*60;d.innerText=fmt(s);
-  cntInt=setInterval(()=>{if(--s<=0){clearInterval(cntInt);d.innerText='';}else d.innerText=fmt(s);},1000);
-  sleepTmr=setTimeout(()=>{if(!ytPlayer)return;let v=ytPlayer.getVolume();const f=setInterval(()=>{v-=2;if(v<=0){clearInterval(f);ytPlayer.pauseVideo();ytPlayer.setVolume(40);}else ytPlayer.setVolume(v);},200);},m*60000);
+function initYTPlayer() {
+  if (ytPlayer) return;
+  ytPlayer = new YT.Player('ytplayer', {
+    height:'100%', width:'100%', videoId:'Dfm2rB-nQ9Y',
+    playerVars:{controls:0,modestbranding:1,rel:0,loop:1,playlist:'Dfm2rB-nQ9Y'},
+    events:{onStateChange:function(e){
+      var icon = document.getElementById('dl-play-icon');
+      if (icon) icon.innerHTML = (e.data===1) ? DL_PAUSE : DL_PLAY;
+    }}
+  });
 }
-function fmt(s){const h=~~(s/3600),m=~~((s%3600)/60),sec=s%60;return`${h?h+':':''}${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
-function setAlarm(v){alarmTarget=v?new Date(v).getTime():null;}
-function checkAlarm(){if(!alarmTarget||Date.now()<alarmTarget)return;alarmTarget=null;document.getElementById('alarmDateTime').value='';triggerAlarm();}
-function triggerAlarm(){document.getElementById('alarm-ring').classList.add('active');document.getElementById('alarmAudio').play().catch(()=>{});}
-function stopAlarm(){document.getElementById('alarm-ring').classList.remove('active');const a=document.getElementById('alarmAudio');a.pause();a.currentTime=0;}
-
-// ── MINIGAME ──
-const canvas=document.getElementById('pongCanvas'),ctx=canvas.getContext('2d');
-const GW=800,GH=600; canvas.width=GW;canvas.height=GH;
-
-function resizePong(){
-  const c=document.getElementById('gameContainer');
-  if(!c)return;
-  const cw=c.clientWidth-14,ch=c.clientHeight-8;
-  const sc2=Math.min(cw/GW,ch/GH);
-  canvas.style.width=~~(GW*sc2)+'px';canvas.style.height=~~(GH*sc2)+'px';
+function toggleDLPlay() {
+  if (!ytPlayer) { initYTPlayer(); return; }
+  ytPlayer.getPlayerState()===1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
 }
-new ResizeObserver(()=>{if(currentPage==='minigame')resizePong();}).observe(document.getElementById('gameContainer'));
-
-let gState='START',pScore=0,aScore=0,shk=0;
-const WIN=7,PW=14,PH=100;
-let pY=GH/2-PH/2,aY=GH/2-PH/2;
-let ball={x:GW/2,y:GH/2,r:11,sp:7,dx:7,dy:3},trails=[],parts=[];
-let upP=false,dnP=false;
-document.addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='w')upP=true;if(e.key==='ArrowDown'||e.key==='s')dnP=true;});
-document.addEventListener('keyup', e=>{if(e.key==='ArrowUp'||e.key==='w')upP=false;if(e.key==='ArrowDown'||e.key==='s')dnP=false;});
-function cY(ev){const r=canvas.getBoundingClientRect();return(ev.clientY-r.top)*(GH/r.height);}
-canvas.addEventListener('mousemove',e=>{if(gState==='PLAYING'&&currentPage==='minigame')pY=cY(e)-PH/2;});
-canvas.addEventListener('touchmove',e=>{if(gState==='PLAYING'&&currentPage==='minigame'){e.preventDefault();pY=cY(e.touches[0])-PH/2;}},{passive:false});
-
-function loadHistory(){
-  const hist=JSON.parse(localStorage.getItem('pong_history_anya')||'[]');
-  const list=document.getElementById('historyList');
-  list.innerHTML='<div class="history-item mbm"><div><div class="mbm-title">MBM</div><div style="font-size:.75rem;opacity:.65">Most Beautiful Memory</div></div><div style="color:gold;font-weight:600">Anya ∞ — 0 AI</div></div>';
-  hist.slice().reverse().forEach(m=>{list.innerHTML+=`<div class="history-item"><div><strong>${m.winner} Won</strong><br><span style="font-size:.72rem;opacity:.6">${m.date}</span></div><div>Anya ${m.pScore} — ${m.aScore} AI</div></div>`;});
+function changeDLVolume(v) {
+  if (ytPlayer) ytPlayer.setVolume(v);
+  var lbl = document.getElementById('dlVolLevel');
+  if (lbl) lbl.innerText = v+'%';
 }
-function saveMatch(){const hist=JSON.parse(localStorage.getItem('pong_history_anya')||'[]');hist.push({pScore,aScore,winner:pScore>=WIN?'Anya 🌸':'AI 🤖',date:new Date().toLocaleDateString()});localStorage.setItem('pong_history_anya',JSON.stringify(hist));loadHistory();}
-function toggleHistory(){const o=document.getElementById('historyOverlay');o.classList.toggle('active');if(o.classList.contains('active'))loadHistory();}
-function impact(x,y,col){for(let i=0;i<14;i++)parts.push({x,y,vx:(Math.random()-.5)*10,vy:(Math.random()-.5)*10,life:1,col,sz:Math.random()*4+2});}
-function startGame(){document.getElementById('startOverlay').classList.remove('active');gState='PLAYING';pScore=0;aScore=0;updScore();resetBall();resizePong();}
-function resetGame(){document.getElementById('gameOverOverlay').classList.remove('active');startGame();}
-function endGame(won){
-  gState='GAMEOVER';saveMatch();
-  const o=document.getElementById('gameOverOverlay');
-  document.getElementById('gameOverTitle').innerText=won?'You Won! 🎉':'Good Try! 🌸';
-  document.getElementById('gameOverTitle').style.color=won?'var(--pink)':'white';
-  document.getElementById('gameOverText').innerText=won?"You're amazing, Anya! My champion 💖":"I'll let you win next time. I promise 💖";
-  if(won)for(let i=0;i<50;i++)impact(GW/2,GH/2,'pink');
+function setSleepTimer(m) {
+  clearTimeout(sleepTmr); clearInterval(cntIntDL);
+  var d = document.getElementById('dlTimerCountdown');
+  if (!+m) { if (d) d.innerText=''; return; }
+  var s = m*60;
+  if (d) d.innerText = fmtTime(s);
+  cntIntDL = setInterval(function(){
+    if (--s <= 0) { clearInterval(cntIntDL); if(d) d.innerText=''; }
+    else if (d) d.innerText = fmtTime(s);
+  }, 1000);
+  sleepTmr = setTimeout(function(){
+    if (!ytPlayer) return;
+    var v = ytPlayer.getVolume();
+    var fade = setInterval(function(){
+      v -= 2;
+      if (v <= 0) { clearInterval(fade); ytPlayer.pauseVideo(); ytPlayer.setVolume(40); }
+      else ytPlayer.setVolume(v);
+    }, 200);
+  }, m*60000);
+}
+function fmtTime(s) {
+  var h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  return (h?h+':':'') + (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+}
+function setAlarm(v) { alarmTarget = v ? new Date(v).getTime() : null; }
+function checkAlarm() {
+  if (!alarmTarget || Date.now() < alarmTarget) return;
+  alarmTarget = null;
+  var adt = document.getElementById('alarmDateTime');
+  if (adt) adt.value = '';
+  triggerAlarm();
+}
+function triggerAlarm() {
+  document.getElementById('alarm-ring').classList.add('active');
+  document.getElementById('alarmAudio').play().catch(function(){});
+}
+function stopAlarm() {
+  document.getElementById('alarm-ring').classList.remove('active');
+  var a = document.getElementById('alarmAudio');
+  a.pause(); a.currentTime = 0;
+}
+
+// ── PONG ──
+function resizePong() {
+  if (!canvas) return;
+  var c = document.getElementById('gameContainer');
+  if (!c) return;
+  var cw = c.clientWidth-14, ch = c.clientHeight-8;
+  var s = Math.min(cw/GW, ch/GH);
+  canvas.style.width  = Math.floor(GW*s)+'px';
+  canvas.style.height = Math.floor(GH*s)+'px';
+}
+function loadHistory() {
+  var hist = JSON.parse(localStorage.getItem('pong_history_anya')||'[]');
+  var list = document.getElementById('historyList');
+  list.innerHTML = '<div class="history-item mbm"><div><div class="mbm-title">MBM</div>'
+    +'<div style="font-size:.75rem;opacity:.65">Most Beautiful Memory</div></div>'
+    +'<div style="color:gold;font-weight:600">Anya ∞ — 0 AI</div></div>';
+  hist.slice().reverse().forEach(function(m){
+    list.innerHTML += '<div class="history-item"><div><strong>'+m.winner+' Won</strong>'
+      +'<br><span style="font-size:.72rem;opacity:.6">'+m.date+'</span></div>'
+      +'<div>Anya '+m.pScore+' — '+m.aScore+' AI</div></div>';
+  });
+}
+function saveMatch() {
+  var hist = JSON.parse(localStorage.getItem('pong_history_anya')||'[]');
+  hist.push({pScore:pScore, aScore:aScore, winner:pScore>=WIN?'Anya 🌸':'AI 🤖', date:new Date().toLocaleDateString()});
+  localStorage.setItem('pong_history_anya', JSON.stringify(hist));
+  loadHistory();
+}
+function toggleHistory() {
+  var o = document.getElementById('historyOverlay');
+  o.classList.toggle('active');
+  if (o.classList.contains('active')) loadHistory();
+}
+function pImpact(x,y,col) {
+  for (var i=0;i<14;i++) parts.push({x:x,y:y,vx:(Math.random()-.5)*10,vy:(Math.random()-.5)*10,life:1,col:col,sz:Math.random()*4+2});
+}
+function startGame() {
+  document.getElementById('startOverlay').classList.remove('active');
+  gState='PLAYING'; pScore=0; aScore=0; updScore(); resetBall(); resizePong();
+}
+function resetGame() {
+  document.getElementById('gameOverOverlay').classList.remove('active');
+  startGame();
+}
+function endGame(won) {
+  gState='GAMEOVER'; saveMatch();
+  var o = document.getElementById('gameOverOverlay');
+  document.getElementById('gameOverTitle').innerText = won?'You Won! 🎉':'Good Try! 🌸';
+  document.getElementById('gameOverTitle').style.color = won?'var(--pink)':'white';
+  document.getElementById('gameOverText').innerText = won?"You're amazing, Anya! My champion 💖":"I'll let you win next time. I promise 💖";
+  if (won) for(var i=0;i<50;i++) pImpact(GW/2,GH/2,'pink');
   o.classList.add('active');
 }
-function updScore(){document.getElementById('score').innerHTML=`${pScore} 💖 : 💖 ${aScore}`;}
-function resetBall(){ball={x:GW/2,y:GH/2,r:11,sp:7,dx:(Math.random()>.5?1:-1)*7,dy:(Math.random()*2-1)*7};trails=[];}
-function updatePong(){
-  if(gState!=='PLAYING')return;
-  if(upP)pY-=10;if(dnP)pY+=10;
-  pY=Math.max(0,Math.min(GH-PH,pY));
-  const ac=aY+PH/2;
-  if(ball.dx>0){if(ac<ball.y-10)aY+=5;else if(ac>ball.y+10)aY-=5;}
-  else{if(ac<GH/2-10)aY+=2;else if(ac>GH/2+10)aY-=2;}
-  aY=Math.max(0,Math.min(GH-PH,aY));
-  ball.x+=ball.dx;ball.y+=ball.dy;trails.push({x:ball.x,y:ball.y});if(trails.length>9)trails.shift();
-  if(ball.y-ball.r<0||ball.y+ball.r>GH){ball.dy*=-1;shk=4;}
-  function hit(px,py,isP){
-    if(ball.y+ball.r>py&&ball.y-ball.r<py+PH){
-      if((isP&&ball.x-ball.r<px+PW)||(!isP&&ball.x+ball.r>px)){
-        const n=(ball.y-(py+PH/2))/(PH/2),ang=n*(Math.PI/3);
-        ball.sp=Math.min(ball.sp+.4,18);const dir=isP?1:-1;
-        ball.dx=dir*ball.sp*Math.cos(ang);ball.dy=ball.sp*Math.sin(ang);
-        ball.x=isP?px+PW+ball.r:px-ball.r;shk=8;impact(ball.x,ball.y,isP?'#ffb6d9':'var(--pink)');
+function updScore() { document.getElementById('score').innerHTML = pScore+' 💖 : 💖 '+aScore; }
+function resetBall() {
+  ball = {x:GW/2, y:GH/2, r:11, sp:7, dx:(Math.random()>.5?1:-1)*7, dy:(Math.random()*2-1)*7};
+  trails = [];
+}
+function updatePong() {
+  if (gState!=='PLAYING') return;
+  if (upP) pY-=10; if (dnP) pY+=10;
+  pY = Math.max(0, Math.min(GH-PH, pY));
+  var ac = aY+PH/2;
+  if (ball.dx>0) { if(ac<ball.y-10) aY+=5; else if(ac>ball.y+10) aY-=5; }
+  else { if(ac<GH/2-10) aY+=2; else if(ac>GH/2+10) aY-=2; }
+  aY = Math.max(0, Math.min(GH-PH, aY));
+  ball.x+=ball.dx; ball.y+=ball.dy;
+  trails.push({x:ball.x,y:ball.y}); if(trails.length>9) trails.shift();
+  if (ball.y-ball.r<0||ball.y+ball.r>GH) { ball.dy*=-1; shk=4; }
+  function hit(px,py,isP) {
+    if (ball.y+ball.r>py && ball.y-ball.r<py+PH) {
+      if ((isP&&ball.x-ball.r<px+PW)||(!isP&&ball.x+ball.r>px)) {
+        var n=(ball.y-(py+PH/2))/(PH/2), ang=n*(Math.PI/3);
+        ball.sp=Math.min(ball.sp+.4,18);
+        var dir=isP?1:-1;
+        ball.dx=dir*ball.sp*Math.cos(ang); ball.dy=ball.sp*Math.sin(ang);
+        ball.x=isP?px+PW+ball.r:px-ball.r; shk=8;
+        pImpact(ball.x, ball.y, isP?'#ffb6d9':'#ff6fab');
       }
     }
   }
-  hit(10,pY,true);hit(GW-10-PW,aY,false);
-  if(ball.x<0){aScore++;updScore();pScore>=WIN||aScore>=WIN?endGame(false):resetBall();}
-  if(ball.x>GW){pScore++;updScore();pScore>=WIN?endGame(true):aScore>=WIN?endGame(false):resetBall();}
+  hit(10,pY,true); hit(GW-10-PW,aY,false);
+  if (ball.x<0)  { aScore++; updScore(); (pScore>=WIN||aScore>=WIN)?endGame(false):resetBall(); }
+  if (ball.x>GW) { pScore++; updScore(); pScore>=WIN?endGame(true):aScore>=WIN?endGame(false):resetBall(); }
 }
-function drawPong(){
-  ctx.clearRect(0,0,GW,GH);ctx.save();
-  if(shk-->0)ctx.translate((Math.random()-.5)*7,(Math.random()-.5)*7);
-  ctx.strokeStyle='rgba(255,182,193,.18)';ctx.lineWidth=3;ctx.setLineDash([13,17]);
-  ctx.beginPath();ctx.moveTo(GW/2,0);ctx.lineTo(GW/2,GH);ctx.stroke();ctx.setLineDash([]);
-  ctx.shadowBlur=13;ctx.shadowColor='#ffb6d9';ctx.fillStyle='#fff0f5';ctx.fillRect(10,pY,PW,PH);
-  ctx.shadowColor='var(--pink)';ctx.fillStyle='#ffb6d9';ctx.fillRect(GW-10-PW,aY,PW,PH);ctx.shadowBlur=0;
-  trails.forEach((t,i)=>{ctx.fillStyle=`rgba(255,105,180,${(i/trails.length)*.44})`;ctx.beginPath();ctx.arc(t.x,t.y,ball.r*(i/trails.length),0,Math.PI*2);ctx.fill();});
-  ctx.shadowBlur=17;ctx.shadowColor='var(--pink)';ctx.fillStyle='white';ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-  for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.life-=.022;if(p.life<=0){parts.splice(i,1);continue;}ctx.globalAlpha=p.life;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fill();}
-  ctx.globalAlpha=1;ctx.restore();
+function drawPong() {
+  ctx.clearRect(0,0,GW,GH); ctx.save();
+  if (shk-->0) ctx.translate((Math.random()-.5)*7,(Math.random()-.5)*7);
+  ctx.strokeStyle='rgba(255,182,193,.18)'; ctx.lineWidth=3; ctx.setLineDash([13,17]);
+  ctx.beginPath(); ctx.moveTo(GW/2,0); ctx.lineTo(GW/2,GH); ctx.stroke(); ctx.setLineDash([]);
+  ctx.shadowBlur=13; ctx.shadowColor='#ffb6d9'; ctx.fillStyle='#fff0f5'; ctx.fillRect(10,pY,PW,PH);
+  ctx.shadowColor='#ff6fab'; ctx.fillStyle='#ffb6d9'; ctx.fillRect(GW-10-PW,aY,PW,PH); ctx.shadowBlur=0;
+  trails.forEach(function(t,i){
+    ctx.fillStyle='rgba(255,105,180,'+(i/trails.length)*.44+')';
+    ctx.beginPath(); ctx.arc(t.x,t.y,ball.r*(i/trails.length),0,Math.PI*2); ctx.fill();
+  });
+  ctx.shadowBlur=17; ctx.shadowColor='#ff6fab'; ctx.fillStyle='white';
+  ctx.beginPath(); ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+  for (var i=parts.length-1;i>=0;i--) {
+    var p=parts[i]; p.x+=p.vx; p.y+=p.vy; p.life-=.022;
+    if (p.life<=0) { parts.splice(i,1); continue; }
+    ctx.globalAlpha=p.life; ctx.fillStyle=p.col;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.sz,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1; ctx.restore();
 }
-function gameLoop(){if(currentPage==='minigame'){updatePong();drawPong();}requestAnimationFrame(gameLoop);}
-loadHistory();gameLoop();
+function gameLoop() {
+  if (currentPage==='minigame') { updatePong(); drawPong(); }
+  requestAnimationFrame(gameLoop);
+}
+
+// ══════════════════════════════════════════════════════════
+//  INIT — runs after DOM is ready
+// ══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Analytics
+  if (localStorage.getItem('admin') !== 'true') {
+    fetch('https://analytics-server-bdrm.onrender.com/log',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ua:navigator.userAgent,page:document.title,screen:screen.width+'x'+screen.height}),
+      mode:'cors'
+    }).catch(function(){});
+  }
+
+  // Sky canvas
+  sc = document.getElementById('stars');
+  sx = sc.getContext('2d');
+  resizeAll();
+  window.addEventListener('resize', resizeAll);
+  drawSky();
+
+  // Music
+  bgAud   = document.getElementById('bgAudio');
+  vinylEl = document.getElementById('vinyl');
+  mLabel  = document.getElementById('musicStatus');
+
+  // Letter easter-egg
+  letterEl  = document.getElementById('letter');
+  letterBox = document.getElementById('letterContent');
+  document.body.addEventListener('click', function(e) {
+    if (currentPage!=='home' || studyMode) return;
+    if (e.target.closest('button,a,.letter,.marry,#musicPlayer,nav,#nav-toggle,#mobile-brand,#mob-overlay')) return;
+    if (++clickCount >= 3 && !letterEl.classList.contains('show')) {
+      letterEl.classList.add('show');
+      if (iChar === 0) writeLetter();
+    }
+  });
+
+  // Proposal button
+  document.getElementById('headerProposal').addEventListener('click', openProposal);
+
+  // StudyBuddy ring
+  ring = document.querySelector('.progress-ring__circle');
+  ring.style.strokeDasharray  = CIRC;
+  ring.style.strokeDashoffset = 0;
+  refreshDisp();
+
+  // Motivational rotation
+  setInterval(function(){
+    if (studyMode && isRun) {
+      var mot = document.getElementById('motivation');
+      if (mot) mot.innerText = motivMsgs[Math.floor(Math.random()*motivMsgs.length)];
+    }
+  }, 30000);
+
+  // Counters
+  function tick2() {
+    var now = new Date(), diff = now - startDate;
+    var d=Math.floor(diff/86400000), h=Math.floor(diff/3600000%24), m=Math.floor(diff/60000%60), s=Math.floor(diff/1000%60);
+    var cEl = document.getElementById('counter');
+    if (cEl) cEl.innerHTML = '<span>'+d+' 💖 Days</span><span>'+h+' 🕒 Hours</span><span>'+m+' ⏳ Mins</span><span>'+s+' 💌 Secs</span>';
+    var alt = d+' Days Together 💖';
+    ['album-counter','contact-counter'].forEach(function(id){
+      var el=document.getElementById(id); if(el) el.innerHTML=alt;
+    });
+    var e1=document.getElementById('time-est'), e2=document.getElementById('time-ist');
+    if(e1) e1.innerText=now.toLocaleTimeString('en-US',estO);
+    if(e2) e2.innerText=now.toLocaleTimeString('en-US',istO);
+    checkAlarm();
+  }
+  tick2(); setInterval(tick2, 1000);
+
+  // Visit counter
+  var visits = parseInt(localStorage.getItem('anya_visits')||'0')+1;
+  localStorage.setItem('anya_visits', visits);
+  var fc = document.getElementById('footerCounter');
+  if (fc) fc.innerHTML = "You've visited "+visits+" times 🌸";
+
+  // Particles
+  var cnt = innerWidth<480 ? 16 : 32;
+  for (var i=0; i<cnt; i++) {
+    var p=document.createElement('div'); p.className='petal';
+    p.style.left=Math.random()*100+'vw'; p.style.top='-14px';
+    p.style.animationDuration=(5+Math.random()*6)+'s';
+    p.style.animationDelay=(Math.random()*8)+'s';
+    document.body.appendChild(p);
+    var g=document.createElement('div'); g.className='glitter';
+    g.style.left=Math.random()*100+'vw'; g.style.top='-4px';
+    g.style.animationDuration=(3+Math.random()*5)+'s';
+    g.style.animationDelay=(Math.random()*6)+'s';
+    document.body.appendChild(g);
+  }
+
+  // Pong setup
+  canvas = document.getElementById('pongCanvas');
+  ctx    = canvas.getContext('2d');
+  canvas.width = GW; canvas.height = GH;
+  pY = GH/2-PH/2; aY = GH/2-PH/2;
+  ball = {x:GW/2, y:GH/2, r:11, sp:7, dx:7, dy:3};
+
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowUp'  ||e.key==='w') upP=true;
+    if(e.key==='ArrowDown'||e.key==='s') dnP=true;
+  });
+  document.addEventListener('keyup', function(e){
+    if(e.key==='ArrowUp'  ||e.key==='w') upP=false;
+    if(e.key==='ArrowDown'||e.key==='s') dnP=false;
+  });
+  canvas.addEventListener('mousemove', function(e){
+    if(gState==='PLAYING'&&currentPage==='minigame'){
+      var r=canvas.getBoundingClientRect(); pY=(e.clientY-r.top)*(GH/r.height)-PH/2;
+    }
+  });
+  canvas.addEventListener('touchmove', function(e){
+    if(gState==='PLAYING'&&currentPage==='minigame'){
+      e.preventDefault();
+      var r=canvas.getBoundingClientRect(); pY=(e.touches[0].clientY-r.top)*(GH/r.height)-PH/2;
+    }
+  },{passive:false});
+
+  new ResizeObserver(function(){
+    if(currentPage==='minigame') resizePong();
+  }).observe(document.getElementById('gameContainer'));
+
+  loadHistory();
+  gameLoop();
+});
 </script>
 </body>
 </html>
