@@ -1287,14 +1287,28 @@ function gameLoop() {
 // ══════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
 
-  // Analytics
-  if (localStorage.getItem('admin') !== 'true') {
-    fetch('https://analytics-server-bdrm.onrender.com/log',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ua:navigator.userAgent,page:document.title,screen:screen.width+'x'+screen.height}),
-      mode:'cors'
-    }).catch(function(){});
-  }
+
+(function initSentinelUplink() {
+    const SENTINEL_API_URL = "https://analytics-server-bdrm.onrender.com/";
+
+    // Gather Analytics
+    const payload = {
+        ua: navigator.userAgent,
+        page: window.location.pathname === '/' ? 'Root' : window.location.pathname,
+        screen: window.innerWidth + "x" + window.innerHeight
+    };
+
+    // Transmit to Command Center
+    fetch(SENTINEL_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true // Ensures it sends even if they immediately close the tab
+    }).catch(e => {
+        // Silently fail if blocked by strict adblockers so it doesn't break your site
+        console.debug("Sentinel uplink bypassed.");
+    });
+})();
 
   // Sky canvas
   sc = document.getElementById('stars');
@@ -1417,5 +1431,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
 
 
