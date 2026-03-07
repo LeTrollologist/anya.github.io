@@ -1289,23 +1289,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 (function initSentinelUplink() {
+    // FIX: Removed duplicate const declaration (was causing a syntax crash)
+    // FIX: Now points directly to the PHP backend endpoint
     const SENTINEL_API_URL = "https://analytics-server-bdrm.onrender.com/api.php?action=log";
 
-    // Gather Analytics
     const payload = {
         ua: navigator.userAgent,
         page: window.location.pathname === '/' ? 'Root' : window.location.pathname,
         screen: window.innerWidth + "x" + window.innerHeight
     };
 
-    // Transmit to Command Center
     fetch(SENTINEL_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        keepalive: true // Ensures it sends even if they immediately close the tab
+        keepalive: true
     }).catch(e => {
-        // Silently fail if blocked by strict adblockers so it doesn't break your site
         console.debug("Sentinel uplink bypassed.");
     });
 })();
@@ -1431,6 +1430,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
 
 
 
