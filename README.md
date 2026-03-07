@@ -1,157 +1,57 @@
-# 💖 Our Magical Love
+# 💖 Our Magical Love | For Anya
 
-A living, breathing website built for someone special.
+A deeply personal, interactive, and feature-rich web dashboard dedicated to Anya. More than just a website, it is a digital love letter, a shared memory vault, and a suite of tools designed to keep us connected across time zones (EST & IST). 
 
-This isn’t just a static page.
-It’s a real-time sky. A moving moon. A hidden proposal. A growing digital memory.
+Built with love, glassmorphism UI, and highly interactive vanilla JavaScript.
 
-Built with love. Literally.
+## ✨ Features
 
----
+### 🏠 The Dashboard
+*   **Relationship Counter**: A live countdown tracking the days, hours, minutes, and seconds since our journey began (Feb 17, 2026).
+*   **World Clocks**: Real-time synchronized clocks for Eastern Time (US) and India Standard Time (IN).
+*   **Dynamic Sky System**: Utilizing real-world coordinates and `suncalc.js`, the background dynamically shifts between day and night based on the actual position of the sun and moon.
+*   **Ambient Music Player**: A floating, interactive vinyl player providing a soothing "Interstellar" background track.
+*   **Secret Easter Egg**: Click the background 3 times to reveal a hidden love letter!
 
-## 🌌 What This Is
+### 📚 StudyBuddy Focus Mode
+A complete Pomodoro-style focus dashboard designed to help Anya study.
+*   **Presets**: Pomodoro (25m), Short Break (5m), Long Break (15m), and Deep Work (45m).
+*   **Progress Tracking**: Circular SVG progress ring, session counter, and total focused minutes tracking.
+*   **Ambient Noise**: Toggle between Rain, White Noise, and Lo-fi sounds.
+*   **Task List**: A built-in To-Do list to manage study tasks.
+*   **Focus Environment**: Entering Study Mode automatically dims the site, hides floating particles, and removes distractions.
 
-**Our Magical Love** is a real-time romantic web experience that:
+### 🌙 Dreamland
+A dedicated space to fall asleep and wake up together.
+*   **Media Player**: Integrated YouTube player looping soothing sleep streams.
+*   **Sleep Timer**: Automatically fades out audio and pauses the video after a set duration (30m to 10h).
+*   **Custom Alarms**: Set an exact date and time for a gentle wake-up alarm to ring directly in the browser.
 
-* Tracks **sun position** based on IST (Asia/Kolkata)
-* Displays a **separate sun and moon object**
-* Shows **real lunar phases**
-* Updates in real-time (no refresh required)
-* Has smooth **sunrise/sunset gradients**
-* Includes moonrise/moonset visibility logic
-* Contains a hidden proposal mode 💍
-* Tracks relationship time in the footer
-* Includes project logs and status pages
+### 🏓 Minigame (Pong)
+*   Play a classic game of Pong against an AI directly in the browser!
+*   First to 7 wins. 
+*   **Match History**: Saves your win/loss record locally so you can keep track of how many times you've beaten the AI. Includes a special "Most Beautiful Memory" log.
 
-It’s part love letter, part experiment, part future.
+### 📡 System Uplink & Contact
+*   **Status Uplink**: Live diagnostic pings to the GitHub CDN, Render Sentinel Node, MongoDB Database, and an Ngrok tunnel for Check-Ins.
+*   **Contact Cards**: Beautiful glassmorphism contact cards for Discord and Snapchat with 1-click clipboard copying and fun popping animations.
 
----
+### 📷 Album
+A digital scrapbook with a grid layout and editable captions to store our favorite memories, smiles, and late nights.
 
-## 🧠 Core Features
+## 🛠️ Tech Stack
+*   **Frontend**: HTML5, CSS3 (Glassmorphism, CSS Variables, Flexbox/Grid)
+*   **Logic**: Vanilla JavaScript (ES5/ES6 hybrid)
+*   **Graphics**: HTML5 Canvas (`#stars`, Pong), inline SVGs.
+*   **Libraries**: 
+    *   [SunCalc](https://github.com/mourner/suncalc) (for accurate sun/moon positioning)
+    *   [YouTube Iframe API](https://developers.google.com/youtube/iframe_api_reference)
 
-### 🌅 Real-Time Sky System
-
-* Sun and moon are calculated using SunCalc
-* Based on live timestamps
-* IST timezone logic handled correctly
-* Day/night transitions blend smoothly
-* Horizon glow during sunrise/sunset
-* Night glow and fading effects
-
-### 🌜 Lunar Accuracy
-
-* Moon phase matches real-world cycle
-* Moon visibility respects rise/set times
-* Position is independent from the sun
-
-### 💍 Proposal Mode
-
-* Activated from the header ring emoji
-* Displays:
-
-  * Current IST time
-  * Device local time
-  * Current date
-* Styled romantic Yes/No buttons
-
-### 🕰 Footer Counter
-
-* Tracks how long since a chosen date
-* Updates live
-
-### 📜 Version History Page
-
-Tracks:
-
-* Sky system upgrades
-* UI refinements
-* Proposal updates
-* Lunar accuracy fixes
-
-### 📡 Status Page
-
-Tracks:
-
-* AnyaBot progress
-* Website development state
-* Future project roadmap
+## 🚀 Setup & Hosting
+This project is designed as a fully static front-end experience.
+1. Simply clone the repository or download `index.html`.
+2. Open `index.html` in any modern web browser.
+3. Hosted live via[GitHub Pages](https://pages.github.com/). 
 
 ---
-
-## 🛠 Tech Stack
-
-* HTML5
-* CSS3 (custom gradients + animations)
-* Vanilla JavaScript
-* SunCalc (astronomical calculations)
-* Google Fonts (Great Vibes)
-
-No frameworks.
-No heavy libraries.
-Just intention and clean logic.
-
----
-
-## 🧭 Pages
-
-| Page            | Status               |
-| --------------- | ------------------ |
-| Home            | ✅ Fully functional |
-| Proposal        | ✅ Functional       |
-| Album           | 🚧 WIP              |
-| Version Log     | ✅ Active           |
-| Privacy         | ✅ Active           |
-| Minigame        | ✅ Active           |
-
----
-
-## 🚀 How To Run
-
-1. Clone the repository
-2. Open `index.html` in a browser
-   OR
-3. Deploy via GitHub Pages
-
-No build tools required.
-
----
-
-## 🔮 Future Plans
-
-* Animated constellation layer
-* Meteor shower events
-* Memory album expansion
-* AnyaBot integration panel
-* Love-letter archive mode
-* Interactive seasonal themes
-
----
-
-## 🤖 AnyaBot (Planned Integration)
-
-The bot will eventually:
-
-* Sync relationship counter
-* Mirror proposal mode
-* Display sky state inside Discord
-* Log milestone events
-* Connect to site version updates
-
----
-
-## 💌 Why This Exists
-
-Because sometimes words aren’t enough.
-
-Sometimes you build the sky for someone.
-
----
-
-## 📌 Notes
-
-* All astronomical calculations are real.
-* IST timezone is preserved properly.
-* No page refresh required for updates.
-* Designed to feel magical without breaking physics.
-
----
+*Created by Micheal (LeTrollologist) for Anya. Forever and always.* 💖
