@@ -1287,11 +1287,8 @@ function gameLoop() {
 // ══════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
 
-
 (function initSentinelUplink() {
-    // FIX: Removed duplicate const declaration (was causing a syntax crash)
-    // FIX: Now points directly to the PHP backend endpoint
-    const SENTINEL_API_URL = "https://analytics-server-bdrm.onrender.com/api.php?action=log";
+    const SENTINEL_API_URL = "https://analytics-server-bdrm.onrender.com/log";
 
     const payload = {
         ua: navigator.userAgent,
@@ -1308,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.debug("Sentinel uplink bypassed.");
     });
 })();
-
+  
   // Sky canvas
   sc = document.getElementById('stars');
   sx = sc.getContext('2d');
@@ -1430,6 +1427,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
 
 
 
