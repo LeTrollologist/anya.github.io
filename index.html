@@ -1124,6 +1124,19 @@ function sayNo() {
 function setRing(pct) {
   if (ring) ring.style.strokeDashoffset = CIRC - (pct/100)*CIRC;
 }
+
+// FIX: centralised stat update — always reads the live variables
+function updateStats() {
+  var ss = document.getElementById('statSessions');
+  var sm = document.getElementById('statMinutes');
+  var sb = document.getElementById('statBreaks');
+  var st = document.getElementById('statTasks');
+  if (ss) ss.innerText = sessCount;
+  if (sm) sm.innerText = focMins;
+  if (sb) sb.innerText = breakMins;
+  if (st) st.innerText = taskDone;
+}
+
 function refreshDisp() {
   var m = Math.floor(remSec/60), s = remSec%60;
   var td = document.getElementById('timerDisplay');
@@ -1160,27 +1173,61 @@ function resetTimer() {
   if (btn) { btn.innerText = 'Start'; btn.style.background = 'var(--pink)'; }
   refreshDisp();
 }
+
+// FIX: timerTick now increments live counters every second during a running session,
+// so the stat badges update in real time while the timer is running.
 function timerTick() {
   remSec--;
+
+  // Accumulate minutes live: every 60 seconds add 1 to the right counter
+  if (remSec % 60 === 0 && remSec < totSec) {
+    if (sessionType === 'focus') {
+      focMins++;
+    } else {
+      breakMins++;
+    }
+    updateStats();
+  }
+
   refreshDisp();
+
   if (remSec <= 0) {
     clearInterval(timerInt2); isRun = false;
     var btn = document.getElementById('btnToggle');
     if (btn) btn.innerText = 'Start';
     var mot = document.getElementById('motivation');
     if (sessionType === 'focus') {
-      sessCount++; focMins += defMins;
+      sessCount++;
       if (mot) mot.innerText = "✅ Focus session done! Take a break. 💖";
       addSessionLog('focus', defMins);
     } else {
-      breakMins += defMins;
       if (mot) mot.innerText = "😌 Break over — back to it!";
       addSessionLog('break', defMins);
     }
+    // FIX: use the shared alarm (triggerAlarm) instead of a throwaway Audio object
+    triggerStudyAlarm();
     updateStats();
-    try { new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); } catch(e){}
   }
 }
+
+// FIX: Study alarm reuses the shared alarm infrastructure so both the bell audio
+// and the alarm-ring UI banner fire, identical to the Dreamland alarm.
+function triggerStudyAlarm() {
+  // Temporarily override the alarm-ring title so Anya knows it's a study bell
+  var ringEl = document.getElementById('alarm-ring');
+  var h3 = ringEl.querySelector('h3');
+  var origText = h3.innerText;
+  h3.innerText = '📚 Session complete! Take a break 💖';
+  triggerAlarm();
+  // Restore the original title text after alarm is dismissed
+  var restoreTitle = setInterval(function(){
+    if (!ringEl.classList.contains('active')) {
+      h3.innerText = origText;
+      clearInterval(restoreTitle);
+    }
+  }, 500);
+}
+
 function addSessionLog(type, mins) {
   var now = new Date();
   var timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -1195,16 +1242,7 @@ function addSessionLog(type, mins) {
     (type==='focus'?'Focus':'Break')+' '+mins+'m';
   list.prepend(li);
 }
-function updateStats() {
-  var ss = document.getElementById('statSessions');
-  var sm = document.getElementById('statMinutes');
-  var sb = document.getElementById('statBreaks');
-  var st = document.getElementById('statTasks');
-  if (ss) ss.innerText = sessCount;
-  if (sm) sm.innerText = focMins;
-  if (sb) sb.innerText = breakMins;
-  if (st) st.innerText = taskDone;
-}
+
 function setAmbient(type, btn) {
   document.querySelectorAll('.amb-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
@@ -1882,4 +1920,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
