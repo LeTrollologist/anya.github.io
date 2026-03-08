@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Since We Last Spoke</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-glow: #00f3ff;
+            --secondary-glow: #bc13fe;
+            --bg-color: #030014;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden; /* Prevent scrolling */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1200px;
+        }
+
+        /* Interactive Canvas Background */
+        #starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Main Content Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            /* Will be manipulated by JS for 3D tilt effect */
+            transform-style: preserve-3d; 
+            padding: 2rem;
+        }
+
+        /* Header Styling */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            max-width: 900px;
+            line-height: 1.4;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5), 
+                         0 0 20px rgba(0, 243, 255, 0.3),
+                         0 0 40px rgba(188, 19, 254, 0.5);
+            animation: pulseText 4s infinite alternate;
+            transform: translateZ(30px); /* Pops out slightly */
+        }
+
+        @keyframes pulseText {
+            0% { text-shadow: 0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.3); }
+            100% { text-shadow: 0 0 15px rgba(188, 19, 254, 0.8), 0 0 30px rgba(188, 19, 254, 0.5), 0 0 50px rgba(0, 243, 255, 0.4); }
+        }
+
+        /* Time Display Layout */
+        .time-blocks {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            transform: translateZ(50px); /* Pops out more than header */
+        }
+
+        /* Glassmorphism Cards */
+        .time-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            min-width: 140px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                        inset 0 0 20px rgba(0, 243, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .time-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: skewX(-20deg);
+            transition: 0.5s;
+        }
+
+        .time-box:hover::before {
+            left: 200%;
+        }
+
+        .time-box:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px 0 rgba(0, 243, 255, 0.2),
+                        inset 0 0 30px rgba(188, 19, 254, 0.2);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+        }
+
+        /* Numbers inside cards */
+        .value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary-glow);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
+            margin-bottom: 0.5rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ms-value {
+            color: var(--secondary-glow);
+            text-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+        }
+
+        /* Labels inside cards */
+        .label {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #a0a0ff;
+            font-weight: 700;
+        }
+
+        /* Small screen adjustments */
+        @media (max-width: 800px) {
+            h1 { font-size: 1.8rem; }
+            .time-blocks { gap: 1rem; }
+            .time-box { min-width: 100px; padding: 1rem; }
+            .value { font-size: 2.2rem; }
+            .label { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Interactive Starfield -->
+    <canvas id="starfield"></canvas>
+
+    <div class="container" id="ui-container">
+        <h1>Time Passed Since We Last Spoke,<br>I miss you and await your return</h1>
+        
+        <div class="time-blocks">
+            <div class="time-box">
+                <div class="value" id="days">000</div>
+                <div class="label">Days</div>
+            </div>
+            <div class="time-box">
+                <div class="value" id="hours">00</div>
+                <div class="label">Hours</div>
+            </div>
+            <div class="time-box">
+                <div class="value" id="minutes">00</div>
+                <div class="label">Minutes</div>
+            </div>
+            <div class="time-box">
+                <div class="value" id="seconds">00</div>
+                <div class="label">Seconds</div>
+            </div>
+            <div class="time-box">
+                <div class="value ms-value" id="milliseconds">000</div>
+                <div class="label">Millisecs</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CORE TIME LOGIC --- //
+        const targetDate = new Date("2026-03-05T11:24:29.816Z").getTime();
+
+        const elDays = document.getElementById('days');
+        const elHours = document.getElementById('hours');
+        const elMinutes = document.getElementById('minutes');
+        const elSeconds = document.getElementById('seconds');
+        const elMilliseconds = document.getElementById('milliseconds');
+
+        function pad(num, size = 2) {
+            let s = num + "";
+            while (s.length < size) s = "0" + s;
+            return s;
+        }
+
+        function updateTime() {
+            const now = Date.now();
+            const difference = now - targetDate;
+
+            // If for some reason the date is in the future, don't crash, just show 0
+            if (difference < 0) {
+                requestAnimationFrame(updateTime);
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((difference / 1000 / 60) % 60);
+            const seconds = Math.floor((difference / 1000) % 60);
+            const milliseconds = Math.floor(difference % 1000);
+
+            elDays.innerText = pad(days, 3);
+            elHours.innerText = pad(hours);
+            elMinutes.innerText = pad(minutes);
+            elSeconds.innerText = pad(seconds);
+            elMilliseconds.innerText = pad(milliseconds, 3);
+
+            requestAnimationFrame(updateTime); // Super smooth 60fps+ updating
+        }
+
+        // Start the counter
+        requestAnimationFrame(updateTime);
+
+
+        // --- 2. INTERACTIVE PARALLAX & STARFIELD --- //
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        const uiContainer = document.getElementById('ui-container');
+
+        let width, height;
+        let stars =[];
+        const numStars = 600;
+
+        // Variables for smooth mouse interactions
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let targetMouseX = window.innerWidth / 2;
+        let targetMouseY = window.innerHeight / 2;
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Star {
+            constructor() {
+                this.x = (Math.random() - 0.5) * 2000;
+                this.y = (Math.random() - 0.5) * 2000;
+                this.z = Math.random() * 2000;
+                this.radius = Math.random() * 1.5;
+            }
+
+            update() {
+                // Stars move towards the viewer (Hyperdrive effect)
+                this.z -= 3;
+                if (this.z <= 0) {
+                    this.z = 2000;
+                    this.x = (Math.random() - 0.5) * 2000;
+                    this.y = (Math.random() - 0.5) * 2000;
+                }
+            }
+
+            draw() {
+                // 3D to 2D Projection
+                let x = (this.x / this.z) * width + width / 2;
+                let y = (this.y / this.z) * height + height / 2;
+                
+                // Parallax shift based on mouse
+                const parallaxX = (mouseX - width / 2) * (2000 - this.z) * 0.0002;
+                const parallaxY = (mouseY - height / 2) * (2000 - this.z) * 0.0002;
+                
+                x += parallaxX;
+                y += parallaxY;
+
+                let size = (1 - this.z / 2000) * 3;
+
+                // Don't draw if outside screen
+                if (x < 0 || x > width || y < 0 || y > height) return;
+
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${1 - this.z / 2000})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push(new Star());
+        }
+
+        // Track mouse movements
+        window.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        // Touch support for mobile
+        window.addEventListener('touchmove', (e) => {
+            targetMouseX = e.touches[0].clientX;
+            targetMouseY = e.touches[0].clientY;
+        });
+
+        function animateStars() {
+            // Draw background with slight transparency for a trailing effect
+            ctx.fillStyle = 'rgba(3, 0, 20, 0.4)'; 
+            ctx.fillRect(0, 0, width, height);
+
+            // Interpolate mouse smoothly
+            mouseX += (targetMouseX - mouseX) * 0.05;
+            mouseY += (targetMouseY - mouseY) * 0.05;
+
+            // Tilt the UI container based on mouse position
+            const rotateY = ((mouseX / width) - 0.5) * 20; // Max 10 deg left/right
+            const rotateX = ((mouseY / height) - 0.5) * -20; // Max 10 deg up/down
+            uiContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+
+        // Start the starfield animation
+        requestAnimationFrame(animateStars);
+    </script>
+</body>
+</html>
