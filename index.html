@@ -62,7 +62,6 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 .ni:hover{background:var(--pink-d);border-color:var(--border-p);transform:scale(1.18)}
 
 /* ── MOBILE ── */
-/* FIX: hamburger hidden when menu is open */
 #nav-toggle{
   display:none;position:fixed;top:10px;right:12px;z-index:101;
   background:var(--glass-d);border:1px solid var(--border-p);border-radius:var(--rp);
@@ -225,7 +224,6 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
   box-shadow:0 4px 16px var(--pink-g);transition:transform .2s,box-shadow .2s;min-height:44px;
 }
 .marry button:hover{transform:scale(1.1);box-shadow:0 6px 24px var(--pink-g)}
-/* FIX: Return to home button in proposal */
 #propHomeBtn{
   margin-top:18px;background:transparent;border:1px solid rgba(255,255,255,.35);
   color:rgba(255,255,255,.7);font-family:var(--fb);font-size:.88rem;
@@ -327,7 +325,6 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 }
 .history-btn:hover{background:var(--pink-d)}
 #gameContainer{flex:1;display:flex;align-items:center;justify-content:center;padding:4px 8px 7px;min-height:0;position:relative}
-/* FIX: darker table for visibility */
 #pongCanvas{display:block;max-width:100%;max-height:100%;border-radius:12px;border:1px solid var(--border-p);box-shadow:0 0 28px var(--pink-g);background:rgba(0,0,0,.6);cursor:crosshair;touch-action:none}
 .overlay{
   position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);
@@ -425,7 +422,6 @@ body.studyMode .page-section{display:none!important}
 }
 #studyTitle{font-family:var(--fd);font-size:2.6rem;color:white;text-shadow:0 0 10px rgba(255,255,255,.35);margin-bottom:2px}
 #motivation{font-family:var(--fb);font-size:.85rem;font-style:italic;color:rgba(255,255,255,.58);margin-bottom:12px;text-align:center}
-/* FIX: Stats now show real data with labels */
 .study-stats{display:flex;gap:8px;margin-bottom:13px;flex-wrap:wrap;justify-content:center}
 .stat-badge{
   font-family:var(--fm);font-size:.62rem;color:rgba(255,255,255,.56);
@@ -472,7 +468,6 @@ body.studyMode .page-section{display:none!important}
 #todoList li.done{text-decoration:line-through;opacity:.45;border-left-color:rgba(0,255,136,.45)}
 #todoList li button{background:none;border:none;color:rgba(255,105,180,.65);cursor:pointer;font-size:.95rem;padding:2px 5px;min-width:26px;min-height:26px;transition:.2s}
 #todoList li button:hover{color:var(--pink)}
-/* FIX: session log panel */
 #sessionLog{width:100%;margin-top:10px;display:none}
 #sessionLog h3{font-family:var(--fb);font-size:.88rem;color:rgba(255,255,255,.6);margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:4px;font-weight:600}
 #sessionLogList{list-style:none;max-height:90px;overflow-y:auto}
@@ -616,7 +611,6 @@ body.studyMode .page-section{display:none!important}
       <button onclick="sayNo()">No</button>
     </div>
     <p>Disclaimer: Not a real proposal 💖 — a glimpse into <em>our</em> future.</p>
-    <!-- FIX: Return to home button -->
     <button id="propHomeBtn" onclick="closeProposal()">← Return to Home</button>
   </div>
   <div class="ending" id="ending"></div>
@@ -716,7 +710,7 @@ body.studyMode .page-section{display:none!important}
   </div>
 </div>
 
-<!-- ══ STARGAZER (new page) ══ -->
+<!-- ══ STARGAZER ══ -->
 <div id="page-stargazer" class="page-section">
   <canvas id="stargazer-canvas"></canvas>
   <div id="sg-overlay">
@@ -809,7 +803,6 @@ body.studyMode .page-section{display:none!important}
       </div>
       <ul id="todoList"></ul>
     </div>
-    <!-- FIX: Session log -->
     <div id="sessionLog">
       <h3>Session Log</h3>
       <ul id="sessionLogList"></ul>
@@ -860,7 +853,7 @@ var ltxt = 'You are written in my sky and in every future I see.';
 // Proposal
 var propTick;
 
-// StudyBuddy — FIX: added breakMins tracking + sessionType
+// StudyBuddy
 var timerInt2, isRun = false, defMins = 25, totSec = 1500, remSec = 1500;
 var phase = 'POMODORO', sessionType = 'focus';
 var sessCount = 0, focMins = 0, breakMins = 0, taskDone = 0;
@@ -908,10 +901,8 @@ var estO = {timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'
 var istO = {timeZone:'Asia/Kolkata',    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
 
 // ══════════════════════════════════════════════════════════
-// FUNCTIONS
+// MOBILE NAV
 // ══════════════════════════════════════════════════════════
-
-// ── MOBILE NAV FIX: hide hamburger when menu open ──
 function openMob() {
   document.getElementById('mob-overlay').classList.add('open');
   document.getElementById('nav-toggle').classList.add('hidden');
@@ -923,7 +914,9 @@ function closeMob() {
   document.body.style.overflow = '';
 }
 
-// ── ROUTER ──
+// ══════════════════════════════════════════════════════════
+// ROUTER
+// ══════════════════════════════════════════════════════════
 function navigate(pageId) {
   document.querySelectorAll('.page-section').forEach(function(el){ el.classList.remove('active'); });
   var pg = document.getElementById('page-' + pageId);
@@ -945,7 +938,9 @@ function navigate(pageId) {
   if (studyMode && pageId !== 'home') exitStudyMode();
 }
 
-// ── STATUS ──
+// ══════════════════════════════════════════════════════════
+// STATUS
+// ══════════════════════════════════════════════════════════
 function runDiagnostics() {
   var msg = document.getElementById('statusMessage');
   var nodes = ['mainSite','analytics','database','checkIns'];
@@ -979,7 +974,9 @@ function runDiagnostics() {
     });
 }
 
-// ── SKY ──
+// ══════════════════════════════════════════════════════════
+// SKY
+// ══════════════════════════════════════════════════════════
 function initStars() {
   stars = [];
   for (var i = 0; i < 155; i++) {
@@ -1039,7 +1036,9 @@ function drawSky() {
   requestAnimationFrame(drawSky);
 }
 
-// ── MUSIC ──
+// ══════════════════════════════════════════════════════════
+// MUSIC
+// ══════════════════════════════════════════════════════════
 function toggleMusic() {
   if (!bgAud) return;
   if (bgAud.paused) {
@@ -1067,7 +1066,9 @@ function spawnNote() {
   setTimeout(function(){ n.remove(); }, 2000);
 }
 
-// ── LETTER ──
+// ══════════════════════════════════════════════════════════
+// LETTER
+// ══════════════════════════════════════════════════════════
 function writeLetter() {
   if (!letterBox) return;
   if (iChar < ltxt.length) {
@@ -1080,7 +1081,9 @@ function closeLetter() {
   clickCount = 0;
 }
 
-// ── PROPOSAL ──
+// ══════════════════════════════════════════════════════════
+// PROPOSAL
+// ══════════════════════════════════════════════════════════
 function updatePropClocks() {
   var now = new Date();
   document.getElementById('proposalText').innerHTML =
@@ -1096,7 +1099,6 @@ function openProposal() {
   m.style.display = 'flex';
   setTimeout(function(){ m.style.opacity = '1'; }, 10);
 }
-// FIX: closeProposal — return to home cleanly
 function closeProposal() {
   clearInterval(propTick);
   var m = document.getElementById('marry');
@@ -1116,7 +1118,9 @@ function sayNo() {
   setTimeout(function(){ alert("I'll keep asking forever 💖"); }, 300);
 }
 
-// ── STUDYBUDDY ──
+// ══════════════════════════════════════════════════════════
+// STUDYBUDDY
+// ══════════════════════════════════════════════════════════
 function setRing(pct) {
   if (ring) ring.style.strokeDashoffset = CIRC - (pct/100)*CIRC;
 }
@@ -1128,7 +1132,6 @@ function refreshDisp() {
   if (tp) tp.innerText = phase;
   setRing((remSec/totSec)*100);
 }
-// FIX: setPreset now accepts sessionType param
 function setPreset(mins, btn, ph, type) {
   document.querySelectorAll('.study-tab').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
@@ -1136,7 +1139,6 @@ function setPreset(mins, btn, ph, type) {
   resetTimer();
   var mot = document.getElementById('motivation');
   if (mot) mot.innerText = (sessionType==='focus') ? 'Focus now, freedom later.' : 'Breathe. You earned this.';
-  // Change ring color for break vs focus
   if (ring) ring.style.stroke = sessionType === 'break' ? 'rgba(100,200,255,.8)' : 'rgba(255,105,180,.8)';
 }
 function toggleTimer() {
@@ -1166,7 +1168,6 @@ function timerTick() {
     var btn = document.getElementById('btnToggle');
     if (btn) btn.innerText = 'Start';
     var mot = document.getElementById('motivation');
-    // FIX: track both focus and break time + log session
     if (sessionType === 'focus') {
       sessCount++; focMins += defMins;
       if (mot) mot.innerText = "✅ Focus session done! Take a break. 💖";
@@ -1180,7 +1181,6 @@ function timerTick() {
     try { new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); } catch(e){}
   }
 }
-// FIX: session log entries
 function addSessionLog(type, mins) {
   var now = new Date();
   var timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -1252,7 +1252,9 @@ function exitStudyMode() {
   navigate('home');
 }
 
-// ── CONTACT ──
+// ══════════════════════════════════════════════════════════
+// CONTACT
+// ══════════════════════════════════════════════════════════
 function copyText(e, text, card) {
   navigator.clipboard.writeText(text).then(function(){
     var rect = card.getBoundingClientRect();
@@ -1271,7 +1273,9 @@ function copyText(e, text, card) {
   }).catch(function(){ alert('Copy failed.'); });
 }
 
-// ── DREAMLAND ──
+// ══════════════════════════════════════════════════════════
+// DREAMLAND
+// ══════════════════════════════════════════════════════════
 function onYouTubeIframeAPIReady() {
   if (currentPage === 'dreamland') initYTPlayer();
 }
@@ -1336,7 +1340,6 @@ function triggerAlarm() {
   var ring = document.getElementById('alarm-ring');
   ring.classList.add('active');
   document.getElementById('alarmAudio').play().catch(function(){});
-  // FIX: auto-snooze after 30 seconds if not dismissed
   var countdown = 30;
   var sc = document.getElementById('snoozeCountdown');
   if (sc) sc.innerText = 'Auto-snoozing in ' + countdown + 's…';
@@ -1349,7 +1352,6 @@ function triggerAlarm() {
     }
   }, 1000);
 }
-// FIX: snooze delays by 5 minutes
 function snoozeAlarm() {
   clearInterval(autoSnoozeTimer);
   var ring = document.getElementById('alarm-ring');
@@ -1358,10 +1360,8 @@ function snoozeAlarm() {
   ring.classList.remove('active');
   var sc = document.getElementById('snoozeCountdown');
   if (sc) sc.innerText = '';
-  // re-trigger in 5 minutes
   alarmTarget = Date.now() + 5 * 60 * 1000;
 }
-// FIX: stopAlarm = wake up, fully dismisses
 function stopAlarm() {
   clearInterval(autoSnoozeTimer);
   alarmTarget = null;
@@ -1372,7 +1372,9 @@ function stopAlarm() {
   if (sc) sc.innerText = '';
 }
 
-// ── PONG ──
+// ══════════════════════════════════════════════════════════
+// PONG
+// ══════════════════════════════════════════════════════════
 function resizePong() {
   if (!canvas) return;
   var c = document.getElementById('gameContainer');
@@ -1459,7 +1461,6 @@ function updatePong() {
   if (ball.x>GW) { pScore++; updScore(); pScore>=WIN?endGame(true):aScore>=WIN?endGame(false):resetBall(); }
 }
 function drawPong() {
-  // FIX: darker background for visibility
   ctx.fillStyle = 'rgba(0,0,0,0.6)';
   ctx.fillRect(0,0,GW,GH);
   ctx.save();
@@ -1488,37 +1489,90 @@ function gameLoop() {
 }
 
 // ══════════════════════════════════════════════════════════
-// STARGAZER — new interactive star map page
+// STARGAZER
 // ══════════════════════════════════════════════════════════
+
+// FIX: Returns canvas-relative X position for a star, matching the draw formula exactly.
+function sgStarScreenX(s) {
+  var W = sgCanvas.width;
+  var totalWidth = W * 2.5;
+  return ((s.x + sgOffsetX) % totalWidth + totalWidth) % totalWidth;
+}
+
+// FIX: Find star at canvas-relative (cx, cy). Picks the closest within hit radius.
+function sgGetStarAt(cx, cy) {
+  if (!sgCanvas || !sgStars.length) return null;
+  var W = sgCanvas.width;
+  var best = null, bestDist = Infinity;
+  for (var i = 0; i < sgStars.length; i++) {
+    var s = sgStars[i];
+    var sx2 = sgStarScreenX(s);
+    if (sx2 > W + 20) continue;
+    var dx = cx - sx2, dy = cy - s.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    // Generous hit radius: star visual radius + 10px padding, minimum 16px
+    var hitR = Math.max(s.r + 10, 16);
+    if (dist < hitR && dist < bestDist) {
+      bestDist = dist;
+      best = s;
+    }
+  }
+  return best;
+}
+
 function initStargazer() {
   sgCanvas = document.getElementById('stargazer-canvas');
   if (!sgCanvas) return;
   resizeSG();
   generateSGStars();
-  sgLoop();
 
-  sgCanvas.addEventListener('mousedown', function(e){ sgDrag=true; sgDragX=e.clientX; });
-  sgCanvas.addEventListener('mousemove', function(e){
-    if (sgDrag) { sgOffsetX += (e.clientX - sgDragX) * 0.4; sgDragX = e.clientX; }
-    sgHover = sgGetStarAt(e.clientX, e.clientY);
+  // FIX: All pointer events use canvas-relative coordinates via getBoundingClientRect()
+  sgCanvas.addEventListener('mousedown', function(e) {
+    sgDrag = true;
+    sgDragX = e.clientX;
+  });
+
+  sgCanvas.addEventListener('mousemove', function(e) {
+    if (sgDrag) {
+      sgOffsetX += (e.clientX - sgDragX) * 0.4;
+      sgDragX = e.clientX;
+    }
+    var rect = sgCanvas.getBoundingClientRect();
+    sgHover = sgGetStarAt(e.clientX - rect.left, e.clientY - rect.top);
     sgCanvas.style.cursor = sgHover ? 'pointer' : 'crosshair';
   });
-  sgCanvas.addEventListener('mouseup', function(e){
-    if (Math.abs(e.clientX - sgDragX) < 5) sgClickStar(e.clientX, e.clientY);
+
+  sgCanvas.addEventListener('mouseup', function(e) {
+    var rect = sgCanvas.getBoundingClientRect();
+    if (Math.abs(e.clientX - sgDragX) < 5) {
+      sgClickStar(e.clientX - rect.left, e.clientY - rect.top);
+    }
     sgDrag = false;
   });
-  sgCanvas.addEventListener('touchstart', function(e){ sgDrag=true; sgDragX=e.touches[0].clientX; },{passive:true});
-  sgCanvas.addEventListener('touchmove', function(e){
+
+  sgCanvas.addEventListener('touchstart', function(e) {
+    sgDrag = true;
+    sgDragX = e.touches[0].clientX;
+  }, {passive: true});
+
+  sgCanvas.addEventListener('touchmove', function(e) {
     if (!sgDrag) return;
     sgOffsetX += (e.touches[0].clientX - sgDragX) * 0.4;
     sgDragX = e.touches[0].clientX;
-  },{passive:true});
-  sgCanvas.addEventListener('touchend', function(e){
-    if (e.changedTouches[0] && Math.abs(e.changedTouches[0].clientX - sgDragX) < 10)
-      sgClickStar(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+  }, {passive: true});
+
+  sgCanvas.addEventListener('touchend', function(e) {
+    if (e.changedTouches[0] && Math.abs(e.changedTouches[0].clientX - sgDragX) < 10) {
+      var rect = sgCanvas.getBoundingClientRect();
+      sgClickStar(
+        e.changedTouches[0].clientX - rect.left,
+        e.changedTouches[0].clientY - rect.top
+      );
+    }
     sgDrag = false;
   });
 }
+
 function resizeSG() {
   if (!sgCanvas) return;
   var cont = document.getElementById('page-stargazer');
@@ -1526,6 +1580,7 @@ function resizeSG() {
   sgCanvas.width  = cont.clientWidth  || innerWidth;
   sgCanvas.height = cont.clientHeight || innerHeight;
 }
+
 function generateSGStars() {
   sgStars = [];
   var W = sgCanvas ? sgCanvas.width : innerWidth;
@@ -1545,7 +1600,6 @@ function generateSGStars() {
       id: i
     });
   }
-  // Build simple constellation groups (pairs of nearby stars)
   sgStars._lines = [];
   for (var j = 0; j < Math.floor(count / 12); j++) {
     var a = Math.floor(Math.random() * count);
@@ -1555,30 +1609,17 @@ function generateSGStars() {
     if (Math.sqrt(dx*dx+dy*dy) < 180) sgStars._lines.push([a, b]);
   }
 }
-function sgGetStarAt(cx, cy) {
-  if (!sgCtx || !sgStars.length) return null;
-  var W = sgCanvas.width;
-  for (var i = 0; i < sgStars.length; i++) {
-    var s = sgStars[i];
-    var sx2 = ((s.x + sgOffsetX) % (W * 2.5) + W * 2.5) % (W * 2.5);
-    if (sx2 > W + 20) continue;
-    var dx = cx - sx2, dy = cy - s.y;
-    if (Math.sqrt(dx*dx + dy*dy) < Math.max(s.r + 6, 12)) return s;
-  }
-  return null;
-}
+
 function sgClickStar(cx, cy) {
   if (sgClickCooldown) return;
   var s = sgGetStarAt(cx, cy);
   if (!s) return;
   sgClickCooldown = true;
   setTimeout(function(){ sgClickCooldown = false; }, 400);
-  // Pick an unused name from the pool
   var usedNames = Object.values(sgNamed);
   var available = sgNamePool.filter(function(n){ return usedNames.indexOf(n) === -1; });
   if (available.length === 0) available = sgNamePool;
   if (sgNamed[s.id]) {
-    // already named — show it again
     sgShowStarName(sgNamed[s.id]);
   } else {
     var name = available[Math.floor(Math.random() * available.length)];
@@ -1588,6 +1629,7 @@ function sgClickStar(cx, cy) {
     if (nc) nc.innerText = Object.keys(sgNamed).length;
   }
 }
+
 function sgShowStarName(name) {
   var el = document.getElementById('sg-star-name');
   if (!el) return;
@@ -1595,55 +1637,63 @@ function sgShowStarName(name) {
   el.classList.add('show');
   setTimeout(function(){ el.classList.remove('show'); }, 2200);
 }
+
 function sgShuffle() {
   sgNamed = {};
   var nc = document.getElementById('sg-named-count');
   if (nc) nc.innerText = '0';
   generateSGStars();
 }
+
 function sgReset() {
   sgNamed = {};
   var nc = document.getElementById('sg-named-count');
   if (nc) nc.innerText = '0';
 }
+
 function sgToggleLines() { sgShowLines = !sgShowLines; }
+
 var sgFrame = 0;
 function sgLoop() {
-  if (currentPage !== 'stargazer') { requestAnimationFrame(sgLoop); return; }
+  // FIX: Guard against sgCanvas being null (called before initStargazer runs)
+  if (!sgCanvas || currentPage !== 'stargazer') {
+    requestAnimationFrame(sgLoop);
+    return;
+  }
   sgCtx = sgCanvas.getContext('2d');
   var W = sgCanvas.width, H = sgCanvas.height;
-  // Deep space background
+
   sgCtx.fillStyle = '#010110';
   sgCtx.fillRect(0, 0, W, H);
-  // Nebula glow
+
   var grad = sgCtx.createRadialGradient(W*0.6, H*0.4, 0, W*0.6, H*0.4, W*0.55);
   grad.addColorStop(0, 'rgba(80,40,140,0.12)');
   grad.addColorStop(0.5, 'rgba(40,20,80,0.06)');
   grad.addColorStop(1, 'transparent');
   sgCtx.fillStyle = grad;
   sgCtx.fillRect(0, 0, W, H);
+
   sgFrame++;
-  // Constellation lines
+
   if (sgShowLines && sgStars._lines) {
     sgCtx.strokeStyle = 'rgba(180,160,255,0.18)';
     sgCtx.lineWidth = 0.8;
     sgStars._lines.forEach(function(ln) {
       var a = sgStars[ln[0]], b = sgStars[ln[1]];
-      var ax = ((a.x + sgOffsetX) % (W*2.5) + W*2.5) % (W*2.5);
-      var bx = ((b.x + sgOffsetX) % (W*2.5) + W*2.5) % (W*2.5);
+      var ax = sgStarScreenX(a), bx = sgStarScreenX(b);
       if (ax > W+20 || bx > W+20) return;
       sgCtx.beginPath(); sgCtx.moveTo(ax, a.y); sgCtx.lineTo(bx, b.y); sgCtx.stroke();
     });
   }
-  // Stars
+
   for (var i = 0; i < sgStars.length; i++) {
     var s = sgStars[i];
-    var sx2 = ((s.x + sgOffsetX) % (W*2.5) + W*2.5) % (W*2.5);
+    // FIX: use sgStarScreenX() so hover/click X calculations always match draw X
+    var sx2 = sgStarScreenX(s);
     if (sx2 > W + 20) continue;
     s.twinklePhase += s.twinkleSpeed;
     var alpha = s.brightness * (0.7 + 0.3 * Math.sin(s.twinklePhase));
     var named = sgNamed[s.id];
-    // Glow for named stars
     if (named) {
       sgCtx.shadowBlur = 14;
       sgCtx.shadowColor = '#c9b8ff';
@@ -1656,7 +1706,6 @@ function sgLoop() {
     sgCtx.beginPath();
     sgCtx.arc(sx2, s.y, named ? s.r + 1 : s.r, 0, Math.PI * 2);
     sgCtx.fill();
-    // Name label
     if (named) {
       sgCtx.globalAlpha = 0.75;
       sgCtx.shadowBlur = 0;
@@ -1666,17 +1715,20 @@ function sgLoop() {
       sgCtx.fillText(named, sx2, s.y - s.r - 5);
     }
   }
+
   sgCtx.globalAlpha = 1;
   sgCtx.shadowBlur = 0;
-  // Hover highlight
+
+  // Hover highlight — uses same sgStarScreenX for consistency
   if (sgHover) {
-    var hx = ((sgHover.x + sgOffsetX) % (W*2.5) + W*2.5) % (W*2.5);
+    var hx = sgStarScreenX(sgHover);
     sgCtx.strokeStyle = 'rgba(200,180,255,0.6)';
     sgCtx.lineWidth = 1.5;
     sgCtx.beginPath();
     sgCtx.arc(hx, sgHover.y, sgHover.r + 8, 0, Math.PI * 2);
     sgCtx.stroke();
   }
+
   requestAnimationFrame(sgLoop);
 }
 
@@ -1822,7 +1874,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   loadHistory();
   gameLoop();
-  sgLoop(); // start stargazer loop (idle until tab is visited)
+
+  // FIX: sgLoop starts here but safely guards against sgCanvas being null
+  // until initStargazer() is called when the stargazer tab is visited.
+  sgLoop();
 });
 </script>
 </body>
