@@ -6,11 +6,12 @@
 <title>Our Magical Love 💖 | For Anya</title>
 <meta property="og:title" content="Our Magical Love">
 <meta property="og:description" content="Our Magical Love: A website for Anya celebrating love, memories, and time together.">
-<meta name="keywords" content="Our Magical Love, For Anya, Sweetbaby, Troll, Trollologist, TrollologistOG, Trollogist, Micheal Loves Anya, Mike Loves Anya, Anya Loves Micheal, Anya Loves Mike, Our Magical Love For Anya, romance, love website, relationship, love story, personal site, memories, couple">
+<meta name="keywords" content="Our Magical Love, For Anya, Sweetbaby, Troll, Trollologist, TrollologistOG, Micheal Loves Anya, Mike Loves Anya">
 <meta property="og:image" content="https://raw.githubusercontent.com/LeTrollologist/anya.github.io/refs/heads/main/OurMagicalLove.png">
 <meta property="og:url" content="https://letrollologist.github.io/anya.github.io/index.html">
 <link rel="shortcut icon" type="image/x-icon" href="https://raw.githubusercontent.com/LeTrollologist/anya.github.io/refs/heads/main/favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<meta name="google-site-verification" content="krF3ofyKNoHewfwgCg7NXU_nt5U6Gm-elSz5FrKrSNk"/>
 <style>
 :root{
   --pink:#ff6fab;--pink-s:#ffb3d1;--pink-g:rgba(255,111,171,.4);--pink-d:rgba(255,111,171,.14);
@@ -29,7 +30,6 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;background:rad
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:var(--border-p);border-radius:var(--rp)}
 
-/* BG layers */
 canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 #sunSvg,#moonSvg{position:fixed;transform:translate(-50%,-50%);z-index:2;pointer-events:none;transition:opacity .8s}
 
@@ -61,13 +61,16 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
   transition:all .2s;flex-shrink:0;line-height:1;border:1px solid transparent;background:transparent}
 .ni:hover{background:var(--pink-d);border-color:var(--border-p);transform:scale(1.18)}
 
-/* Mobile hamburger */
+/* ── MOBILE ── */
+/* FIX: hamburger hidden when menu is open */
 #nav-toggle{
   display:none;position:fixed;top:10px;right:12px;z-index:101;
   background:var(--glass-d);border:1px solid var(--border-p);border-radius:var(--rp);
   color:white;font-size:1.15rem;padding:8px 13px;cursor:pointer;
   backdrop-filter:blur(20px);box-shadow:0 4px 18px rgba(0,0,0,.45);
+  transition:opacity .2s;
 }
+#nav-toggle.hidden{opacity:0;pointer-events:none}
 #mobile-brand{
   display:none;position:fixed;top:10px;left:13px;z-index:100;
   font-family:var(--fd);font-size:1.25rem;color:white;
@@ -78,7 +81,7 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 }
 #mob-overlay{
   display:none;position:fixed;inset:0;z-index:99;
-  background:rgba(5,5,14,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(5,5,14,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 20px;
 }
 #mob-overlay.open{display:flex}
@@ -89,7 +92,7 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
   padding:9px 16px;cursor:pointer;font-size:.9rem;font-weight:600;
   letter-spacing:.04em;transition:.2s;
 }
-.mob-close:hover{background:rgba(255,111,171,.4);}
+.mob-close:hover{background:rgba(255,111,171,.4)}
 .mob-link{
   color:white;text-decoration:none;font-family:var(--fd);font-size:2rem;
   cursor:pointer;text-shadow:0 0 10px var(--pink-g);width:100%;text-align:center;
@@ -107,6 +110,8 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 #page-home{overflow:hidden;padding:0}
 #page-minigame{overflow:hidden;padding:0;display:none;flex-direction:column}
 #page-minigame.active{display:flex}
+#page-stargazer{overflow:hidden;padding:0;display:none}
+#page-stargazer.active{display:block}
 
 /* ── FOOTER ── */
 #site-footer{
@@ -204,7 +209,7 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 .close-btn{position:absolute;top:9px;right:12px;background:none;border:none;font-size:.95rem;color:#aaa;cursor:pointer;padding:4px}
 .close-btn:hover{color:var(--pink)}
 
-/* ── PROPOSAL / ENDING ── */
+/* ── PROPOSAL ── */
 .marry{
   position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);display:none;flex-direction:column;
@@ -220,6 +225,14 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
   box-shadow:0 4px 16px var(--pink-g);transition:transform .2s,box-shadow .2s;min-height:44px;
 }
 .marry button:hover{transform:scale(1.1);box-shadow:0 6px 24px var(--pink-g)}
+/* FIX: Return to home button in proposal */
+#propHomeBtn{
+  margin-top:18px;background:transparent;border:1px solid rgba(255,255,255,.35);
+  color:rgba(255,255,255,.7);font-family:var(--fb);font-size:.88rem;
+  padding:8px 22px;border-radius:var(--rp);cursor:pointer;letter-spacing:.06em;
+  transition:.2s;
+}
+#propHomeBtn:hover{background:rgba(255,255,255,.1);color:white}
 .ending{
   position:absolute;inset:0;background:white;color:#222;display:flex;
   align-items:center;justify-content:center;font-family:var(--fd);
@@ -314,9 +327,10 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 }
 .history-btn:hover{background:var(--pink-d)}
 #gameContainer{flex:1;display:flex;align-items:center;justify-content:center;padding:4px 8px 7px;min-height:0;position:relative}
-#pongCanvas{display:block;max-width:100%;max-height:100%;border-radius:12px;border:1px solid var(--border-p);box-shadow:0 0 28px var(--pink-g);background:rgba(255,255,255,.03);cursor:crosshair;touch-action:none}
+/* FIX: darker table for visibility */
+#pongCanvas{display:block;max-width:100%;max-height:100%;border-radius:12px;border:1px solid var(--border-p);box-shadow:0 0 28px var(--pink-g);background:rgba(0,0,0,.6);cursor:crosshair;touch-action:none}
 .overlay{
-  position:absolute;inset:0;background:rgba(0,0,0,.66);backdrop-filter:blur(10px);
+  position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);display:none;flex-direction:column;
   align-items:center;justify-content:center;z-index:40;color:white;text-align:center;
   padding:20px;opacity:0;transition:opacity .4s;
@@ -366,15 +380,22 @@ input[type=datetime-local]{background:rgba(255,255,255,.06);border:1px solid rgb
 .dl-vr{display:flex;justify-content:space-between}
 input[type=range]{width:100%;accent-color:#b89cff;margin-top:2px}
 .dl-cd{text-align:center;font-family:var(--fm);font-size:1.25rem;margin-top:11px;color:#9d85ff;min-height:24px;text-shadow:0 0 10px rgba(157,133,255,.5)}
+
+/* ── ALARM ── */
 #alarm-ring{
-  position:fixed;top:-120px;left:50%;transform:translateX(-50%);
-  width:min(90%,370px);background:white;color:#111;padding:16px 18px;
+  position:fixed;top:-160px;left:50%;transform:translateX(-50%);
+  width:min(90%,400px);background:white;color:#111;padding:18px 20px;
   border-radius:var(--rc);z-index:1000;text-align:center;
   transition:top .6s cubic-bezier(.68,-.55,.265,1.55);box-shadow:0 20px 40px rgba(0,0,0,.55);
 }
 #alarm-ring.active{top:calc(var(--nav-h) + 12px)}
-#alarm-ring h3{font-family:var(--fb);font-size:1rem;font-weight:600;margin-bottom:9px}
-.stop-btn{background:var(--pink);border:none;color:white;padding:8px 20px;border-radius:var(--rp);cursor:pointer;font-weight:600;font-size:.82rem}
+#alarm-ring h3{font-family:var(--fb);font-size:1rem;font-weight:600;margin-bottom:5px}
+#snoozeCountdown{font-family:var(--fm);font-size:.72rem;color:#999;margin-bottom:10px;min-height:16px}
+.alarm-btns{display:flex;gap:9px;justify-content:center}
+.stop-btn{background:var(--pink);border:none;color:white;padding:8px 20px;border-radius:var(--rp);cursor:pointer;font-weight:600;font-size:.82rem;transition:.2s}
+.stop-btn:hover{opacity:.85}
+.snooze-btn{background:#eee;border:none;color:#333;padding:8px 20px;border-radius:var(--rp);cursor:pointer;font-weight:600;font-size:.82rem;transition:.2s}
+.snooze-btn:hover{background:#ddd}
 
 /* ── PRIVACY ── */
 .privacy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr));gap:14px;width:min(92%,960px);margin:10px auto 0;padding-bottom:14px}
@@ -388,7 +409,6 @@ input[type=range]{width:100%;accent-color:#b89cff;margin-top:2px}
 /* ── STUDYBUDDY ── */
 body.studyMode .petal,body.studyMode .glitter,body.studyMode #sunSvg,body.studyMode #moonSvg{display:none!important}
 body.studyMode{background:linear-gradient(160deg,#0a1020,#111830,#060c18)!important}
-
 #studyPanel{
   position:fixed;top:var(--nav-h);left:0;right:0;bottom:var(--foot-h);
   overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
@@ -397,7 +417,6 @@ body.studyMode{background:linear-gradient(160deg,#0a1020,#111830,#060c18)!import
 }
 body.studyMode #studyPanel{display:flex}
 body.studyMode .page-section{display:none!important}
-
 .study-inner{
   width:min(100%,470px);background:rgba(10,16,32,.9);
   border:1px solid rgba(255,105,180,.22);border-radius:22px;padding:22px 20px;
@@ -406,9 +425,22 @@ body.studyMode .page-section{display:none!important}
 }
 #studyTitle{font-family:var(--fd);font-size:2.6rem;color:white;text-shadow:0 0 10px rgba(255,255,255,.35);margin-bottom:2px}
 #motivation{font-family:var(--fb);font-size:.85rem;font-style:italic;color:rgba(255,255,255,.58);margin-bottom:12px;text-align:center}
+/* FIX: Stats now show real data with labels */
 .study-stats{display:flex;gap:8px;margin-bottom:13px;flex-wrap:wrap;justify-content:center}
-.stat-badge{font-family:var(--fm);font-size:.62rem;color:rgba(255,255,255,.56);background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:var(--rp);padding:3px 11px;letter-spacing:.08em}
-.stat-badge span{color:white}
+.stat-badge{
+  font-family:var(--fm);font-size:.62rem;color:rgba(255,255,255,.56);
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  border-radius:var(--rp);padding:4px 11px;letter-spacing:.08em;
+  cursor:help;position:relative;
+}
+.stat-badge span{color:white;font-weight:bold}
+.stat-badge .stat-tooltip{
+  display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:rgba(10,16,32,.95);border:1px solid var(--border-p);border-radius:8px;
+  padding:6px 10px;white-space:nowrap;font-size:.6rem;color:rgba(255,255,255,.8);
+  pointer-events:none;z-index:200;
+}
+.stat-badge:hover .stat-tooltip{display:block}
 .study-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap;justify-content:center}
 .study-tab{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);color:rgba(255,255,255,.68);padding:5px 12px;border-radius:var(--rp);cursor:pointer;font-family:var(--fb);font-size:.8rem;transition:.22s;min-height:32px;letter-spacing:.03em}
 .study-tab:hover,.study-tab.active{background:rgba(255,105,180,.45);border-color:var(--border-p);color:white}
@@ -440,6 +472,55 @@ body.studyMode .page-section{display:none!important}
 #todoList li.done{text-decoration:line-through;opacity:.45;border-left-color:rgba(0,255,136,.45)}
 #todoList li button{background:none;border:none;color:rgba(255,105,180,.65);cursor:pointer;font-size:.95rem;padding:2px 5px;min-width:26px;min-height:26px;transition:.2s}
 #todoList li button:hover{color:var(--pink)}
+/* FIX: session log panel */
+#sessionLog{width:100%;margin-top:10px;display:none}
+#sessionLog h3{font-family:var(--fb);font-size:.88rem;color:rgba(255,255,255,.6);margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:4px;font-weight:600}
+#sessionLogList{list-style:none;max-height:90px;overflow-y:auto}
+#sessionLogList li{font-family:var(--fm);font-size:.6rem;color:rgba(255,255,255,.55);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+#sessionLogList li span{color:var(--pink-s)}
+
+/* ── STARGAZER ── */
+#stargazer-canvas{position:absolute;inset:0;width:100%;height:100%}
+#sg-overlay{
+  position:absolute;top:0;left:0;right:0;z-index:20;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:12px 16px;pointer-events:none;
+}
+#sg-info{
+  background:rgba(5,5,20,.82);border:1px solid rgba(157,133,255,.3);border-radius:12px;
+  padding:10px 14px;color:white;font-family:var(--fm);font-size:.68rem;
+  max-width:220px;backdrop-filter:blur(10px);pointer-events:none;
+  line-height:1.8;
+}
+#sg-info strong{color:#c9b8ff;font-size:.72rem}
+#sg-controls{
+  background:rgba(5,5,20,.82);border:1px solid rgba(157,133,255,.3);border-radius:12px;
+  padding:10px 14px;color:white;font-family:var(--fm);font-size:.64rem;
+  pointer-events:all;backdrop-filter:blur(10px);
+  display:flex;flex-direction:column;gap:6px;
+}
+#sg-controls button{
+  background:rgba(157,133,255,.18);border:1px solid rgba(157,133,255,.3);color:#c9b8ff;
+  border-radius:var(--rp);padding:5px 12px;cursor:pointer;font-family:var(--fm);
+  font-size:.62rem;letter-spacing:.06em;transition:.2s;
+}
+#sg-controls button:hover{background:rgba(157,133,255,.35)}
+#sg-star-name{
+  position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
+  background:rgba(5,5,20,.88);border:1px solid rgba(157,133,255,.4);
+  border-radius:var(--rp);padding:6px 16px;color:#e0d4ff;
+  font-family:var(--fd);font-size:1.1rem;text-shadow:0 0 8px rgba(157,133,255,.6);
+  pointer-events:none;z-index:30;opacity:0;transition:opacity .3s;white-space:nowrap;
+}
+#sg-star-name.show{opacity:1}
+#sg-bottom{
+  position:absolute;bottom:0;left:0;right:0;z-index:20;
+  display:flex;align-items:center;justify-content:center;
+  padding:8px 16px;
+  background:linear-gradient(transparent,rgba(2,2,15,.8));
+  pointer-events:none;
+}
+#sg-tagline{font-family:var(--fd);font-size:clamp(.95rem,2.5vw,1.4rem);color:rgba(255,255,255,.55);text-shadow:0 0 12px rgba(157,133,255,.4)}
 
 /* ── PARTICLES ── */
 .petal,.glitter{position:fixed;pointer-events:none;z-index:5;animation:fall linear infinite}
@@ -460,11 +541,9 @@ body.studyMode .page-section{display:none!important}
   .clock-box{min-width:108px;padding:7px 10px}
 }
 </style>
-<meta name="google-site-verification" content="krF3ofyKNoHewfwgCg7NXU_nt5U6Gm-elSz5FrKrSNk"/>
 </head>
 <body>
 
-<!-- BG -->
 <canvas id="stars"></canvas>
 <svg id="sunSvg" width="128" height="128">
   <circle id="sunGlowLayer" cx="64" cy="64" r="64" fill="rgba(255,240,150,.42)"/>
@@ -476,7 +555,7 @@ body.studyMode .page-section{display:none!important}
   <circle cx="25" cy="25" r="19" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
 </svg>
 
-<!-- NAV (desktop) -->
+<!-- NAV desktop -->
 <nav id="nav-bar">
   <span id="nav-title" onclick="navigate('home')">💖 Our Magical Love</span>
   <div class="nd"></div>
@@ -488,9 +567,10 @@ body.studyMode .page-section{display:none!important}
   <a class="nl" href="https://overdefensively-unabjective-eilene.ngrok-free.dev/" target="_blank">Check In</a>
   <a class="nl" onclick="navigate('minigame')">Minigame</a>
   <a class="nl" onclick="navigate('dreamland')">Dreamland</a>
+  <a class="nl" onclick="navigate('stargazer')">🌌 Stars</a>
 </nav>
 
-<!-- Mobile brand + hamburger -->
+<!-- Mobile -->
 <span id="mobile-brand" onclick="navigate('home')">💖 Anya</span>
 <button id="nav-toggle" onclick="openMob()">☰</button>
 <div id="mob-overlay">
@@ -503,6 +583,7 @@ body.studyMode .page-section{display:none!important}
   <a class="mob-link" href="https://overdefensively-unabjective-eilene.ngrok-free.dev/" target="_blank" onclick="closeMob()">📍 Check In</a>
   <a class="mob-link" onclick="navigate('minigame');closeMob()">🏓 Minigame</a>
   <a class="mob-link" onclick="navigate('dreamland');closeMob()">🌙 Dreamland</a>
+  <a class="mob-link" onclick="navigate('stargazer');closeMob()">🌌 Stargazer</a>
 </div>
 
 <!-- Music -->
@@ -527,6 +608,7 @@ body.studyMode .page-section{display:none!important}
     </div>
   </div>
   <div class="letter" id="letter"><button class="close-btn" onclick="closeLetter()">✕</button><div id="letterContent"></div></div>
+  <!-- PROPOSAL -->
   <div class="marry" id="marry">
     <div id="proposalText"></div>
     <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:8px">
@@ -534,6 +616,8 @@ body.studyMode .page-section{display:none!important}
       <button onclick="sayNo()">No</button>
     </div>
     <p>Disclaimer: Not a real proposal 💖 — a glimpse into <em>our</em> future.</p>
+    <!-- FIX: Return to home button -->
+    <button id="propHomeBtn" onclick="closeProposal()">← Return to Home</button>
   </div>
   <div class="ending" id="ending"></div>
 </div>
@@ -632,6 +716,28 @@ body.studyMode .page-section{display:none!important}
   </div>
 </div>
 
+<!-- ══ STARGAZER (new page) ══ -->
+<div id="page-stargazer" class="page-section">
+  <canvas id="stargazer-canvas"></canvas>
+  <div id="sg-overlay">
+    <div id="sg-info">
+      <strong>🌌 Stargazer</strong><br>
+      Click a star to name it<br>
+      Drag to rotate the sky<br>
+      <span id="sg-named-count">0</span> stars named
+    </div>
+    <div id="sg-controls">
+      <button onclick="sgShuffle()">✨ New Sky</button>
+      <button onclick="sgReset()">🗑 Clear Names</button>
+      <button onclick="sgToggleLines()">🔗 Constellations</button>
+    </div>
+  </div>
+  <div id="sg-star-name"></div>
+  <div id="sg-bottom">
+    <div id="sg-tagline">Every star is a moment I've loved you 💖</div>
+  </div>
+</div>
+
 <!-- ══ PRIVACY ══ -->
 <div id="page-privacy" class="page-section">
   <div class="page-title">Privacy & Data 💖</div>
@@ -651,15 +757,28 @@ body.studyMode .page-section{display:none!important}
     <div id="studyTitle">StudyBuddy 📚</div>
     <div id="motivation">Focus now, freedom later.</div>
     <div class="study-stats">
-      <div class="stat-badge">Sessions: <span id="statSessions">0</span></div>
-      <div class="stat-badge">Focus: <span id="statMinutes">0</span>m</div>
-      <div class="stat-badge">Done: <span id="statTasks">0</span></div>
+      <div class="stat-badge">
+        Sessions: <span id="statSessions">0</span>
+        <div class="stat-tooltip" id="tipSessions">Focus + Deep Work sessions completed</div>
+      </div>
+      <div class="stat-badge">
+        Focus: <span id="statMinutes">0</span>m
+        <div class="stat-tooltip" id="tipFocus">Total focused minutes this session</div>
+      </div>
+      <div class="stat-badge">
+        Breaks: <span id="statBreaks">0</span>m
+        <div class="stat-tooltip" id="tipBreaks">Total break minutes taken</div>
+      </div>
+      <div class="stat-badge">
+        Done: <span id="statTasks">0</span>
+        <div class="stat-tooltip" id="tipTasks">Tasks marked complete</div>
+      </div>
     </div>
     <div class="study-tabs">
-      <button class="study-tab active" onclick="setPreset(25,this,'POMODORO')">Pomodoro</button>
-      <button class="study-tab" onclick="setPreset(5,this,'SHORT BREAK')">Short Break</button>
-      <button class="study-tab" onclick="setPreset(15,this,'LONG BREAK')">Long Break</button>
-      <button class="study-tab" onclick="setPreset(45,this,'DEEP WORK')">Deep Work</button>
+      <button class="study-tab active" onclick="setPreset(25,this,'POMODORO','focus')">Pomodoro</button>
+      <button class="study-tab" onclick="setPreset(5,this,'SHORT BREAK','break')">Short Break</button>
+      <button class="study-tab" onclick="setPreset(15,this,'LONG BREAK','break')">Long Break</button>
+      <button class="study-tab" onclick="setPreset(45,this,'DEEP WORK','focus')">Deep Work</button>
     </div>
     <div class="progress-ring">
       <svg viewBox="0 0 160 160">
@@ -690,13 +809,26 @@ body.studyMode .page-section{display:none!important}
       </div>
       <ul id="todoList"></ul>
     </div>
+    <!-- FIX: Session log -->
+    <div id="sessionLog">
+      <h3>Session Log</h3>
+      <ul id="sessionLogList"></ul>
+    </div>
   </div>
 </div>
 
+<!-- Alarm audio + UI -->
 <audio id="alarmAudio" loop src="https://assets.mixkit.co/sfx/preview/mixkit-morning-clock-alarm-1003.mp3"></audio>
-<div id="alarm-ring"><h3>Time to wake up, my love 🤍</h3><button class="stop-btn" onclick="stopAlarm()">Dismiss</button></div>
+<div id="alarm-ring">
+  <h3>⏰ Time to wake up, my love 🤍</h3>
+  <div id="snoozeCountdown"></div>
+  <div class="alarm-btns">
+    <button class="snooze-btn" onclick="snoozeAlarm()">💤 Snooze 5m</button>
+    <button class="stop-btn" onclick="stopAlarm()">✓ Wake Up</button>
+  </div>
+</div>
 
-<!-- ══ FOOTER ══ -->
+<!-- FOOTER -->
 <footer id="site-footer">
   <div id="footerCounter">Loading…</div>
   <div class="fl">
@@ -709,17 +841,9 @@ body.studyMode .page-section{display:none!important}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-/*
- * ALL shared mutable variables are declared with var at the top level.
- * var hoists to function/global scope so inline onclick attrs and
- * event listeners that fire before DOMContentLoaded can still see them.
- * Function declarations also hoist, so calling navigate(), closeLetter()
- * etc. from onclick attrs is safe even before the init block runs.
- */
-
-// ── SHARED STATE (all var, no const/let at top level) ──
-var currentPage  = 'home';
-var studyMode    = false;
+// ══ SHARED STATE ══
+var currentPage = 'home';
+var studyMode   = false;
 
 // Sky
 var LAT = 22.5726, LNG = 88.3639;
@@ -736,9 +860,11 @@ var ltxt = 'You are written in my sky and in every future I see.';
 // Proposal
 var propTick;
 
-// StudyBuddy
-var timerInt2, isRun = false, defMins = 25, totSec = 1500, remSec = 1500, phase = 'POMODORO';
-var sessCount = 0, focMins = 0, taskDone = 0;
+// StudyBuddy — FIX: added breakMins tracking + sessionType
+var timerInt2, isRun = false, defMins = 25, totSec = 1500, remSec = 1500;
+var phase = 'POMODORO', sessionType = 'focus';
+var sessCount = 0, focMins = 0, breakMins = 0, taskDone = 0;
+var sessionHistory = [];
 var ring, CIRC = 2 * Math.PI * 70;
 var ambAud = null;
 var ambSrc = {
@@ -754,6 +880,7 @@ var motivMsgs = [
 
 // Dreamland
 var ytPlayer = null, sleepTmr = null, cntIntDL = null, alarmTarget = null;
+var alarmSnoozeInt = null, autoSnoozeTimer = null, snoozeCountInt = null;
 var DL_PLAY  = '<path d="M8 5v14l11-7z"/>';
 var DL_PAUSE = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
 
@@ -764,23 +891,35 @@ var WIN = 7, PW = 14, PH = 100;
 var pY, aY, ball, trails = [], parts = [];
 var upP = false, dnP = false;
 
-// Dates / timers
+// Stargazer
+var sgCanvas, sgCtx, sgStars = [], sgNamed = {}, sgShowLines = false;
+var sgDrag = false, sgDragX = 0, sgOffsetX = 0, sgHover = null;
+var sgNamePool = [
+  'Anya','Love','Forever','Sweetbaby','Dream','Hope','Bliss','Luna','Nova','Aurora',
+  'Rose','Heart','Seraph','Grace','Eternal','Solace','Lumina','Celeste','Aura','Joy',
+  'Starfire','Cosmos','Infinity','Tender','Cherish','Adore','Radiance','Miracle',
+  'Haven','Promise','Destiny','Reverie','Twilight','Serene','Devoted'
+];
+var sgClickCooldown = false;
+
+// Dates
 var startDate = new Date('2026-02-17T16:19:00+05:30');
 var estO = {timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
 var istO = {timeZone:'Asia/Kolkata',    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
 
 // ══════════════════════════════════════════════════════════
-//  FUNCTION DECLARATIONS  (hoist — safe to call from onclick)
+// FUNCTIONS
 // ══════════════════════════════════════════════════════════
 
-// ── MOBILE NAV ──
-function openMob()  {
+// ── MOBILE NAV FIX: hide hamburger when menu open ──
+function openMob() {
   document.getElementById('mob-overlay').classList.add('open');
-  // Prevent body scroll while menu is open
+  document.getElementById('nav-toggle').classList.add('hidden');
   document.body.style.overflow = 'hidden';
 }
 function closeMob() {
   document.getElementById('mob-overlay').classList.remove('open');
+  document.getElementById('nav-toggle').classList.remove('hidden');
   document.body.style.overflow = '';
 }
 
@@ -790,10 +929,8 @@ function navigate(pageId) {
   var pg = document.getElementById('page-' + pageId);
   if (pg) pg.classList.add('active');
   currentPage = pageId;
-
   document.querySelectorAll('.nl').forEach(function(a){ a.classList.remove('active'); });
   document.querySelectorAll('.nl[onclick*="' + pageId + '"]').forEach(function(a){ a.classList.add('active'); });
-
   document.body.style.touchAction = pageId === 'minigame' ? 'none' : 'auto';
   if (pageId === 'status') runDiagnostics();
   if (pageId !== 'home') {
@@ -804,10 +941,11 @@ function navigate(pageId) {
   }
   if (pageId === 'dreamland' && !ytPlayer && window.YT && window.YT.Player) initYTPlayer();
   if (pageId === 'minigame') setTimeout(resizePong, 60);
+  if (pageId === 'stargazer') setTimeout(initStargazer, 80);
   if (studyMode && pageId !== 'home') exitStudyMode();
 }
 
-// ── STATUS / DIAGNOSTICS ──
+// ── STATUS ──
 function runDiagnostics() {
   var msg = document.getElementById('statusMessage');
   var nodes = ['mainSite','analytics','database','checkIns'];
@@ -852,6 +990,7 @@ function resizeAll() {
   if (!sc) return;
   sc.width = innerWidth; sc.height = innerHeight; initStars();
   if (currentPage === 'minigame') resizePong();
+  if (currentPage === 'stargazer') resizeSG();
 }
 function drawStars() {
   if (!sx) return;
@@ -863,7 +1002,7 @@ function drawStars() {
   });
 }
 function updateBg(alt) {
-  if (studyMode || currentPage === 'dreamland') return;
+  if (studyMode || currentPage === 'dreamland' || currentPage === 'stargazer') return;
   var t = Math.max(0, Math.min(1, (alt+Math.PI/2)/Math.PI));
   document.body.style.background = 'linear-gradient(to bottom,rgb('+
     Math.round(25+205*t)+','+Math.round(50+130*t)+','+Math.round(80+175*t)+'),rgb(15,25,50))';
@@ -872,7 +1011,7 @@ function drawSky() {
   drawStars();
   var now = new Date(), sp = SunCalc.getPosition(now, LAT, LNG);
   updateBg(sp.altitude);
-  var show = !studyMode && currentPage !== 'dreamland';
+  var show = !studyMode && currentPage !== 'dreamland' && currentPage !== 'stargazer';
   var sun  = document.getElementById('sunSvg');
   var moon = document.getElementById('moonSvg');
   if (show) {
@@ -894,6 +1033,7 @@ function drawSky() {
   } else {
     sun.style.display = moon.style.display = 'none';
     if (currentPage === 'dreamland') document.body.style.background = '#020205';
+    if (currentPage === 'stargazer') document.body.style.background = '#020210';
     if (studyMode) document.body.style.background = 'linear-gradient(160deg,#0a1020,#111830,#060c18)';
   }
   requestAnimationFrame(drawSky);
@@ -909,7 +1049,7 @@ function toggleMusic() {
         mLabel.innerText = 'Playing… 🎵';
         noteInt = setInterval(spawnNote, 1500);
       })
-      .catch(function(){ alert('Audio blocked by browser. Tap the player to try again.'); });
+      .catch(function(){});
   } else {
     bgAud.pause();
     vinylEl.classList.remove('spin');
@@ -944,8 +1084,8 @@ function closeLetter() {
 function updatePropClocks() {
   var now = new Date();
   document.getElementById('proposalText').innerHTML =
-    'IST: '+now.toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour12:true})+
-    '<br>Device: '+now.toLocaleTimeString();
+    'Will you marry me? 💍<br><span style="font-size:clamp(.9rem,2.5vw,1.4rem);opacity:.75">'+
+    now.toLocaleString('en-US',{timeZone:'Asia/Kolkata',hour12:true})+'</span>';
 }
 function openProposal() {
   if (studyMode) return;
@@ -956,14 +1096,21 @@ function openProposal() {
   m.style.display = 'flex';
   setTimeout(function(){ m.style.opacity = '1'; }, 10);
 }
-function sayYes() {
+// FIX: closeProposal — return to home cleanly
+function closeProposal() {
   clearInterval(propTick);
   var m = document.getElementById('marry');
   m.style.opacity = '0';
-  setTimeout(function(){ m.style.display='none'; }, 400);
+  setTimeout(function(){ m.style.display = 'none'; }, 400);
+}
+function sayYes() {
+  closeProposal();
   var e = document.getElementById('ending');
   e.innerHTML = 'Forever begins now ♡<br>'+new Date().toLocaleDateString();
   e.style.opacity = '1'; e.style.pointerEvents = 'auto';
+  setTimeout(function(){
+    e.style.opacity='0'; e.style.pointerEvents='none';
+  }, 5000);
 }
 function sayNo() {
   setTimeout(function(){ alert("I'll keep asking forever 💖"); }, 300);
@@ -981,13 +1128,16 @@ function refreshDisp() {
   if (tp) tp.innerText = phase;
   setRing((remSec/totSec)*100);
 }
-function setPreset(mins, btn, ph) {
+// FIX: setPreset now accepts sessionType param
+function setPreset(mins, btn, ph, type) {
   document.querySelectorAll('.study-tab').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
-  defMins = mins; phase = ph;
+  defMins = mins; phase = ph; sessionType = type || 'focus';
   resetTimer();
   var mot = document.getElementById('motivation');
-  if (mot) mot.innerText = (ph==='POMODORO'||ph==='DEEP WORK') ? 'Focus now, freedom later.' : 'Breathe. You earned this.';
+  if (mot) mot.innerText = (sessionType==='focus') ? 'Focus now, freedom later.' : 'Breathe. You earned this.';
+  // Change ring color for break vs focus
+  if (ring) ring.style.stroke = sessionType === 'break' ? 'rgba(100,200,255,.8)' : 'rgba(255,105,180,.8)';
 }
 function toggleTimer() {
   var btn = document.getElementById('btnToggle');
@@ -1016,18 +1166,43 @@ function timerTick() {
     var btn = document.getElementById('btnToggle');
     if (btn) btn.innerText = 'Start';
     var mot = document.getElementById('motivation');
-    if (mot) mot.innerText = "✅ Time's up! Great work, Anya.";
-    if (phase==='POMODORO'||phase==='DEEP WORK') { sessCount++; focMins += defMins; }
+    // FIX: track both focus and break time + log session
+    if (sessionType === 'focus') {
+      sessCount++; focMins += defMins;
+      if (mot) mot.innerText = "✅ Focus session done! Take a break. 💖";
+      addSessionLog('focus', defMins);
+    } else {
+      breakMins += defMins;
+      if (mot) mot.innerText = "😌 Break over — back to it!";
+      addSessionLog('break', defMins);
+    }
     updateStats();
     try { new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play(); } catch(e){}
   }
 }
+// FIX: session log entries
+function addSessionLog(type, mins) {
+  var now = new Date();
+  var timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  var entry = { type: type, mins: mins, time: timeStr };
+  sessionHistory.unshift(entry);
+  var list = document.getElementById('sessionLogList');
+  var log = document.getElementById('sessionLog');
+  if (!list || !log) return;
+  log.style.display = 'block';
+  var li = document.createElement('li');
+  li.innerHTML = (type==='focus'?'🎯':'☕')+' <span>'+timeStr+'</span> — '+
+    (type==='focus'?'Focus':'Break')+' '+mins+'m';
+  list.prepend(li);
+}
 function updateStats() {
   var ss = document.getElementById('statSessions');
   var sm = document.getElementById('statMinutes');
+  var sb = document.getElementById('statBreaks');
   var st = document.getElementById('statTasks');
   if (ss) ss.innerText = sessCount;
   if (sm) sm.innerText = focMins;
+  if (sb) sb.innerText = breakMins;
   if (st) st.innerText = taskDone;
 }
 function setAmbient(type, btn) {
@@ -1073,7 +1248,6 @@ function exitStudyMode() {
   document.getElementById('studyPanel').style.display = 'none';
   var tog = document.getElementById('studyToggle');
   tog.innerText = '📚'; tog.title = 'StudyBuddy';
-  // CRITICAL: remove inline display:none set by enterStudyMode so .active class can show the page
   document.querySelectorAll('.page-section').forEach(function(el){ el.style.display = ''; });
   navigate('home');
 }
@@ -1103,7 +1277,6 @@ function onYouTubeIframeAPIReady() {
 }
 function initYTPlayer() {
   if (ytPlayer) return;
-  // Use enablejsapi=1 and origin param to avoid postMessage origin errors
   var origin = window.location.origin || 'https://letrollologist.github.io';
   ytPlayer = new YT.Player('ytplayer', {
     height:'100%', width:'100%', videoId:'Dfm2rB-nQ9Y',
@@ -1119,9 +1292,8 @@ function initYTPlayer() {
 }
 function toggleDLPlay() {
   if (!ytPlayer || typeof ytPlayer.getPlayerState !== 'function') { initYTPlayer(); return; }
-  try {
-    ytPlayer.getPlayerState()===1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
-  } catch(e) { console.warn('YT player not ready yet'); }
+  try { ytPlayer.getPlayerState()===1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo(); }
+  catch(e) {}
 }
 function changeDLVolume(v) {
   if (ytPlayer) ytPlayer.setVolume(v);
@@ -1161,13 +1333,43 @@ function checkAlarm() {
   triggerAlarm();
 }
 function triggerAlarm() {
-  document.getElementById('alarm-ring').classList.add('active');
+  var ring = document.getElementById('alarm-ring');
+  ring.classList.add('active');
   document.getElementById('alarmAudio').play().catch(function(){});
+  // FIX: auto-snooze after 30 seconds if not dismissed
+  var countdown = 30;
+  var sc = document.getElementById('snoozeCountdown');
+  if (sc) sc.innerText = 'Auto-snoozing in ' + countdown + 's…';
+  autoSnoozeTimer = setInterval(function(){
+    countdown--;
+    if (sc) sc.innerText = countdown > 0 ? 'Auto-snoozing in ' + countdown + 's…' : '';
+    if (countdown <= 0) {
+      clearInterval(autoSnoozeTimer);
+      snoozeAlarm();
+    }
+  }, 1000);
 }
+// FIX: snooze delays by 5 minutes
+function snoozeAlarm() {
+  clearInterval(autoSnoozeTimer);
+  var ring = document.getElementById('alarm-ring');
+  var a = document.getElementById('alarmAudio');
+  a.pause(); a.currentTime = 0;
+  ring.classList.remove('active');
+  var sc = document.getElementById('snoozeCountdown');
+  if (sc) sc.innerText = '';
+  // re-trigger in 5 minutes
+  alarmTarget = Date.now() + 5 * 60 * 1000;
+}
+// FIX: stopAlarm = wake up, fully dismisses
 function stopAlarm() {
+  clearInterval(autoSnoozeTimer);
+  alarmTarget = null;
   document.getElementById('alarm-ring').classList.remove('active');
   var a = document.getElementById('alarmAudio');
   a.pause(); a.currentTime = 0;
+  var sc = document.getElementById('snoozeCountdown');
+  if (sc) sc.innerText = '';
 }
 
 // ── PONG ──
@@ -1257,9 +1459,12 @@ function updatePong() {
   if (ball.x>GW) { pScore++; updScore(); pScore>=WIN?endGame(true):aScore>=WIN?endGame(false):resetBall(); }
 }
 function drawPong() {
-  ctx.clearRect(0,0,GW,GH); ctx.save();
+  // FIX: darker background for visibility
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(0,0,GW,GH);
+  ctx.save();
   if (shk-->0) ctx.translate((Math.random()-.5)*7,(Math.random()-.5)*7);
-  ctx.strokeStyle='rgba(255,182,193,.18)'; ctx.lineWidth=3; ctx.setLineDash([13,17]);
+  ctx.strokeStyle='rgba(255,182,193,.15)'; ctx.lineWidth=3; ctx.setLineDash([13,17]);
   ctx.beginPath(); ctx.moveTo(GW/2,0); ctx.lineTo(GW/2,GH); ctx.stroke(); ctx.setLineDash([]);
   ctx.shadowBlur=13; ctx.shadowColor='#ffb6d9'; ctx.fillStyle='#fff0f5'; ctx.fillRect(10,pY,PW,PH);
   ctx.shadowColor='#ff6fab'; ctx.fillStyle='#ffb6d9'; ctx.fillRect(GW-10-PW,aY,PW,PH); ctx.shadowBlur=0;
@@ -1283,35 +1488,226 @@ function gameLoop() {
 }
 
 // ══════════════════════════════════════════════════════════
-//  INIT — runs after DOM is ready
+// STARGAZER — new interactive star map page
+// ══════════════════════════════════════════════════════════
+function initStargazer() {
+  sgCanvas = document.getElementById('stargazer-canvas');
+  if (!sgCanvas) return;
+  resizeSG();
+  generateSGStars();
+  sgLoop();
+
+  sgCanvas.addEventListener('mousedown', function(e){ sgDrag=true; sgDragX=e.clientX; });
+  sgCanvas.addEventListener('mousemove', function(e){
+    if (sgDrag) { sgOffsetX += (e.clientX - sgDragX) * 0.4; sgDragX = e.clientX; }
+    sgHover = sgGetStarAt(e.clientX, e.clientY);
+    sgCanvas.style.cursor = sgHover ? 'pointer' : 'crosshair';
+  });
+  sgCanvas.addEventListener('mouseup', function(e){
+    if (Math.abs(e.clientX - sgDragX) < 5) sgClickStar(e.clientX, e.clientY);
+    sgDrag = false;
+  });
+  sgCanvas.addEventListener('touchstart', function(e){ sgDrag=true; sgDragX=e.touches[0].clientX; },{passive:true});
+  sgCanvas.addEventListener('touchmove', function(e){
+    if (!sgDrag) return;
+    sgOffsetX += (e.touches[0].clientX - sgDragX) * 0.4;
+    sgDragX = e.touches[0].clientX;
+  },{passive:true});
+  sgCanvas.addEventListener('touchend', function(e){
+    if (e.changedTouches[0] && Math.abs(e.changedTouches[0].clientX - sgDragX) < 10)
+      sgClickStar(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    sgDrag = false;
+  });
+}
+function resizeSG() {
+  if (!sgCanvas) return;
+  var cont = document.getElementById('page-stargazer');
+  if (!cont) return;
+  sgCanvas.width  = cont.clientWidth  || innerWidth;
+  sgCanvas.height = cont.clientHeight || innerHeight;
+}
+function generateSGStars() {
+  sgStars = [];
+  var W = sgCanvas ? sgCanvas.width : innerWidth;
+  var H = sgCanvas ? sgCanvas.height : innerHeight;
+  var count = Math.floor((W * H) / 3000);
+  count = Math.max(80, Math.min(300, count));
+  for (var i = 0; i < count; i++) {
+    var mag = Math.random();
+    sgStars.push({
+      x: Math.random() * W * 2.5,
+      y: Math.random() * H,
+      r: mag < 0.3 ? 3.5 : mag < 0.65 ? 2 : 1.1,
+      brightness: 0.4 + Math.random() * 0.6,
+      twinkleSpeed: 0.01 + Math.random() * 0.03,
+      twinklePhase: Math.random() * Math.PI * 2,
+      color: ['#ffffff','#ffe8d6','#d6eaff','#ffd6f5'][Math.floor(Math.random()*4)],
+      id: i
+    });
+  }
+  // Build simple constellation groups (pairs of nearby stars)
+  sgStars._lines = [];
+  for (var j = 0; j < Math.floor(count / 12); j++) {
+    var a = Math.floor(Math.random() * count);
+    var b = Math.floor(Math.random() * count);
+    var dx = sgStars[a].x - sgStars[b].x;
+    var dy = sgStars[a].y - sgStars[b].y;
+    if (Math.sqrt(dx*dx+dy*dy) < 180) sgStars._lines.push([a, b]);
+  }
+}
+function sgGetStarAt(cx, cy) {
+  if (!sgCtx || !sgStars.length) return null;
+  var W = sgCanvas.width;
+  for (var i = 0; i < sgStars.length; i++) {
+    var s = sgStars[i];
+    var sx2 = ((s.x + sgOffsetX) % (W * 2.5) + W * 2.5) % (W * 2.5);
+    if (sx2 > W + 20) continue;
+    var dx = cx - sx2, dy = cy - s.y;
+    if (Math.sqrt(dx*dx + dy*dy) < Math.max(s.r + 6, 12)) return s;
+  }
+  return null;
+}
+function sgClickStar(cx, cy) {
+  if (sgClickCooldown) return;
+  var s = sgGetStarAt(cx, cy);
+  if (!s) return;
+  sgClickCooldown = true;
+  setTimeout(function(){ sgClickCooldown = false; }, 400);
+  // Pick an unused name from the pool
+  var usedNames = Object.values(sgNamed);
+  var available = sgNamePool.filter(function(n){ return usedNames.indexOf(n) === -1; });
+  if (available.length === 0) available = sgNamePool;
+  if (sgNamed[s.id]) {
+    // already named — show it again
+    sgShowStarName(sgNamed[s.id]);
+  } else {
+    var name = available[Math.floor(Math.random() * available.length)];
+    sgNamed[s.id] = name;
+    sgShowStarName(name);
+    var nc = document.getElementById('sg-named-count');
+    if (nc) nc.innerText = Object.keys(sgNamed).length;
+  }
+}
+function sgShowStarName(name) {
+  var el = document.getElementById('sg-star-name');
+  if (!el) return;
+  el.innerText = '⭐ ' + name;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2200);
+}
+function sgShuffle() {
+  sgNamed = {};
+  var nc = document.getElementById('sg-named-count');
+  if (nc) nc.innerText = '0';
+  generateSGStars();
+}
+function sgReset() {
+  sgNamed = {};
+  var nc = document.getElementById('sg-named-count');
+  if (nc) nc.innerText = '0';
+}
+function sgToggleLines() { sgShowLines = !sgShowLines; }
+var sgFrame = 0;
+function sgLoop() {
+  if (currentPage !== 'stargazer') { requestAnimationFrame(sgLoop); return; }
+  sgCtx = sgCanvas.getContext('2d');
+  var W = sgCanvas.width, H = sgCanvas.height;
+  // Deep space background
+  sgCtx.fillStyle = '#010110';
+  sgCtx.fillRect(0, 0, W, H);
+  // Nebula glow
+  var grad = sgCtx.createRadialGradient(W*0.6, H*0.4, 0, W*0.6, H*0.4, W*0.55);
+  grad.addColorStop(0, 'rgba(80,40,140,0.12)');
+  grad.addColorStop(0.5, 'rgba(40,20,80,0.06)');
+  grad.addColorStop(1, 'transparent');
+  sgCtx.fillStyle = grad;
+  sgCtx.fillRect(0, 0, W, H);
+  sgFrame++;
+  // Constellation lines
+  if (sgShowLines && sgStars._lines) {
+    sgCtx.strokeStyle = 'rgba(180,160,255,0.18)';
+    sgCtx.lineWidth = 0.8;
+    sgStars._lines.forEach(function(ln) {
+      var a = sgStars[ln[0]], b = sgStars[ln[1]];
+      var ax = ((a.x + sgOffsetX) % (W*2.5) + W*2.5) % (W*2.5);
+      var bx = ((b.x + sgOffsetX) % (W*2.5) + W*2.5) % (W*2.5);
+      if (ax > W+20 || bx > W+20) return;
+      sgCtx.beginPath(); sgCtx.moveTo(ax, a.y); sgCtx.lineTo(bx, b.y); sgCtx.stroke();
+    });
+  }
+  // Stars
+  for (var i = 0; i < sgStars.length; i++) {
+    var s = sgStars[i];
+    var sx2 = ((s.x + sgOffsetX) % (W*2.5) + W*2.5) % (W*2.5);
+    if (sx2 > W + 20) continue;
+    s.twinklePhase += s.twinkleSpeed;
+    var alpha = s.brightness * (0.7 + 0.3 * Math.sin(s.twinklePhase));
+    var named = sgNamed[s.id];
+    // Glow for named stars
+    if (named) {
+      sgCtx.shadowBlur = 14;
+      sgCtx.shadowColor = '#c9b8ff';
+    } else {
+      sgCtx.shadowBlur = s.r > 2.5 ? 6 : 2;
+      sgCtx.shadowColor = s.color;
+    }
+    sgCtx.globalAlpha = alpha;
+    sgCtx.fillStyle = named ? '#e0d0ff' : s.color;
+    sgCtx.beginPath();
+    sgCtx.arc(sx2, s.y, named ? s.r + 1 : s.r, 0, Math.PI * 2);
+    sgCtx.fill();
+    // Name label
+    if (named) {
+      sgCtx.globalAlpha = 0.75;
+      sgCtx.shadowBlur = 0;
+      sgCtx.fillStyle = '#c9b8ff';
+      sgCtx.font = '10px "DM Mono", monospace';
+      sgCtx.textAlign = 'center';
+      sgCtx.fillText(named, sx2, s.y - s.r - 5);
+    }
+  }
+  sgCtx.globalAlpha = 1;
+  sgCtx.shadowBlur = 0;
+  // Hover highlight
+  if (sgHover) {
+    var hx = ((sgHover.x + sgOffsetX) % (W*2.5) + W*2.5) % (W*2.5);
+    sgCtx.strokeStyle = 'rgba(200,180,255,0.6)';
+    sgCtx.lineWidth = 1.5;
+    sgCtx.beginPath();
+    sgCtx.arc(hx, sgHover.y, sgHover.r + 8, 0, Math.PI * 2);
+    sgCtx.stroke();
+  }
+  requestAnimationFrame(sgLoop);
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
 // ══════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
 
-(function initSentinelUplink() {
-    const SENTINEL_URL = "https://analytics-server-bdrm.onrender.com/log";
-
-    // Generate or retrieve a session ID so repeat visits from same tab are grouped
-    let sessionId = sessionStorage.getItem('_sid');
+  // Sentinel analytics uplink
+  (function(){
+    var SENTINEL_URL = 'https://analytics-server-bdrm.onrender.com/log';
+    var sessionId = sessionStorage.getItem('_sid');
     if (!sessionId) {
-        sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36);
-        sessionStorage.setItem('_sid', sessionId);
+      sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem('_sid', sessionId);
     }
-
     fetch(SENTINEL_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            ua:        navigator.userAgent,
-            page:      window.location.pathname || '/',
-            screen:    window.innerWidth + 'x' + window.innerHeight,
-            referrer:  document.referrer || '',
-            sessionId: sessionId
-        }),
-        keepalive: true
-    }).catch(() => {});
-})();
-  
-  // Sky canvas
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        ua:navigator.userAgent,
+        page:window.location.pathname||'/',
+        screen:window.innerWidth+'x'+window.innerHeight,
+        referrer:document.referrer||'',
+        sessionId:sessionId
+      }),
+      keepalive:true
+    }).catch(function(){});
+  })();
+
+  // Sky
   sc = document.getElementById('stars');
   sx = sc.getContext('2d');
   resizeAll();
@@ -1322,8 +1718,6 @@ document.addEventListener('DOMContentLoaded', function() {
   bgAud   = document.getElementById('bgAudio');
   bgAud.addEventListener('error', function() {
     if (mLabel) mLabel.innerText = 'Audio unavailable';
-    vinylEl.classList.remove('spin');
-    clearInterval(noteInt);
   });
   vinylEl = document.getElementById('vinyl');
   mLabel  = document.getElementById('musicStatus');
@@ -1340,7 +1734,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Proposal button
+  // Proposal
   document.getElementById('headerProposal').addEventListener('click', openProposal);
 
   // StudyBuddy ring
@@ -1349,7 +1743,6 @@ document.addEventListener('DOMContentLoaded', function() {
   ring.style.strokeDashoffset = 0;
   refreshDisp();
 
-  // Motivational rotation
   setInterval(function(){
     if (studyMode && isRun) {
       var mot = document.getElementById('motivation');
@@ -1395,7 +1788,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.appendChild(g);
   }
 
-  // Pong setup
+  // Pong
   canvas = document.getElementById('pongCanvas');
   ctx    = canvas.getContext('2d');
   canvas.width = GW; canvas.height = GH;
@@ -1424,18 +1817,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   new ResizeObserver(function(){
     if(currentPage==='minigame') resizePong();
+    if(currentPage==='stargazer') resizeSG();
   }).observe(document.getElementById('gameContainer'));
 
   loadHistory();
   gameLoop();
+  sgLoop(); // start stargazer loop (idle until tab is visited)
 });
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
