@@ -1,4 +1,4 @@
-# 💖 Our Magical Love (v3.1.0)
+# 💖 Our Magical Love (v3.1.2)
 **A personalized digital sanctuary for Anya.**
 
 This project is a multi-functional personal website designed to celebrate love, manage productivity, and provide a space for relaxation. It combines astronomical data, interactive gaming, and utility tools into a cohesive, "glass-morphism" inspired interface.
