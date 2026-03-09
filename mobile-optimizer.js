@@ -21,7 +21,7 @@
 
     function applySubSampling(canvas, val, descriptor, property) {
         // Only scale the heavy background canvases, leave Minigame (Pong) untouched for physics accuracy
-        if (canvas.id === 'stars' || canvas.id === 'stargazer-canvas') {
+        if (canvas.id === 'stars') {
             canvas.style[property] = val + 'px'; // Keep visual size 100%
             descriptor.set.call(canvas, Math.floor(val * 0.75)); // Drop actual pixels by 25%
         } else {
