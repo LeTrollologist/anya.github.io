@@ -59,7 +59,7 @@
     const originalAddEventListener = EventTarget.prototype.addEventListener;
     
     EventTarget.prototype.addEventListener = function(type, listener, options) {
-        if (['wheel', 'mousewheel', 'touchstart', 'touchmove'].includes(type)) {
+        if (['wheel', 'mousewheel', 'touchstart', 'touchmove'].includes(type) && this.id !== 'pongCanvas') {
             if (typeof options === 'boolean') {
                 options = { capture: options, passive: true };
             } else if (!options) {
