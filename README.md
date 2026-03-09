@@ -1,9 +1,9 @@
-# 💖 Our Magical Love (v3.1.2)
+# 💖 Our Magical Love (v3.2.5)
 **A personalized digital sanctuary for Anya.**
 
 This project is a multi-functional personal website designed to celebrate love, manage productivity, and provide a space for relaxation. It combines astronomical data, interactive gaming, and utility tools into a cohesive, "glass-morphism" inspired interface.
 
-## 🌌 New in v3.1.0: The Celestial Update
+## 🌌 New in v3.2:
 We've added a brand new **Stargazer** module. You can now explore a procedurally generated night sky, name stars after special moments, and toggle constellations.
 
 ## ✨ Features
