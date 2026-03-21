@@ -48,10 +48,13 @@
 
     function isCanvasCovered(ctx) {
         if (ctx.canvas.id === 'stars') {
-            // If study mode is active or dreamland is open, the sky is hidden. 
-            // Abort drawing to save 100% of the background CPU load.
-            if (document.body.classList.contains('studyMode') || 
-                document.getElementById('page-dreamland').classList.contains('active')) {
+            // Sky canvas is invisible whenever one of these pages/modes is active:
+            // - Study mode: solid gradient covers the sky
+            // - Dreamland: solid dark background
+            // - Stargazer: its own canvas fills the screen on top of the sky
+            if (document.body.classList.contains('studyMode') ||
+                document.getElementById('page-dreamland').classList.contains('active') ||
+                document.getElementById('page-stargazer').classList.contains('active')) {
                 return true;
             }
         }

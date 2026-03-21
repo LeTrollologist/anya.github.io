@@ -20,9 +20,17 @@
         }
 
         /* Cache heavy glassmorphism blurs on the GPU */
+        /* Note: backdrop-filter is not a valid will-change value — use transform only */
         .glass-card, #nav-bar, .dl-shell, .study-inner, .status-card {
-            will-change: transform, backdrop-filter;
+            will-change: transform;
             transform: translateZ(0);
+        }
+
+        /* D. CELESTIAL BODIES — repositioned on each SunCalc update */
+        #sunSvg, #moonSvg, #moonLabel {
+            will-change: transform, left, top;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         /* B. CSS CONTAINMENT (Sandbox DOM recalculations) */
