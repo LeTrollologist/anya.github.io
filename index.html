@@ -1006,6 +1006,9 @@ var upP = false, dnP = false;
 var combo = 0;          // consecutive rally hits
 var aiTarget = 300;     // AI predicted interception y
 var aiReactTime = 0;    // throttle AI recalculation
+var lastTime  = 0;      // timestamp for frame-rate-independent physics
+var BASE_SP   = 9;      // starting ball speed (logical px/frame @60fps)
+var MAX_SP    = 22;     // hard cap on ball speed
 
 // Stargazer
 var sgCanvas, sgCtx, sgStars = [], sgNamed = {}, sgShowLines = false;
@@ -1681,7 +1684,11 @@ function pImpact(x, y, col) {
 }
 function startGame() {
   document.getElementById('startOverlay').classList.remove('active');
-  gState='PLAYING'; pScore=0; aScore=0; updScore(); resetBall(); resizePong();
+  gState='PLAYING'; pScore=0; aScore=0; updScore();
+  ball = null; // force BASE_SP on new game — no carry-over from a previous match
+  resetBall(true);
+  lastTime = 0; // reset dt so first frame doesn't spike
+  resizePong();
 }
 function resetGame() {
   document.getElementById('gameOverOverlay').classList.remove('active');
@@ -1697,9 +1704,17 @@ function endGame(won) {
   o.classList.add('active');
 }
 function updScore() { document.getElementById('score').innerHTML = pScore+' 💖 : 💖 '+aScore; }
-function resetBall() {
+function resetBall(fullReset) {
   combo = 0;
-  ball = {x:GW/2, y:GH/2, r:11, sp:7, dx:(Math.random()>.5?1:-1)*7, dy:(Math.random()*2-1)*6};
+  // Carry 62% of previous speed into the next serve so it never feels sluggish,
+  // but clamp so it can't snowball past 65% of the hard cap.
+  var sp = (fullReset || !ball)
+    ? BASE_SP
+    : Math.min(MAX_SP * 0.65, Math.max(BASE_SP, ball.sp * 0.62));
+  var dx = (Math.random() > 0.5 ? 1 : -1) * sp;
+  // Keep dy ratio ≤ 0.75 so the ball never goes nearly-horizontal
+  var dy = (Math.random() * 1.4 - 0.7) * sp;
+  ball = {x:GW/2, y:GH/2, r:11, sp:sp, dx:dx, dy:dy};
   trails = [];
   aiTarget = GH/2;
 }
@@ -1715,63 +1730,73 @@ function predictBallY(fromX, fromY, dx, dy, targetX) {
   return y;
 }
 
-function updatePong() {
-  if (gState!=='PLAYING') return;
-  // Player paddle
-  if (upP) pY -= 10; if (dnP) pY += 10;
+// dt = elapsed ms normalised to 60 fps (1.0 = 60 Hz, 0.5 = 120 Hz, 2.0 = 30 Hz).
+// All per-frame movements are multiplied by dt so the game runs identically
+// regardless of refresh rate — fixes the "too fast on mobile 120 Hz" issue.
+function updatePong(dt) {
+  if (gState !== 'PLAYING') return;
+
+  // Player keyboard paddle (mouse/touch set pY directly so no dt needed there)
+  if (upP) pY -= 10 * dt;
+  if (dnP) pY += 10 * dt;
   pY = Math.max(0, Math.min(GH-PH, pY));
 
-  // AI — predict ball landing position, throttled to simulate reaction lag
+  // AI — predict ball landing position, throttled to simulate reaction lag.
+  // predictBallY uses dx/dy ratios so it cancels out dt and stays accurate.
   var now = Date.now();
   if (now > aiReactTime) {
-    aiReactTime = now + 120; // recalculate max every 120ms
+    aiReactTime = now + 130;
     var aiX = GW - 10 - PW;
-    if (ball.dx > 0 && ball.x < aiX - 40) {
-      // Ball heading toward AI — predict with wall reflections
+    if (ball.dx > 0 && ball.x < aiX - 30) {
       var pred = predictBallY(ball.x, ball.y, ball.dx, ball.dy, aiX - ball.r);
-      // Add difficulty-scaled error (easier at start, harder as AI scores)
-      var errMag = Math.max(8, 55 - aScore * 7 - pScore * 2);
+      // errMag shrinks as AI racks up points (gets sharper), max=60 at game start
+      var errMag = Math.max(10, 60 - aScore * 8 - pScore * 2);
       aiTarget = pred + (Math.random() - 0.5) * errMag;
     } else {
-      // Ball going away — drift back toward center
       aiTarget = GH / 2;
     }
     aiTarget = Math.max(PH/2, Math.min(GH - PH/2, aiTarget));
   }
-  // Smooth movement toward target (speed scales with game progress)
-  var aiSpd = 3.8 + Math.min(5, (pScore + aScore) * 0.38);
+  // AI paddle speed scales with total points scored; dt-scaled for frame-rate independence
+  var aiSpd = (3.8 + Math.min(5, (pScore + aScore) * 0.4)) * dt;
   var aiCenter = aY + PH/2;
   var diff = aiTarget - aiCenter;
   var move = Math.min(Math.abs(diff), aiSpd) * (diff < 0 ? -1 : 1);
   aY = Math.max(0, Math.min(GH-PH, aY + move));
 
-  ball.x += ball.dx; ball.y += ball.dy;
+  // Ball movement — dt-scaled so 120 Hz phones run the same speed as 60 Hz desktop
+  ball.x += ball.dx * dt;
+  ball.y += ball.dy * dt;
   trails.push({x:ball.x, y:ball.y}); if (trails.length > 13) trails.shift();
 
-  if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy = Math.abs(ball.dy); shk = 3; }
-  else if (ball.y + ball.r > GH) { ball.y = GH-ball.r; ball.dy = -Math.abs(ball.dy); shk = 3; }
+  // Wall bounces
+  if (ball.y - ball.r < 0)  { ball.y = ball.r;     ball.dy =  Math.abs(ball.dy); shk = 3; }
+  if (ball.y + ball.r > GH) { ball.y = GH-ball.r;  ball.dy = -Math.abs(ball.dy); shk = 3; }
 
+  // Paddle collisions — position-based, not per-frame, so no dt needed
   function hit(px, py, isP) {
     if (ball.y+ball.r > py && ball.y-ball.r < py+PH) {
       if ((isP && ball.x-ball.r < px+PW) || (!isP && ball.x+ball.r > px)) {
         combo++;
-        var n = (ball.y - (py+PH/2)) / (PH/2);
+        var n   = (ball.y - (py+PH/2)) / (PH/2);
         var ang = n * (Math.PI / 3);
-        ball.sp = Math.min(ball.sp + 0.38, 20);
+        ball.sp = Math.min(ball.sp + 0.45, MAX_SP);
         var dir = isP ? 1 : -1;
         ball.dx = dir * ball.sp * Math.cos(ang);
         ball.dy = ball.sp * Math.sin(ang);
-        ball.x = isP ? px+PW+ball.r : px-ball.r;
+        // Push ball clear of paddle to prevent double-hit
+        ball.x  = isP ? px+PW+ball.r : px-ball.r;
         shk = 7;
         pImpact(ball.x, ball.y, isP ? '#ffb6d9' : '#ff6fab');
-        // Gold burst on long rallies
         if (combo >= 5) pImpact(ball.x, ball.y, 'rgba(255,220,60,0.9)');
       }
     }
   }
-  hit(10, pY, true); hit(GW-10-PW, aY, false);
-  if (ball.x < 0)  { combo=0; aScore++; updScore(); (aScore>=WIN)?endGame(false):resetBall(); }
-  if (ball.x > GW) { combo=0; pScore++; updScore(); (pScore>=WIN)?endGame(true) :(aScore>=WIN)?endGame(false):resetBall(); }
+  hit(10, pY, true);
+  hit(GW-10-PW, aY, false);
+
+  if (ball.x < 0)  { combo=0; aScore++; updScore(); aScore>=WIN ? endGame(false) : resetBall(); }
+  if (ball.x > GW) { combo=0; pScore++; updScore(); pScore>=WIN ? endGame(true)  : aScore>=WIN ? endGame(false) : resetBall(); }
 }
 
 // ── Rounded rectangle helper (fallback for older browsers)
@@ -1872,8 +1897,19 @@ function drawPong() {
   ctx.globalAlpha = 1;
   ctx.restore();
 }
-function gameLoop() {
-  if (currentPage==='minigame') { updatePong(); drawPong(); }
+function gameLoop(ts) {
+  if (currentPage === 'minigame') {
+    if (!lastTime) lastTime = ts;
+    // Normalise elapsed time to 60 fps units.
+    // Cap at 1.5 to avoid a massive dt spike when returning to the tab.
+    var dt = Math.min((ts - lastTime) / (1000/60), 1.5);
+    lastTime = ts;
+    updatePong(dt);
+    drawPong();
+  } else {
+    // Reset so the first frame after switching back doesn't get a huge dt
+    lastTime = 0;
+  }
   requestAnimationFrame(gameLoop);
 }
 
