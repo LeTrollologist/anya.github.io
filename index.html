@@ -455,18 +455,25 @@ body.studyMode{background:linear-gradient(160deg,#0a1020,#111830,#060c18)!import
 #studyPanel{
   position:fixed;top:var(--nav-h);left:0;right:0;bottom:var(--foot-h);
   overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
-  display:none;flex-direction:column;align-items:center;
-  z-index:20;padding:14px 12px 20px;
+  display:none;
+  z-index:20;padding:14px 12px 24px;
+  box-sizing:border-box;
 }
-body.studyMode #studyPanel{display:flex}
+/* block (not flex) so the shell grows to its natural content height
+   and #studyPanel's overflow-y:auto actually scrolls it */
+body.studyMode #studyPanel{display:block}
 body.studyMode .page-section{display:none!important}
 
 /* Shell card */
 .study-shell{
   width:min(100%,980px);
+  margin:0 auto;                 /* centre without flexbox */
   background:rgba(8,12,26,.92);
   border:1px solid rgba(255,105,180,.20);border-radius:24px;
-  padding:0;overflow:hidden;
+  padding:0;
+  /* overflow:clip clips rounded-corner overflow without creating a scroll
+     container (unlike overflow:hidden which was compressing the flex child) */
+  overflow:clip;
   backdrop-filter:blur(26px);
   box-shadow:0 24px 60px rgba(0,0,0,.7),0 0 0 1px rgba(255,105,180,.06);
 }
@@ -523,6 +530,29 @@ body.studyMode .page-section{display:none!important}
 }
 @media(min-width:580px){
   .sb-body{grid-template-columns:280px 1fr}
+}
+/* ── StudyBuddy mobile ── */
+@media(max-width:579px){
+  #studyPanel{padding:8px 6px 20px}
+  .study-shell{border-radius:14px}
+  .sb-hdr{padding:11px 13px 10px}
+  .sb-brand{font-size:1.25rem}
+  .sb-subject-row,.sb-goal-row{padding:8px 13px}
+  /* stacked: remove right border on left col, add bottom divider */
+  .sb-left{border-right:none;border-bottom:1px solid rgba(255,255,255,.07);padding:14px 10px}
+  .sb-right{padding:14px 12px}
+  /* smaller ring on narrow screens */
+  .progress-ring{width:126px;height:126px}
+  #timerDisplay{font-size:2rem}
+  /* mode tabs: 2 per row on very small phones */
+  .study-tabs{justify-content:flex-start}
+  .study-tab{font-size:.68rem;padding:5px 8px;min-width:60px}
+  /* ambient grid: 3 cols still fits; shrink font */
+  .amb-btn{font-size:.56rem;padding:5px 2px}
+  /* task input row compact */
+  .todo-ig input{font-size:.8rem;padding:7px 9px}
+  /* stat badges slightly narrower */
+  .stat-num{font-size:1.15rem}
 }
 
 /* Left column */
@@ -1879,7 +1909,7 @@ function enterStudyMode() {
   studyMode=true;
   document.body.classList.add('studyMode');
   document.querySelectorAll('.page-section').forEach(function(el){el.style.display='none';});
-  document.getElementById('studyPanel').style.display='flex';
+  document.getElementById('studyPanel').style.display='block';
   var tog=document.getElementById('studyToggle'); tog.innerText='✕'; tog.title='Exit StudyBuddy';
   // Load all persisted data
   updateSBDate(); loadStreak(); loadGoal(); loadStudySubject(); loadNotes(); loadSavedTasks(); updateLTStats(); updateStats();
