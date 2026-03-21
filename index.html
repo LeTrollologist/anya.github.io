@@ -585,32 +585,50 @@ body.studyMode .page-section{display:none!important}
   <!-- Limb darkening -->
   <circle cx="64" cy="64" r="26" fill="none" stroke="rgba(200,100,0,0.25)" stroke-width="3"/>
 </svg>
-<svg id="moonSvg" width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
+<svg id="moonSvg" width="90" height="90" viewBox="0 0 80 80" style="overflow:visible">
   <defs>
+    <!-- Outer night glow (blue-white halo) -->
     <radialGradient id="moonGlowGrad" cx="50%" cy="50%" r="50%">
-      <stop offset="52%"  stop-color="transparent"/>
-      <stop offset="100%" stop-color="rgba(170,205,255,0.2)"/>
+      <stop offset="50%"  stop-color="transparent"/>
+      <stop offset="80%"  stop-color="rgba(170,205,255,0.10)"/>
+      <stop offset="100%" stop-color="rgba(140,180,255,0.22)"/>
+    </radialGradient>
+    <!-- Earthshine gradient on dark side (faint blue-grey Earth-reflected light) -->
+    <radialGradient id="earthshineGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="rgba(80,110,180,0.13)"/>
+      <stop offset="100%" stop-color="rgba(40,60,130,0.04)"/>
+    </radialGradient>
+    <!-- Limb gradient on lit side (slightly warmer at terminator) -->
+    <radialGradient id="moonLimbGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="60%"  stop-color="rgba(255,255,255,0)"/>
+      <stop offset="100%" stop-color="rgba(180,160,120,0.18)"/>
     </radialGradient>
     <clipPath id="moonClip">
       <circle cx="40" cy="40" r="26"/>
     </clipPath>
   </defs>
-  <!-- Outer atmospheric glow -->
+  <!-- Outer atmospheric halo -->
   <circle cx="40" cy="40" r="40" fill="url(#moonGlowGrad)"/>
   <!-- Dark base (unlit side) -->
-  <circle cx="40" cy="40" r="26" fill="#0e0e20"/>
+  <circle cx="40" cy="40" r="26" fill="#0a0a1c"/>
+  <!-- Earthshine — subtle bluish glow on the dark hemisphere -->
+  <circle cx="40" cy="40" r="26" fill="url(#earthshineGrad)" clip-path="url(#moonClip)"/>
   <!-- Lit portion — path computed by JS using accurate elliptical arc terminator -->
-  <path id="moonLitPath" fill="#c8d5ee" opacity="0.93" clip-path="url(#moonClip)"/>
+  <path id="moonLitPath" fill="#d0ddf0" opacity="0.95" clip-path="url(#moonClip)"/>
+  <!-- Warm limb darkening on lit side -->
+  <circle cx="40" cy="40" r="26" fill="url(#moonLimbGrad)" clip-path="url(#moonClip)"/>
   <!-- Surface texture: craters clipped to disc -->
-  <g clip-path="url(#moonClip)" fill="rgba(0,0,0,0.11)">
+  <g clip-path="url(#moonClip)" fill="rgba(0,0,0,0.10)">
     <circle cx="33" cy="34" r="4"/>
     <circle cx="48" cy="44" r="2.8"/>
     <circle cx="36" cy="50" r="2.2"/>
     <circle cx="45" cy="30" r="2"/>
     <circle cx="28" cy="47" r="1.6"/>
+    <circle cx="52" cy="36" r="1.4"/>
+    <circle cx="31" cy="44" r="1.2"/>
   </g>
-  <!-- Rim highlight -->
-  <circle cx="40" cy="40" r="26" fill="none" stroke="rgba(150,185,255,0.25)" stroke-width="1"/>
+  <!-- Rim — thin blue-white ring -->
+  <circle cx="40" cy="40" r="26" fill="none" stroke="rgba(160,195,255,0.30)" stroke-width="1.2"/>
   <title id="moonPhaseTitle">Moon</title>
 </svg>
 <div id="moonLabel"></div>
@@ -1142,9 +1160,18 @@ function drawSky() {
       moon.style.left = moonX + 'px';
       moon.style.top  = moonY + 'px';
       moon.style.display = 'block';
+      // Daylight fade — moon washes out as sun rises above horizon.
+      // At night (sp.altitude ≤ 0) moon is fully visible.
+      // By the time sun is 20° above horizon the moon fades to ~10% opacity,
+      // matching how the real daytime moon looks against a bright sky.
+      var dayFade = sp.altitude > 0
+        ? Math.max(0, Math.min(1, sp.altitude / (Math.PI / 9)))
+        : 0;
+      var moonOpacity = +(1 - dayFade * 0.90).toFixed(3);
+      moon.style.opacity = moonOpacity;
       // Accurate elliptical arc terminator (replaces old cx-shift hack)
       document.getElementById('moonLitPath').setAttribute('d', moonPhasePath(26, 40, 40, mil.phase));
-      // Phase label — shown just below the moon
+      // Phase label — shown just below the moon, fades with moon
       var phaseName = getMoonPhaseName(mil.phase);
       var illumPct  = Math.round(mil.fraction * 100);
       document.getElementById('moonPhaseTitle').textContent = phaseName + ' · ' + illumPct + '% lit';
@@ -1152,6 +1179,7 @@ function drawSky() {
         moonLabel.style.left    = moonX + 'px';
         moonLabel.style.top     = (moonY + 46) + 'px';
         moonLabel.style.display = 'block';
+        moonLabel.style.opacity = moonOpacity;
         moonLabel.textContent   = phaseName + ' · ' + illumPct + '%';
       }
     } else {
