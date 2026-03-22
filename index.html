@@ -1513,62 +1513,89 @@ function openMoonCalc() {
   window.open('https://www.mooncalc.org/#' + LAT + ',' + LNG + ',7/' + date + '/' + time, '_blank');
 }
 
-// Cache SunCalc results — celestial positions change slowly, no need to recalc every frame
-var skyCache = { sp: null, mp: null, mil: null, lastCalc: 0 };
+// Format a Date as "h:mm AM/PM"
+function fmtHHMM(d) {
+  if (!d) return '--:--';
+  var h = d.getHours(), m = d.getMinutes();
+  var ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return h + ':' + (m < 10 ? '0' : '') + m + '\u202f' + ap;
+}
+
+// Convert altitude (radians, −π/2 → +π/2) to a screen Y coordinate.
+// Horizon sits at 87% of viewport height; zenith sits at 7%.
+// This matches how mooncalc.org visualises the sky arc — objects rising
+// from near the bottom and climbing toward the top as altitude increases.
+function altToY(altRad) {
+  return innerHeight * (0.87 - Math.max(0, altRad) / (Math.PI / 2) * 0.80);
+}
+
+// Cache SunCalc/MoonCalc results — positions change slowly, no need to recalc every frame.
+// getMoonTimes is included so we can display rise/set and anchor the arc correctly,
+// exactly as mooncalc.org does internally.
+var skyCache = { sp: null, mp: null, mil: null, mt: null, lastCalc: 0 };
 function drawSky() {
   drawStars();
-  // Throttle SunCalc to once every 10 seconds (~180x fewer calls than every frame)
+  // Throttle recalculation to once every 10 s (~180× fewer calls than every frame)
   var now = new Date(), nowMs = now.getTime();
   if (!skyCache.sp || nowMs - skyCache.lastCalc > 10000) {
-    skyCache.sp      = SunCalc.getPosition(now, LAT, LNG);
-    skyCache.mp      = SunCalc.getMoonPosition(now, LAT, LNG);
-    skyCache.mil     = SunCalc.getMoonIllumination(now);
+    skyCache.sp       = SunCalc.getPosition(now, LAT, LNG);
+    skyCache.mp       = SunCalc.getMoonPosition(now, LAT, LNG);
+    skyCache.mil      = SunCalc.getMoonIllumination(now);
+    skyCache.mt       = SunCalc.getMoonTimes(now, LAT, LNG);  // rise, set, alwaysUp/Down
     skyCache.lastCalc = nowMs;
   }
-  var sp = skyCache.sp, mp = skyCache.mp, mil = skyCache.mil;
+  var sp = skyCache.sp, mp = skyCache.mp, mil = skyCache.mil, mt = skyCache.mt;
   updateBg(sp.altitude);
   var show = !studyMode && currentPage !== 'dreamland' && currentPage !== 'stargazer';
   var sun       = document.getElementById('sunSvg');
   var moon      = document.getElementById('moonSvg');
   var moonLabel = document.getElementById('moonLabel');
   if (show) {
-    // — Sun —
+    // ── Sun ──
     if (sp.altitude > -.1) {
-      sun.style.left = ((sp.azimuth+Math.PI)/(2*Math.PI)*innerWidth) + 'px';
-      sun.style.top  = (innerHeight*(1-(sp.altitude+Math.PI/2)/Math.PI)) + 'px';
+      sun.style.left    = ((sp.azimuth + Math.PI) / (2 * Math.PI) * innerWidth) + 'px';
+      sun.style.top     = altToY(sp.altitude) + 'px';
       sun.style.display = 'block';
       var glowAlpha = Math.max(0, Math.sin(sp.altitude) * 0.8);
       document.getElementById('sunGlowLayer').setAttribute('fill',
         'rgba(255,235,120,' + glowAlpha + ')');
     } else { sun.style.display = 'none'; }
-    // — Moon —
+
+    // ── Moon ── (position driven by getMoonPosition altitude/azimuth,
+    //             exactly as mooncalc.org uses those values internally)
     if (mp.altitude > -.1) {
-      var moonX = (mp.azimuth+Math.PI)/(2*Math.PI)*innerWidth;
-      var moonY = innerHeight*(1-(mp.altitude+Math.PI/2)/Math.PI);
-      moon.style.left = moonX + 'px';
-      moon.style.top  = moonY + 'px';
+      // Azimuth → X: SunCalc measures from South clockwise, offset by π gives 0–2π
+      // mapping naturally puts East (moonrise) on the left and West (moonset) on right.
+      var moonX = (mp.azimuth + Math.PI) / (2 * Math.PI) * innerWidth;
+      // Altitude → Y: altToY() puts horizon near bottom, zenith near top
+      var moonY = altToY(mp.altitude);
+
+      moon.style.left    = moonX + 'px';
+      moon.style.top     = moonY + 'px';
       moon.style.display = 'block';
-      // Daylight fade — moon washes out as sun rises above horizon.
-      // At night (sp.altitude ≤ 0) moon is fully visible.
-      // By the time sun is 20° above horizon the moon fades to ~10% opacity,
-      // matching how the real daytime moon looks against a bright sky.
-      var dayFade = sp.altitude > 0
-        ? Math.max(0, Math.min(1, sp.altitude / (Math.PI / 9)))
-        : 0;
+
+      // Daylight fade — moon washes out as sun climbs above horizon
+      var dayFade    = sp.altitude > 0
+        ? Math.max(0, Math.min(1, sp.altitude / (Math.PI / 9))) : 0;
       var moonOpacity = +(1 - dayFade * 0.90).toFixed(3);
       moon.style.opacity = moonOpacity;
-      // Accurate elliptical arc terminator (replaces old cx-shift hack)
+
+      // Phase shape
       document.getElementById('moonLitPath').setAttribute('d', moonPhasePath(26, 40, 40, mil.phase));
-      // Phase label — shown just below the moon, fades with moon
+
+      // Build label: phase · illumination · ↑ rise · ↓ set
       var phaseName = getMoonPhaseName(mil.phase);
       var illumPct  = Math.round(mil.fraction * 100);
+      var riseStr   = mt && mt.rise ? fmtHHMM(mt.rise) : '--:--';
+      var setStr    = mt && mt.set  ? fmtHHMM(mt.set)  : '--:--';
       document.getElementById('moonPhaseTitle').textContent = phaseName + ' · ' + illumPct + '% lit';
       if (moonLabel) {
         moonLabel.style.left    = moonX + 'px';
         moonLabel.style.top     = (moonY + 46) + 'px';
         moonLabel.style.display = 'block';
         moonLabel.style.opacity = moonOpacity;
-        moonLabel.textContent   = phaseName + ' · ' + illumPct + '%';
+        moonLabel.textContent   = phaseName + ' · ' + illumPct + '% · ↑' + riseStr + ' ↓' + setStr;
       }
     } else {
       moon.style.display = 'none';
