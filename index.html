@@ -451,6 +451,7 @@ input[type=range]{width:100%;accent-color:#b89cff;margin-top:2px}
 
 /* ── STUDYBUDDY ── */
 body.studyMode .petal,body.studyMode .glitter,body.studyMode #sunSvg,body.studyMode #moonSvg,body.studyMode #musicPlayer{display:none!important}
+body.onStargazer .petal,body.onStargazer .glitter{display:none!important}
 body.studyMode{background:linear-gradient(160deg,#0a1020,#111830,#060c18)!important}
 #studyPanel{
   position:fixed;top:var(--nav-h);left:0;right:0;bottom:var(--foot-h);
@@ -912,8 +913,8 @@ body.studyMode .page-section{display:none!important}
   <div class="sub-text">Your space to study, rest, and explore.</div>
   <div class="dashboard">
     <div class="world-clocks">
-      <div class="clock-box"><div class="clock-label">Eastern Time 🇺🇸</div><div class="clock-time" id="time-est">--:--:-- --</div></div>
-      <div class="clock-box"><div class="clock-label">India Time 🇮🇳</div><div class="clock-time" id="time-ist">--:--:-- --</div></div>
+      <div class="clock-box"><div class="clock-label">Dubai 🇦🇪</div><div class="clock-time" id="time-dxb">--:--:-- --</div></div>
+      <div class="clock-box"><div class="clock-label">India 🇮🇳</div><div class="clock-time" id="time-ist">--:--:-- --</div></div>
     </div>
   </div>
 </div>
@@ -1331,8 +1332,8 @@ var sgNamePool = [
 var sgClickCooldown = false;
 
 // Dates
-var estO = {timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
-var istO = {timeZone:'Asia/Kolkata',    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
+var dxbO = {timeZone:'Asia/Dubai',   hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
+var istO = {timeZone:'Asia/Kolkata', hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
 
 // ══════════════════════════════════════════════════════════
 // MOBILE NAV
@@ -1373,6 +1374,7 @@ function navigate(pageId) {
   document.querySelectorAll('.mob-link').forEach(function(a){ a.classList.remove('active'); });
   document.querySelectorAll('.mob-link[data-page="' + pageId + '"]').forEach(function(a){ a.classList.add('active'); });
   document.body.style.touchAction = pageId === 'minigame' ? 'none' : 'auto';
+  document.body.classList.toggle('onStargazer', pageId === 'stargazer');
   if (pageId === 'status') runDiagnostics();
   if (pageId !== 'home') {
     closeLetter();
@@ -2622,8 +2624,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Clocks
   function tick2() {
     var now = new Date();
-    var e1=document.getElementById('time-est'), e2=document.getElementById('time-ist');
-    if(e1) e1.innerText=now.toLocaleTimeString('en-US',estO);
+    var e1=document.getElementById('time-dxb'), e2=document.getElementById('time-ist');
+    if(e1) e1.innerText=now.toLocaleTimeString('en-US',dxbO);
     if(e2) e2.innerText=now.toLocaleTimeString('en-US',istO);
     checkAlarm();
   }
