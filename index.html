@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Our Magical Love 💖 | For Anya</title>
+<title>Anya's Space</title>
 <script src="compute-optimizer.js"></script>
 <script src="mobile-optimizer.js"></script>
-<meta property="og:title" content="Our Magical Love">
-<meta property="og:description" content="Our Magical Love: A website for Anya celebrating love, memories, and time together.">
-<meta name="keywords" content="Our Magical Love, For Anya, Sweetbaby, Troll, Trollologist, TrollologistOG, Micheal Loves Anya, Mike Loves Anya">
+<meta property="og:title" content="Anya's Space">
+<meta property="og:description" content="A space for Anya — study, dream, play, explore.">
+
 <meta property="og:image" content="https://raw.githubusercontent.com/LeTrollologist/anya.github.io/refs/heads/main/OurMagicalLove.png">
 <meta property="og:url" content="https://letrollologist.github.io/anya.github.io/index.html">
 <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
@@ -875,30 +875,22 @@ body.studyMode .page-section{display:none!important}
 
 <!-- NAV desktop -->
 <nav id="nav-bar">
-  <span id="nav-title" onclick="navigate('home')">💖 Our Magical Love</span>
+  <span id="nav-title" onclick="navigate('home')">✦ Anya</span>
   <div class="nd"></div>
   <a class="nl active" data-page="home"      onclick="navigate('home')">Home</a>
-  <span class="ni" id="headerProposal" title="Proposal 💍">💍</span>
   <span class="ni" id="studyToggle" title="StudyBuddy" onclick="toggleStudyMode()">📚</span>
-  <a class="nl" data-page="album"      onclick="navigate('album')">Album</a>
-  <a class="nl" data-page="contact"    onclick="navigate('contact')">Contact</a>
-  <a class="nl" href="https://overdefensively-unabjective-eilene.ngrok-free.dev/" target="_blank">Check In</a>
   <a class="nl" data-page="minigame"   onclick="navigate('minigame')">Minigame</a>
   <a class="nl" data-page="dreamland"  onclick="navigate('dreamland')">Dreamland</a>
   <a class="nl" data-page="stargazer"  onclick="navigate('stargazer')">🌌 Stars</a>
 </nav>
 
 <!-- Mobile -->
-<span id="mobile-brand" onclick="navigate('home')">💖 Anya</span>
+<span id="mobile-brand" onclick="navigate('home')">✦ Anya</span>
 <button id="nav-toggle" onclick="openMob()" aria-label="Open menu">☰</button>
 <div id="mob-overlay" role="dialog" aria-modal="true">
   <button class="mob-close" onclick="closeMob()">✕ Close</button>
   <a class="mob-link active" data-page="home"     onclick="navigate('home');closeMob()">🏠 Home</a>
-  <a class="mob-link"                             onclick="openProposal();closeMob()">💍 Proposal</a>
   <a class="mob-link"                             onclick="toggleStudyMode();closeMob()">📚 StudyBuddy</a>
-  <a class="mob-link" data-page="album"           onclick="navigate('album');closeMob()">📷 Album</a>
-  <a class="mob-link" data-page="contact"         onclick="navigate('contact');closeMob()">✉️ Contact</a>
-  <a class="mob-link" href="https://overdefensively-unabjective-eilene.ngrok-free.dev/" target="_blank" onclick="closeMob()">📍 Check In</a>
   <a class="mob-link" data-page="minigame"        onclick="navigate('minigame');closeMob()">🏓 Minigame</a>
   <a class="mob-link" data-page="dreamland"       onclick="navigate('dreamland');closeMob()">🌙 Dreamland</a>
   <a class="mob-link" data-page="stargazer"       onclick="navigate('stargazer');closeMob()">🌌 Stargazer</a>
@@ -916,31 +908,18 @@ body.studyMode .page-section{display:none!important}
 
 <!-- ══ HOME ══ -->
 <div id="page-home" class="page-section active">
-  <div class="love-text">I love you Anya</div>
-  <div class="sub-text">Forever and always. I will never forget you.</div>
+  <div class="love-text" style="font-size:1.4rem;letter-spacing:.02em">Welcome, Anya</div>
+  <div class="sub-text">Your space to study, rest, and explore.</div>
   <div class="dashboard">
-    <div class="counter" id="counter"></div>
     <div class="world-clocks">
       <div class="clock-box"><div class="clock-label">Eastern Time 🇺🇸</div><div class="clock-time" id="time-est">--:--:-- --</div></div>
       <div class="clock-box"><div class="clock-label">India Time 🇮🇳</div><div class="clock-time" id="time-ist">--:--:-- --</div></div>
     </div>
   </div>
-  <div class="letter" id="letter"><button class="close-btn" onclick="closeLetter()">✕</button><div id="letterContent"></div></div>
-  <!-- PROPOSAL -->
-  <div class="marry" id="marry">
-    <div id="proposalText"></div>
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:8px">
-      <button onclick="sayYes()">Yes 💍</button>
-      <button onclick="sayNo()">No</button>
-    </div>
-    <p>Disclaimer: Not a real proposal 💖 — a glimpse into <em>our</em> future.</p>
-    <button id="propHomeBtn" onclick="closeProposal()">← Return to Home</button>
-  </div>
-  <div class="ending" id="ending"></div>
 </div>
 
 <!-- ══ ALBUM ══ -->
-<div id="page-album" class="page-section">
+<div id="page-album" class="page-section" style="display:none!important">
   <div class="page-title">Our Album 📷</div>
   <div class="alt-counter" id="album-counter"></div>
   <div class="note">Our memories will live here… every smile, every late night, every future 🌙💗</div>
@@ -953,7 +932,7 @@ body.studyMode .page-section{display:none!important}
 </div>
 
 <!-- ══ CONTACT ══ -->
-<div id="page-contact" class="page-section">
+<div id="page-contact" class="page-section" style="display:none!important">
   <div class="page-title">Reach Me ✨</div>
   <div class="alt-counter" id="contact-counter"></div>
   <div class="contact-container">
@@ -993,8 +972,8 @@ body.studyMode .page-section{display:none!important}
   </div>
   <div id="gameContainer">
     <canvas id="pongCanvas"></canvas>
-    <div id="startOverlay" class="overlay active"><h1>Play with Me?</h1><p>First to 7 wins. I believe in you, Anya! 🌸</p><button onclick="startGame()">Start Game</button></div>
-    <div id="gameOverOverlay" class="overlay"><h1 id="gameOverTitle">You Won!</h1><p id="gameOverText">You're amazing! 💖</p><button onclick="resetGame()">Play Again</button></div>
+    <div id="startOverlay" class="overlay active"><h1>Pong</h1><p>First to 7 wins. First to 7 wins.</p><button onclick="startGame()">Start Game</button></div>
+    <div id="gameOverOverlay" class="overlay"><h1 id="gameOverTitle">You Won!</h1><p id="gameOverText">Well played.</p><button onclick="resetGame()">Play Again</button></div>
     <div id="historyOverlay" class="overlay">
       <div id="historyPanel">
         <h1 style="font-family:var(--fd);font-size:1.9rem;margin-bottom:9px;">Match History</h1>
@@ -1051,13 +1030,13 @@ body.studyMode .page-section{display:none!important}
   </div>
   <div id="sg-star-name"></div>
   <div id="sg-bottom">
-    <div id="sg-tagline">Every star is a moment I've loved you 💖</div>
+    <div id="sg-tagline">Every star has a name. Click one to find it.</div>
   </div>
 </div>
 
 <!-- ══ PRIVACY ══ -->
 <div id="page-privacy" class="page-section">
-  <div class="page-title">Privacy & Data 💖</div>
+  <div class="page-title">Privacy & Data</div>
   <div class="privacy-grid">
     <div class="privacy-card"><h3>💖 Personal Privacy</h3><p>This website is made for <strong>Anya</strong>. Her information is never shared. Please respect that.</p></div>
     <div class="privacy-card"><h3>🔒 Passion Project</h3><p>All content is made for personal enjoyment. Please respect the privacy of those involved.</p></div>
@@ -1253,7 +1232,7 @@ body.studyMode .page-section{display:none!important}
 <!-- Alarm audio + UI -->
 <audio id="alarmAudio" loop src="https://letrollologist.github.io/anya.github.io/freesound_community-alarm-clock-90867.mp3"></audio>
 <div id="alarm-ring">
-  <h3>⏰ Time to wake up, my love 🤍</h3>
+  <h3>⏰ Time to wake up, Anya 🌙</h3>
   <div id="snoozeCountdown"></div>
   <div class="alarm-btns">
     <button class="snooze-btn" onclick="snoozeAlarm()">💤 Snooze 5m</button>
@@ -1265,7 +1244,7 @@ body.studyMode .page-section{display:none!important}
 <footer id="site-footer">
   <div id="footerCounter">Loading…</div>
   <div class="fl">
-    <span>© 2026 Our Magical Love</span>
+    <span>© 2026 Anya's Space</span>
     <span>·</span><a onclick="navigate('privacy')">Privacy</a>
     <span>·</span><a onclick="navigate('status')">System</a>
   </div>
@@ -1284,11 +1263,6 @@ var sc, sx, stars = [];
 
 // Music
 var bgAud, vinylEl, mLabel, noteInt;
-
-// Letter
-var clickCount = 0, iChar = 0;
-var letterEl, letterBox;
-var ltxt = 'You are written in my sky and in every future I see.';
 
 // Proposal
 var propTick;
@@ -1312,17 +1286,17 @@ var ambSrc = {
 };
 var motivFocus = [
   'Focus now, freedom later.','Your future self is proud.','Stay steady. Stay calm.',
-  'Small steps, big futures.','You can do this, Anya. 💖','Deep breaths. Then deep work.',
+  'Small steps, big futures.','You can do this. 💪','Deep breaths. Then deep work.',
   'Progress, not perfection.','You are doing amazing. Keep going.',
   'One task at a time.','Excellence is built in small moments.',
   'Stay curious. Stay focused.','Each session is an investment in your future.',
-  'Consistency beats intensity.','You\'ve got this. 💖','Lock in. 🔒','Make it count.'
+  'Consistency beats intensity.','You\'ve got this.','Lock in. 🔒','Make it count.'
 ];
 var motivBreak = [
   'Breathe. You earned this.','Rest is productive.','Hydrate and recharge. 💧',
   'Stretch your body. Clear your mind.','Breaks make the work better.',
   'Step back. Come back stronger.','A rested mind is a sharp mind.',
-  'You\'re allowed to rest. 💖','Enjoy every second.','You\'re doing great, Anya.'
+  'You\'re allowed to rest.','Enjoy every second.','You\'re doing great.'
 ];
 
 // Dreamland
@@ -1346,17 +1320,17 @@ var MAX_SP    = 22;     // hard cap on ball speed
 
 // Stargazer
 var sgCanvas, sgCtx, sgStars = [], sgNamed = {}, sgShowLines = false;
-var sgDrag = false, sgDragX = 0, sgOffsetX = 0, sgHover = null;
+var sgDrag = false, sgDragX = 0, sgDragY = 0, sgHover = null;
+var sgViewRA = 180, sgViewDec = 25, sgScale = 400, sgProjectCache = [];
 var sgNamePool = [
-  'Anya','Love','Forever','Sweetbaby','Dream','Hope','Bliss','Luna','Nova','Aurora',
+  'Vega','Lyra','Cygnus','Orion','Perseus','Hope','Bliss','Luna','Nova','Aurora',
   'Rose','Heart','Seraph','Grace','Eternal','Solace','Lumina','Celeste','Aura','Joy',
-  'Starfire','Cosmos','Infinity','Tender','Cherish','Adore','Radiance','Miracle',
-  'Haven','Promise','Destiny','Reverie','Twilight','Serene','Devoted'
+  'Starfire','Cosmos','Infinity','Andromeda','Cassiopeia','Aquila','Radiance','Miracle',
+  'Haven','Promise','Destiny','Reverie','Twilight','Serene','Hydra'
 ];
 var sgClickCooldown = false;
 
 // Dates
-var startDate = new Date('2026-02-17T16:19:00+05:30');
 var estO = {timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
 var istO = {timeZone:'Asia/Kolkata',    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true};
 
@@ -1610,70 +1584,14 @@ function toggleMusic() {
 function spawnNote() {
   var r = document.getElementById('musicPlayer').getBoundingClientRect();
   var n = document.createElement('div');
-  n.innerText = ['🎵','🎶','💖','✨'][Math.floor(Math.random()*4)];
+  n.innerText = ['🎵','🎶','🎵','✨'][Math.floor(Math.random()*4)];
   n.style.cssText = 'position:fixed;left:'+(r.left+Math.random()*40+10)+'px;top:'+r.top+'px;'
     +'font-size:1.25rem;pointer-events:none;z-index:100;animation:floatNote 2s ease-out forwards;';
   document.body.appendChild(n);
   setTimeout(function(){ n.remove(); }, 2000);
 }
 
-// ══════════════════════════════════════════════════════════
-// LETTER
-// ══════════════════════════════════════════════════════════
-var letterTyping = false;
-function writeLetter() {
-  if (!letterBox || !letterTyping) return;
-  if (iChar < ltxt.length) {
-    letterBox.textContent = ltxt.slice(0, ++iChar);
-    setTimeout(writeLetter, 60);
-  } else {
-    letterTyping = false;
-  }
-}
-function closeLetter() {
-  if (letterEl) letterEl.classList.remove('show');
-  letterTyping = false;
-  clickCount = 0;
-  iChar = 0;
-  if (letterBox) letterBox.textContent = '';
-}
-
-// ══════════════════════════════════════════════════════════
-// PROPOSAL
-// ══════════════════════════════════════════════════════════
-function updatePropClocks() {
-  var now = new Date();
-  document.getElementById('proposalText').innerHTML =
-    'Will you marry me? 💍<br><span style="font-size:clamp(.9rem,2.5vw,1.4rem);opacity:.75">'+
-    now.toLocaleString('en-US',{timeZone:'Asia/Kolkata',hour12:true})+'</span>';
-}
-function openProposal() {
-  if (studyMode) return;
-  if (currentPage !== 'home') navigate('home');
-  updatePropClocks();
-  propTick = setInterval(updatePropClocks, 1000);
-  var m = document.getElementById('marry');
-  m.style.display = 'flex';
-  setTimeout(function(){ m.style.opacity = '1'; }, 10);
-}
-function closeProposal() {
-  clearInterval(propTick);
-  var m = document.getElementById('marry');
-  m.style.opacity = '0';
-  setTimeout(function(){ m.style.display = 'none'; }, 400);
-}
-function sayYes() {
-  closeProposal();
-  var e = document.getElementById('ending');
-  e.innerHTML = 'Forever begins now ♡<br>'+new Date().toLocaleDateString();
-  e.style.opacity = '1'; e.style.pointerEvents = 'auto';
-  setTimeout(function(){
-    e.style.opacity='0'; e.style.pointerEvents='none';
-  }, 5000);
-}
-function sayNo() {
-  setTimeout(function(){ alert("I'll keep asking forever 💖"); }, 300);
-}
+function openProposal(){} function closeProposal(){} function sayYes(){} function sayNo(){}
 
 // ══════════════════════════════════════════════════════════
 // STUDYBUDDY
@@ -2128,8 +2046,8 @@ function loadHistory() {
   var hist = JSON.parse(localStorage.getItem('pong_history_anya')||'[]');
   var list = document.getElementById('historyList');
   list.innerHTML = '<div class="history-item mbm"><div><div class="mbm-title">MBM</div>'
-    +'<div style="font-size:.75rem;opacity:.65">Most Beautiful Memory</div></div>'
-    +'<div style="color:gold;font-weight:600">Anya ∞ — 0 AI</div></div>';
+    +'<div style="font-size:.75rem;opacity:.65">Match History</div></div>'
+    +'<div style="color:gold;font-weight:600">You vs AI</div></div>';
   hist.slice().reverse().forEach(function(m){
     list.innerHTML += '<div class="history-item"><div><strong>'+m.winner+' Won</strong>'
       +'<br><span style="font-size:.72rem;opacity:.6">'+m.date+'</span></div>'
@@ -2678,21 +2596,6 @@ document.addEventListener('DOMContentLoaded', function() {
   vinylEl = document.getElementById('vinyl');
   mLabel  = document.getElementById('musicStatus');
 
-  // Letter easter-egg
-  letterEl  = document.getElementById('letter');
-  letterBox = document.getElementById('letterContent');
-  document.body.addEventListener('click', function(e) {
-    if (currentPage!=='home' || studyMode) return;
-    if (e.target.closest('button,a,.letter,.marry,#musicPlayer,nav,#nav-toggle,#mobile-brand,#mob-overlay')) return;
-    if (++clickCount >= 3 && !letterEl.classList.contains('show')) {
-      letterEl.classList.add('show');
-      if (iChar === 0) { letterTyping = true; writeLetter(); }
-    }
-  });
-
-  // Proposal
-  document.getElementById('headerProposal').addEventListener('click', openProposal);
-
   // StudyBuddy ring
   ring = document.querySelector('.progress-ring__circle');
   ring.style.strokeDasharray  = CIRC;
@@ -2716,16 +2619,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key==='r'||e.key==='R') { e.preventDefault(); resetTimer(); }
   });
 
-  // Counters
+  // Clocks
   function tick2() {
-    var now = new Date(), diff = now - startDate;
-    var d=Math.floor(diff/86400000), h=Math.floor(diff/3600000%24), m=Math.floor(diff/60000%60), s=Math.floor(diff/1000%60);
-    var cEl = document.getElementById('counter');
-    if (cEl) cEl.innerHTML = '<span>'+d+' 💖 Days</span><span>'+h+' 🕒 Hours</span><span>'+m+' ⏳ Mins</span><span>'+s+' 💌 Secs</span>';
-    var alt = d+' Days Together 💖';
-    ['album-counter','contact-counter'].forEach(function(id){
-      var el=document.getElementById(id); if(el) el.innerHTML=alt;
-    });
+    var now = new Date();
     var e1=document.getElementById('time-est'), e2=document.getElementById('time-ist');
     if(e1) e1.innerText=now.toLocaleTimeString('en-US',estO);
     if(e2) e2.innerText=now.toLocaleTimeString('en-US',istO);
@@ -2737,7 +2633,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var visits = parseInt(localStorage.getItem('anya_visits')||'0')+1;
   localStorage.setItem('anya_visits', visits);
   var fc = document.getElementById('footerCounter');
-  if (fc) fc.innerHTML = "You've visited "+visits+" times 🌸";
+  if (fc) fc.innerHTML = "Visited "+visits+" times ✦";
 
   // Particles
   var cnt = innerWidth<480 ? 16 : 32;
