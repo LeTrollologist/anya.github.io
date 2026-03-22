@@ -40,6 +40,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;background:rad
 
 canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
 #sunSvg,#moonSvg{position:fixed;transform:translate(-50%,-50%);z-index:2;pointer-events:none;transition:opacity .8s}
+#moonSvg{pointer-events:auto;cursor:pointer}
 #moonLabel{position:fixed;z-index:2;color:rgba(180,210,255,0.82);font-size:.58rem;font-family:'DM Mono',monospace;text-align:center;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,0.95);letter-spacing:.05em;transform:translateX(-50%);display:none;white-space:nowrap}
 
 /* ── NAV ── */
@@ -828,7 +829,7 @@ body.studyMode .page-section{display:none!important}
   <!-- Limb darkening -->
   <circle cx="64" cy="64" r="26" fill="none" stroke="rgba(200,100,0,0.25)" stroke-width="3"/>
 </svg>
-<svg id="moonSvg" width="90" height="90" viewBox="0 0 80 80" style="overflow:visible">
+<svg id="moonSvg" width="90" height="90" viewBox="0 0 80 80" style="overflow:visible" onclick="openMoonCalc()">
   <defs>
     <!-- Outer night glow (blue-white halo) -->
     <radialGradient id="moonGlowGrad" cx="50%" cy="50%" r="50%">
@@ -1503,6 +1504,15 @@ function updateBg(alt) {
   document.body.style.background = 'linear-gradient(to bottom,rgb('+
     Math.round(25+205*t)+','+Math.round(50+130*t)+','+Math.round(80+175*t)+'),rgb(15,25,50))';
 }
+// Open mooncalc.org for the site's location + current date/time
+function openMoonCalc() {
+  var n = new Date();
+  var pad = function(v){ return String(v).padStart(2,'0'); };
+  var date = n.getFullYear() + '.' + pad(n.getMonth()+1) + '.' + pad(n.getDate());
+  var time = pad(n.getHours()) + ':' + pad(n.getMinutes()) + ':' + pad(n.getSeconds());
+  window.open('https://www.mooncalc.org/#' + LAT + ',' + LNG + ',7/' + date + '/' + time, '_blank');
+}
+
 // Cache SunCalc results — celestial positions change slowly, no need to recalc every frame
 var skyCache = { sp: null, mp: null, mil: null, lastCalc: 0 };
 function drawSky() {
