@@ -1523,11 +1523,10 @@ function fmtHHMM(d) {
 }
 
 // Convert altitude (radians, −π/2 → +π/2) to a screen Y coordinate.
-// Horizon sits at 87% of viewport height; zenith sits at 7%.
-// This matches how mooncalc.org visualises the sky arc — objects rising
-// from near the bottom and climbing toward the top as altitude increases.
+// Horizon sits at 72% of viewport height (safely above the dashboard UI);
+// zenith sits at 10%. Negative altitudes clamp to the horizon line.
 function altToY(altRad) {
-  return innerHeight * (0.87 - Math.max(0, altRad) / (Math.PI / 2) * 0.80);
+  return innerHeight * (0.72 - Math.max(0, altRad) / (Math.PI / 2) * 0.62);
 }
 
 // Cache SunCalc/MoonCalc results — positions change slowly, no need to recalc every frame.
