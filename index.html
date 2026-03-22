@@ -387,6 +387,8 @@ canvas#stars{position:fixed;inset:0;pointer-events:none;z-index:1}
   cursor:pointer;box-shadow:0 4px 16px var(--pink-g);transition:.2s;
 }
 .overlay button:hover{transform:scale(1.1)}
+.diff-btn{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,182,193,.3)!important;font-size:clamp(.72rem,2.2vw,1rem)!important;padding:6px 16px!important;box-shadow:none!important;border-radius:6px!important;opacity:.7;transition:.2s}
+.diff-btn:hover,.diff-btn.active{opacity:1;background:rgba(255,100,160,.25)!important;border-color:var(--pink)!important;transform:none!important}
 #historyPanel{background:rgba(10,6,22,.92);border:1px solid var(--border-p);border-radius:var(--rc);width:min(90%,470px);padding:18px;max-height:70vh;overflow-y:auto}
 .history-item{background:var(--glass);margin:7px 0;padding:11px;border-radius:9px;display:flex;justify-content:space-between;align-items:center;border-left:3px solid var(--pink);font-size:.85rem}
 .history-item.mbm{border-left-color:gold;background:rgba(255,215,0,.08)}
@@ -909,7 +911,7 @@ body.studyMode .page-section{display:none!important}
 
 <!-- ══ HOME ══ -->
 <div id="page-home" class="page-section active">
-  <div class="love-text" style="font-size:1.4rem;letter-spacing:.02em">Welcome, Anya</div>
+  <div class="love-text">Welcome, Anya</div>
   <div class="sub-text">Your space to study, rest, and explore.</div>
   <div class="dashboard">
     <div class="world-clocks">
@@ -973,7 +975,17 @@ body.studyMode .page-section{display:none!important}
   </div>
   <div id="gameContainer">
     <canvas id="pongCanvas"></canvas>
-    <div id="startOverlay" class="overlay active"><h1>Pong</h1><p>First to 7 wins. First to 7 wins.</p><button onclick="startGame()">Start Game</button></div>
+    <div id="startOverlay" class="overlay active">
+  <h1>Pong</h1>
+  <p>First to 7 wins.</p>
+  <div id="diffButtons" style="display:flex;gap:8px;margin:10px 0 14px;flex-wrap:wrap;justify-content:center">
+    <button class="diff-btn" onclick="setDiff('easy')"   id="diff-easy">Easy</button>
+    <button class="diff-btn" onclick="setDiff('medium')" id="diff-medium">Medium</button>
+    <button class="diff-btn active" onclick="setDiff('anya')" id="diff-anya">Anya</button>
+    <button class="diff-btn" onclick="setDiff('hard')"   id="diff-hard">Hard</button>
+  </div>
+  <button onclick="startGame()">Start Game</button>
+</div>
     <div id="gameOverOverlay" class="overlay"><h1 id="gameOverTitle">You Won!</h1><p id="gameOverText">Well played.</p><button onclick="resetGame()">Play Again</button></div>
     <div id="historyOverlay" class="overlay">
       <div id="historyPanel">
@@ -1318,6 +1330,7 @@ var aiReactTime = 0;    // throttle AI recalculation
 var lastTime  = 0;      // timestamp for frame-rate-independent physics
 var BASE_SP   = 9;      // starting ball speed (logical px/frame @60fps)
 var MAX_SP    = 22;     // hard cap on ball speed
+var pongDiff  = 'anya'; // current difficulty
 
 // Stargazer
 var sgCanvas, sgCtx, sgStars = [], sgNamed = {}, sgShowLines = false;
@@ -1377,10 +1390,8 @@ function navigate(pageId) {
   document.body.classList.toggle('onStargazer', pageId === 'stargazer');
   if (pageId === 'status') runDiagnostics();
   if (pageId !== 'home') {
-    closeLetter();
     var m = document.getElementById('marry');
-    m.style.opacity = '0';
-    setTimeout(function(){ m.style.display = 'none'; }, 300);
+    if (m) { m.style.opacity = '0'; setTimeout(function(){ m.style.display = 'none'; }, 300); }
   }
   if (pageId === 'dreamland' && !ytPlayer && window.YT && window.YT.Player) initYTPlayer();
   if (pageId === 'minigame') setTimeout(resizePong, 60);
@@ -2035,6 +2046,13 @@ function stopAlarm() {
 // ══════════════════════════════════════════════════════════
 // PONG
 // ══════════════════════════════════════════════════════════
+function setDiff(d) {
+  pongDiff = d;
+  document.querySelectorAll('.diff-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.getElementById('diff-' + d);
+  if (btn) btn.classList.add('active');
+}
+
 function resizePong() {
   if (!canvas) return;
   var c = document.getElementById('gameContainer');
@@ -2047,8 +2065,7 @@ function resizePong() {
 function loadHistory() {
   var hist = JSON.parse(localStorage.getItem('pong_history_anya')||'[]');
   var list = document.getElementById('historyList');
-  list.innerHTML = '<div class="history-item mbm"><div><div class="mbm-title">MBM</div>'
-    +'<div style="font-size:.75rem;opacity:.65">Match History</div></div>'
+  list.innerHTML = '<div class="history-item mbm"><div><div class="mbm-title">Match History</div></div>'
     +'<div style="color:gold;font-weight:600">You vs AI</div></div>';
   hist.slice().reverse().forEach(function(m){
     list.innerHTML += '<div class="history-item"><div><strong>'+m.winner+' Won</strong>'
@@ -2083,22 +2100,26 @@ function pImpact(x, y, col) {
 }
 function startGame() {
   document.getElementById('startOverlay').classList.remove('active');
+  // Set speed based on difficulty
+  var spMap = {easy:7, medium:8, anya:7, hard:9};
+  BASE_SP = spMap[pongDiff] || 9;
+  MAX_SP  = pongDiff === 'hard' ? 22 : 18;
   gState='PLAYING'; pScore=0; aScore=0; updScore();
-  ball = null; // force BASE_SP on new game — no carry-over from a previous match
+  ball = null;
   resetBall(true);
-  lastTime = 0; // reset dt so first frame doesn't spike
+  lastTime = 0;
   resizePong();
 }
 function resetGame() {
   document.getElementById('gameOverOverlay').classList.remove('active');
-  startGame();
+  document.getElementById('startOverlay').classList.add('active');
 }
 function endGame(won) {
   gState='GAMEOVER'; saveMatch();
   var o = document.getElementById('gameOverOverlay');
   document.getElementById('gameOverTitle').innerText = won?'You Won! 🎉':'Good Try! 🌸';
   document.getElementById('gameOverTitle').style.color = won?'var(--pink)':'white';
-  document.getElementById('gameOverText').innerText = won?"You're amazing, Anya! My champion 💖":"I'll let you win next time. I promise 💖";
+  document.getElementById('gameOverText').innerText = won?"Well played, Anya.":"Better luck next time.";
   if (won) for(var i=0;i<50;i++) pImpact(GW/2,GH/2,'pink');
   o.classList.add('active');
 }
@@ -2141,23 +2162,29 @@ function updatePong(dt) {
   pY = Math.max(0, Math.min(GH-PH, pY));
 
   // AI — predict ball landing position, throttled to simulate reaction lag.
-  // predictBallY uses dx/dy ratios so it cancels out dt and stays accurate.
+  // Difficulty controls reaction time, error magnitude, and paddle speed.
+  var diffCfg = {
+    easy:   {react:320, errBase:90,  errMin:50, spdBase:2.0, spdScale:0.15, spdMax:1.5},
+    medium: {react:200, errBase:65,  errMin:25, spdBase:2.8, spdScale:0.25, spdMax:3.0},
+    anya:   {react:400, errBase:115, errMin:70, spdBase:1.8, spdScale:0.10, spdMax:1.2},
+    hard:   {react:130, errBase:60,  errMin:10, spdBase:3.8, spdScale:0.40, spdMax:5.0}
+  };
+  var dc = diffCfg[pongDiff] || diffCfg.hard;
   var now = Date.now();
   if (now > aiReactTime) {
-    aiReactTime = now + 130;
+    aiReactTime = now + dc.react;
     var aiX = GW - 10 - PW;
     if (ball.dx > 0 && ball.x < aiX - 30) {
       var pred = predictBallY(ball.x, ball.y, ball.dx, ball.dy, aiX - ball.r);
-      // errMag shrinks as AI racks up points (gets sharper), max=60 at game start
-      var errMag = Math.max(10, 60 - aScore * 8 - pScore * 2);
+      var errMag = Math.max(dc.errMin, dc.errBase - aScore * 8 - pScore * 2);
       aiTarget = pred + (Math.random() - 0.5) * errMag;
     } else {
       aiTarget = GH / 2;
     }
     aiTarget = Math.max(PH/2, Math.min(GH - PH/2, aiTarget));
   }
-  // AI paddle speed scales with total points scored; dt-scaled for frame-rate independence
-  var aiSpd = (3.8 + Math.min(5, (pScore + aScore) * 0.4)) * dt;
+  // AI paddle speed; dt-scaled for frame-rate independence
+  var aiSpd = (dc.spdBase + Math.min(dc.spdMax, (pScore + aScore) * dc.spdScale)) * dt;
   var aiCenter = aY + PH/2;
   var diff = aiTarget - aiCenter;
   var move = Math.min(Math.abs(diff), aiSpd) * (diff < 0 ? -1 : 1);
