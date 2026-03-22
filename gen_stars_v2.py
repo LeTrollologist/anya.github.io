@@ -18,7 +18,7 @@ Run: python gen_stars_v2.py 2>gen_log.txt > star_data_v2.js
 
 import csv, gzip, io, json, re, sys, urllib.request
 
-MAG_LIMIT = 5.0
+MAG_LIMIT = 6.5   # full naked-eye sky + all constellation endpoint stars (incl. Mira)
 
 HYG_URL   = ("https://raw.githubusercontent.com/astronexus/"
              "HYG-Database/main/hyg/v3/hyg_v38.csv.gz")
@@ -131,6 +131,10 @@ for row in reader:
     except (ValueError, KeyError):
         continue
     if mag > MAG_LIMIT:
+        continue
+    # Exclude the Sun (mag -26.7, stored at RA/Dec 0,0 as a placeholder)
+    # and any other non-stellar objects that sneak into the catalogue
+    if mag < -2.0:
         continue
 
     hip_str = row.get("hip", "").strip()
